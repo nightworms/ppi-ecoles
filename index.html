@@ -656,8 +656,38 @@
     .kpi-row { grid-template-columns: repeat(3, 1fr); }
     .grid-2, .grid-3 { grid-template-columns: 1fr; }
   }
+
+  /* ------------------------------------------------------------------
+     En-tête sur écran étroit (tablette)
+     ------------------------------------------------------------------
+     Les sept onglets et le bloc de droite consomment toute la largeur : le
+     titre se retrouve comprimé, passe sur quatre lignes et déborde de
+     l'en-tête haut de 64 px. On dégage de la place, et on empêche le titre
+     de se couper. */
+  @media (max-width: 1400px) {
+    header { padding: 0 20px; height: auto; min-height: 64px; }
+    .logo { gap: 10px; min-width: 0; }
+    .logo-text { font-size: 15px; white-space: nowrap; }
+    /* Le sous-titre est décoratif : 45 signes qu'on retrouve dans le titre
+       de l'onglet et sur les impressions. */
+    .logo-sub { display: none; }
+    .nav-btn { padding: 8px 10px; font-size: 12.5px; }
+    .nav { gap: 2px; margin-left: 14px; }
+    /* Deux indicateurs transitoires — l'horodatage de la dernière lecture et
+       le décompte avant la suivante — qui coûtaient 150 px à l'en-tête. Le
+       bouton Sync, lui, reste : c'est le seul qui serve. */
+    #sync-badge, #next-sync-badge { display: none; }
+  }
+
+  @media (max-width: 1150px) {
+    .logo-icon { width: 34px; height: 34px; }
+    .logo-icon svg { width: 34px; height: 34px; }
+    .logo-text { font-size: 14px; }
+    .nav-btn { padding: 8px 8px; font-size: 12px; }
+    .header-right { gap: 7px; }
+  }
 </style>
-  <link rel="stylesheet" href="carte.css?v=37">
+  <link rel="stylesheet" href="carte.css?v=39">
 </head>
 <body>
 
@@ -1246,10 +1276,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=37"></script>
-<script src="donnees/source.js?v=37"></script>
-<script src="carte.js?v=37"></script>
-<script src="compte.js?v=37"></script>
+<script src="donnees/config.js?v=39"></script>
+<script src="donnees/source.js?v=39"></script>
+<script src="carte.js?v=39"></script>
+<script src="compte.js?v=39"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
