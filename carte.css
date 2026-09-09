@@ -90,10 +90,43 @@
 .carte-zoom button+button{border-top:1px solid var(--border)}
 .carte-zoom button:hover{background:var(--surface2);color:var(--text)}
 
+/* ------------------------------------------------------------------
+   Tablette (iPad en paysage : environ 1024 à 1180 px)
+   ------------------------------------------------------------------
+   Sur ces largeurs, la grille « carte + panneau de 340 px » laissait à la
+   carte moins de deux tiers de l'écran, et le panneau restait large même
+   sans fiche ouverte. On rend donc toute la largeur à la carte, et la fiche
+   vient se poser par-dessus quand on touche une école.
+   La barre d'outils est resserrée : elle occupait trois rangées. */
+@media (max-width:1280px) and (min-width:901px){
+  /* position:relative — c'est le repère du panneau flottant ci-dessous. */
+  #page-carte .carte-wrap{display:block;height:auto;position:relative}
+  #page-carte .carte-zone{height:calc(100vh - 300px);min-height:420px}
+
+  #page-carte .carte-panneau{position:absolute;top:0;right:0;bottom:0;
+    width:min(360px,54%);border-radius:0 12px 12px 0;
+    border-width:0 0 0 1px;z-index:5;
+    box-shadow:-14px 0 34px rgba(0,0,0,.32)}
+  #page-carte .carte-panneau.vide{display:none}
+
+  #page-carte .carte-outils{gap:7px;margin-bottom:10px}
+  #page-carte .carte-outils .filter-select,
+  #page-carte .carte-outils .filter-input{font-size:12px;padding:6px 9px}
+  .carte-calques button{padding:5px 9px;font-size:11px}
+  #carte-compteurs{gap:12px;font-size:11px}
+  #carte-compteurs b{font-size:14px}
+}
+
+/* Le panneau flottant doit se détacher du fond clair comme du fond sombre. */
+@media (max-width:1280px) and (min-width:901px){
+  .carte-zone.clair .carte-panneau{box-shadow:-14px 0 34px rgba(20,32,28,.18)}
+}
+
 @media (max-width:900px){
   #page-carte .carte-wrap{grid-template-columns:1fr;height:auto}
   #page-carte .carte-zone{height:60vh}
   #page-carte .carte-panneau{max-height:50vh}
+  #page-carte .carte-panneau.vide{display:none}
 }
 
 /* ------------------------------------------------------------------

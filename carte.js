@@ -782,11 +782,19 @@ window.Carte = (function () {
     if (selection === id) panneau();
   }
 
+  // Sur une tablette, le pointeur ne survole pas : l'aperçu au vol n'existe pas.
+  var tactile = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+
   function panneau() {
     var d = document.getElementById('carte-panneau');
+    // « vide » sert à la mise en page tablette : sans fiche ouverte, le panneau
+    // ne doit pas prendre un tiers de la largeur au détriment de la carte.
+    d.classList.toggle('vide', !selection);
     if (!selection) {
-      d.innerHTML = '<div class="c-vide-panneau">Survolez un point pour un aperçu, ' +
-        'cliquez pour ouvrir la fiche de l’école.</div>';
+      d.innerHTML = '<div class="c-vide-panneau">' + (tactile
+        ? 'Touchez un point pour ouvrir la fiche de l’école.'
+        : 'Survolez un point pour un aperçu, cliquez pour ouvrir la fiche de l’école.') +
+        '</div>';
       return;
     }
     var e = parId(selection);
