@@ -1,0 +1,41 @@
+# =====================================================================
+#  Tenir la base Supabase éveillée
+#  ---------------------------------------------------------------------
+#  Un projet Supabase du plan gratuit se met en veille après environ une
+#  semaine sans requête. Pendant les vacances scolaires, personne n'ouvre
+#  le site : il serait donc éteint à la rentrée.
+#
+#  Cette tâche interroge la base deux fois par semaine. Elle ne lit qu'une
+#  seule ligne, et n'utilise que la clé publique — celle qui figure déjà
+#  dans donnees/config.js. Aucun secret n'est nécessaire.
+# =====================================================================
+name: Réveil Supabase
+
+on:
+  schedule:
+    # lundi et jeudi, 6 h UTC (10 h à La Réunion) — jamais plus de
+    # 3 jours et demi entre deux requêtes, la veille n'a pas le temps
+    # de se déclencher.
+    - cron: '0 6 * * 1,4'
+  workflow_dispatch:        # permet aussi de la lancer à la main
+
+jobs:
+  reveiller:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Interroger la base
+        run: |
+          URL="https://uiodvghjxkbdbnyfxzvv.supabase.co/rest/v1/ecoles?select=id&limit=1"
+          CLE="sb_publishable_tHkHjw1rasmgEZCFYu4UYw_tGVALCej"
+          CODE=$(curl -s -o /tmp/reponse -w '%{http_code}' \
+                   -H "apikey: $CLE" -H "Authorization: Bearer $CLE" "$URL")
+          echo "Réponse HTTP : $CODE"
+          echo "Corps        : $(head -c 200 /tmp/reponse)"
+          if [ "$CODE" = "200" ]; then
+            echo "✓ La base répond, la veille est repoussée."
+          else
+            echo "✗ La base n'a pas répondu normalement."
+            echo "  Si le projet était déjà en veille, cette requête ne suffit"
+            echo "  pas à le réveiller : il faut le relancer depuis supabase.com."
+            exit 1
+          fi
