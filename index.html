@@ -657,7 +657,7 @@
     .grid-2, .grid-3 { grid-template-columns: 1fr; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=35">
+  <link rel="stylesheet" href="carte.css?v=36">
 </head>
 <body>
 
@@ -1246,10 +1246,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=35"></script>
-<script src="donnees/source.js?v=35"></script>
-<script src="carte.js?v=35"></script>
-<script src="compte.js?v=35"></script>
+<script src="donnees/config.js?v=36"></script>
+<script src="donnees/source.js?v=36"></script>
+<script src="carte.js?v=36"></script>
+<script src="compte.js?v=36"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
@@ -2214,7 +2214,10 @@ let autoRefreshTimer = null;
 let nextRefreshAt = null;
 function startAutoRefresh() {
   if(autoRefreshTimer) clearInterval(autoRefreshTimer);
-  const INTERVAL = 5*60*1000;
+  // 15 minutes. Le PPI évolue quelques fois par semaine : rafraîchir toutes
+  // les cinq minutes ne rendait rien de plus, et triplait le volume transféré
+  // pour chaque onglet resté ouvert.
+  const INTERVAL = 15*60*1000;
   nextRefreshAt = Date.now()+INTERVAL;
   updateNextSyncBadge();
   autoRefreshTimer = setInterval(async()=>{
