@@ -1,0 +1,313 @@
+/* Vue Carte — s'appuie sur les jetons de couleur du tableau de bord */
+/* La barre d'outils occupe deux rangées ; la légende et les avis doivent rester
+   visibles sous la carte plutôt que de passer sous le pli. */
+#page-carte .carte-wrap{display:grid;grid-template-columns:1fr 340px;gap:16px;
+  height:calc(100vh - 290px);min-height:400px}
+#page-carte .carte-zone{position:relative;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden}
+#carte-svg{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#carte-svg.glisse{cursor:grabbing}
+
+/* fond de plan */
+#carte-svg .c-mer{fill:#12222e}
+#carte-svg .c-quartiers path{fill:var(--surface2);stroke:none}
+#carte-svg .c-voisins path{fill:var(--bg);stroke:var(--border);stroke-width:1px;
+  vector-effect:non-scaling-stroke}
+#carte-svg .c-bati{opacity:.16}
+#carte-svg .c-voirie{fill:none;stroke:#3d4a5c;stroke-width:.8px;stroke-linecap:round;
+  stroke-linejoin:round;vector-effect:non-scaling-stroke;opacity:.85}
+#carte-svg .c-traits path{fill:none;stroke:var(--border);stroke-width:1px;
+  vector-effect:non-scaling-stroke;stroke-linejoin:round}
+#carte-svg .c-etiq{fill:var(--text-dim);font-family:'DM Sans',sans-serif;text-anchor:middle;
+  pointer-events:none;paint-order:stroke;stroke:var(--surface2);stroke-linejoin:round;
+  letter-spacing:.04em}
+
+/* marqueurs */
+#carte-svg .c-mk{cursor:pointer}
+#carte-svg .c-zone{fill:transparent;stroke:none;pointer-events:all}
+#carte-svg .c-halo{fill:none;stroke:var(--accent);stroke-width:2px;
+  vector-effect:non-scaling-stroke;pointer-events:none}
+#carte-svg .c-vide{fill:var(--surface2);stroke:var(--text-dim);stroke-width:1.4px;
+  vector-effect:non-scaling-stroke}
+#carte-svg .c-mk path{vector-effect:non-scaling-stroke;pointer-events:all}
+#carte-svg .c-mk:hover path{filter:brightness(1.25)}
+
+/* infobulle */
+#carte-bulle{position:absolute;pointer-events:none;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;
+  color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.45);
+  transform:translate(-50%,calc(-100% - 14px));opacity:0;transition:opacity .1s;
+  z-index:6;max-width:330px}
+#carte-bulle.on{opacity:1}
+#carte-bulle b{display:block;font-size:13px;font-weight:600}
+#carte-bulle .c-q{display:block;font-size:10px;color:var(--text-dim);
+  letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+
+/* listes d'opérations, partagées bulle / panneau */
+.c-ops{list-style:none;margin:7px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.c-ops li{display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:12px}
+.c-pt{width:9px;height:9px;border-radius:50%;flex:none}
+.c-nom{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.c-an{font-variant-numeric:tabular-nums;color:var(--text-muted);font-size:11px}
+.c-mt{font-variant-numeric:tabular-nums;color:var(--text-muted);font-size:11px;
+  min-width:70px;text-align:right}
+.c-et{font-size:10px;text-transform:uppercase;letter-spacing:.04em;min-width:76px;
+  text-align:right}
+.c-tot{margin-top:7px;padding-top:6px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--text-muted);text-align:right}
+.c-rien{margin-top:6px;color:var(--text-dim);font-style:italic;font-size:12px}
+
+/* panneau latéral */
+#page-carte .carte-panneau{background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;overflow-y:auto}
+.c-vide-panneau{color:var(--text-dim);font-size:13px;line-height:1.6}
+.c-retour{background:none;border:none;color:var(--text-muted);font-size:12px;
+  cursor:pointer;padding:0;margin-bottom:10px;font-family:'DM Sans',sans-serif}
+.c-retour:hover{color:var(--text)}
+.c-fiche h3{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;margin:0 0 2px}
+.c-meta{font-size:11.5px;color:var(--text-dim);margin-bottom:14px}
+.c-bloc{margin-bottom:16px}
+.c-bloc-t{font-size:10px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text-muted);font-weight:600;margin-bottom:7px}
+.c-filtre{color:var(--accent);text-transform:none;letter-spacing:0;font-weight:400}
+.c-note{margin-top:7px;font-size:11px;color:var(--text-dim);line-height:1.5}
+
+/* barre d'outils de la carte */
+#page-carte .carte-outils{display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  margin-bottom:14px}
+#carte-compteurs{display:flex;gap:16px;margin-left:auto;font-size:12px;
+  color:var(--text-muted)}
+#carte-compteurs b{color:var(--text);font-size:15px;font-variant-numeric:tabular-nums}
+#carte-legende{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11px;
+  color:var(--text-muted)}
+.c-lg{display:inline-flex;align-items:center;gap:5px}
+.c-lg i{width:9px;height:9px;border-radius:50%;display:inline-block}
+#carte-etat{font-size:11px;color:var(--accent);min-height:14px;margin-top:6px}
+.carte-zoom{position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.carte-zoom button{background:none;border:none;color:var(--text-muted);width:30px;
+  height:28px;cursor:pointer;font-size:15px}
+.carte-zoom button+button{border-top:1px solid var(--border)}
+.carte-zoom button:hover{background:var(--surface2);color:var(--text)}
+
+@media (max-width:900px){
+  #page-carte .carte-wrap{grid-template-columns:1fr;height:auto}
+  #page-carte .carte-zone{height:60vh}
+  #page-carte .carte-panneau{max-height:50vh}
+}
+
+/* ------------------------------------------------------------------
+   Fond de carte clair : la géographie doit se lire. Le tableau de bord
+   reste sombre autour ; seule la surface cartographique s'éclaircit.
+   ------------------------------------------------------------------ */
+#page-carte .carte-zone.clair{background:#e8ede9;border-color:#cfd9d3}
+.carte-zone.clair #carte-svg .c-mer{fill:#dbeafe}
+.carte-zone.clair #carte-svg .c-quartiers path{fill:#ffffff}
+.carte-zone.clair #carte-svg .c-voisins path{fill:#e8ede9;stroke:#cfd9d3}
+.carte-zone.clair #carte-svg .c-bati{opacity:.55}
+.carte-zone.clair #carte-svg .c-voirie{stroke:#6d7d76;opacity:1}
+.carte-zone.clair #carte-svg .c-traits path{stroke:#b9c6bf}
+.carte-zone.clair #carte-svg .c-etiq{fill:#77877f;stroke:#ffffff}
+.carte-zone.clair #carte-svg .c-vide{fill:#ffffff;stroke:#8a9a92}
+.carte-zone.clair #carte-svg .c-halo{stroke:#1d3c33}
+.carte-zone.clair .carte-zoom{background:#ffffff;border-color:#cfd9d3}
+.carte-zone.clair .carte-zoom button{color:#5a6b66}
+.carte-zone.clair .carte-zoom button+button{border-top-color:#cfd9d3}
+.carte-zone.clair .carte-zoom button:hover{background:#e8ede9;color:#14201c}
+
+/* noms de rues */
+#carte-svg .c-rues{fill:var(--text-muted);font-family:'DM Sans',sans-serif;
+  text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:var(--surface2);
+  stroke-linejoin:round;letter-spacing:.02em}
+.carte-zone.clair #carte-svg .c-rues{fill:#3c4a44;stroke:#ffffff}
+
+/* infobulle sur fond clair */
+#carte-bulle.clair{background:#ffffff;border-color:#cfd9d3;color:#14201c;
+  box-shadow:0 8px 24px rgba(20,32,28,.18)}
+#carte-bulle.clair .c-q{color:#77877f}
+#carte-bulle.clair .c-an,#carte-bulle.clair .c-mt{color:#5a6b66}
+#carte-bulle.clair .c-tot{border-top-color:#cfd9d3;color:#5a6b66}
+#carte-bulle.clair .c-rien{color:#8a9a92}
+
+/* interrupteurs de calque */
+.carte-calques{display:flex;gap:6px;align-items:center}
+.carte-calques button{background:var(--surface2);border:1px solid var(--border);
+  color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:12px;
+  padding:7px 12px;border-radius:8px;cursor:pointer;transition:all .15s}
+.carte-calques button[aria-pressed="true"]{background:rgba(240,165,0,.12);
+  border-color:rgba(240,165,0,.4);color:var(--accent)}
+.carte-calques button:hover{color:var(--text)}
+
+/* couronne du relevé des planches */
+#carte-svg .c-planche{fill:none;stroke-width:2.4px;stroke-linecap:round;
+  vector-effect:non-scaling-stroke;pointer-events:none}
+.c-lg i.anneau{background:none;border:2px solid;border-radius:50%;width:10px;height:10px}
+.c-lg-sep{width:1px;height:12px;background:var(--border);display:inline-block}
+.c-lg-note{color:var(--text-dim);font-style:italic}
+
+/* Contrôle de cohérence */
+.ctl-intro{color:var(--text-muted);font-size:13px;line-height:1.6;max-width:64ch;
+  margin:0 0 18px}
+.ctl-intro code{background:var(--surface2);padding:1px 6px;border-radius:4px;font-size:12px}
+.ctl-cartes{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:12px;margin-bottom:22px}
+.ctl-carte{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px}
+.ctl-carte b{display:block;font-family:'Syne',sans-serif;font-size:26px;line-height:1.1;
+  font-variant-numeric:tabular-nums}
+.ctl-carte span{font-size:12px;color:var(--text-muted);line-height:1.45;display:block;
+  margin-top:4px}
+.ctl-carte.alerte b{color:var(--accent)}
+.ctl-t{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin:26px 0 10px;
+  display:flex;align-items:center;gap:8px}
+.ctl-n{background:var(--surface2);border-radius:20px;padding:1px 9px;font-size:11px;
+  color:var(--text-muted);font-family:'DM Sans',sans-serif;font-weight:400}
+.ctl-table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:520px}
+.ctl-table th,.ctl-table td{text-align:left;padding:7px 12px;
+  border-bottom:1px solid var(--border)}
+.ctl-table th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--text-muted);font-weight:600}
+.ctl-table tbody tr:hover{background:var(--surface2)}
+.ctl-rien{color:var(--text-dim);font-style:italic;font-size:13px;padding:4px 0 8px}
+.ctl-note{color:var(--text-dim);font-size:12px;line-height:1.6;max-width:64ch;margin:8px 0 0}
+
+/* ---- connexion ---- */
+.cpt{display:flex;align-items:center;gap:10px;justify-content:flex-end;
+  padding:0 26px 10px;font-size:12px}
+.cpt-form{display:flex;gap:6px}
+.cpt-form input{background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 10px;
+  border-radius:7px;outline:none;min-width:220px}
+.cpt-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);
+  font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 12px;border-radius:7px;
+  cursor:pointer}
+.cpt-btn:hover{color:var(--text)}
+.cpt-primaire{background:rgba(240,165,0,.15);border-color:rgba(240,165,0,.4);
+  color:var(--accent)}
+.cpt-qui{display:flex;align-items:center;gap:8px;color:var(--text-muted)}
+.cpt-qui b{color:var(--text);font-weight:500}
+.cpt-role{font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;
+  border-radius:20px;border:1px solid currentColor}
+.cpt-admin{color:var(--accent)}
+.cpt-redacteur{color:var(--accent2)}
+.cpt-lecteur{color:var(--text-dim)}
+.cpt-info{color:var(--text-dim)}
+.cpt-alerte{color:var(--accent3)}
+
+/* ---- saisie d'une opération ---- */
+/* Actions d'une opération. --text-dim (#4a5568) sur --surface donnait un
+   contraste d'environ 2,3 : illisible. --text-muted monte à ~5,5. */
+.op-modif{justify-content:flex-end;align-items:baseline;gap:6px;margin:-1px 0 5px}
+.op-modif button{background:none;border:none;color:var(--text-muted);font-size:11px;
+  cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;
+  text-underline-offset:2px;padding:0}
+.op-modif button:hover{color:var(--accent)}
+.op-modif .b-al:hover{color:var(--accent3)}
+.op-sep{color:var(--border);font-size:11px}
+.op-form{background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:12px;margin:10px 0;display:flex;flex-direction:column;gap:9px}
+.op-l label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--text-muted);font-weight:600;margin-bottom:4px}
+.op-l input,.op-l select,.op-l textarea{width:100%;background:var(--surface);
+  border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:12.5px;padding:6px 9px;border-radius:7px;outline:none}
+.op-l textarea{resize:vertical}
+.op-2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.op-b{display:flex;gap:7px;flex-wrap:wrap}
+.btn-ok{background:var(--accent);border:none;color:#0d1117;font-family:'DM Sans',sans-serif;
+  font-size:12px;font-weight:600;padding:7px 14px;border-radius:7px;cursor:pointer}
+.btn-ok:disabled{opacity:.5;cursor:wait}
+.btn-gris,.btn-danger{background:none;border:1px solid var(--border);color:var(--text-muted);
+  font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 12px;border-radius:7px;
+  cursor:pointer}
+.btn-danger{color:var(--accent3);border-color:rgba(224,92,92,.35);margin-left:auto}
+.btn-ajout{background:none;border:1px dashed var(--border);color:var(--text-muted);
+  font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 12px;border-radius:8px;
+  cursor:pointer;width:100%;margin-top:4px}
+.btn-ajout:hover{color:var(--accent);border-color:rgba(240,165,0,.4)}
+
+/* observations */
+.obs{border-left:2px solid var(--border);padding:2px 0 2px 10px;margin-bottom:9px}
+.obs p{margin:0;font-size:12.5px;white-space:pre-wrap;line-height:1.5}
+.obs-qui{font-size:10.5px;color:var(--text-dim);margin-top:3px;
+  font-family:'DM Sans',sans-serif}
+.obs-qui button{background:none;border:none;color:var(--text-dim);font-size:10.5px;
+  cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0 0 0 4px}
+.obs-qui button:hover{color:var(--accent3)}
+.c-rien-ko{color:var(--accent3)}
+
+/* alertes rattachées à une opération */
+.c-als{list-style:none;margin:2px 0 0;padding:0 0 0 17px;display:flex;
+  flex-direction:column;gap:3px}
+.c-al{display:flex;align-items:baseline;gap:6px;font-size:11.5px;
+  color:var(--text-dim);line-height:1.45}
+.c-al-ic{flex:none;font-size:11px}
+.c-al-t{color:var(--text)}
+.c-al-x{background:none;border:none;color:var(--text-dim);cursor:pointer;
+  font-size:13px;line-height:1;padding:0 2px;margin-left:auto;opacity:.5}
+.c-al-x:hover{opacity:1;color:var(--accent3)}
+.al-form{margin-left:17px}
+
+/* l'opération concernée, sur une carte d'alerte */
+.alert-op{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:9px;
+  padding:7px 10px;border-radius:8px;background:rgba(127,145,165,.09);
+  border:1px solid var(--border);font-size:11.5px}
+.alert-op-t{font-weight:600;color:var(--text)}
+.alert-op-d{color:var(--text-dim)}
+.alert-op-lien{margin-left:auto;background:none;border:none;cursor:pointer;
+  color:var(--accent2);font-size:11px;text-decoration:underline;
+  text-underline-offset:2px;padding:0;font-family:inherit}
+.alert-op-perdue{color:var(--accent3);display:block}
+.c-note-ko{color:var(--accent3);border-left:2px solid var(--accent3);padding-left:8px}
+.c-note-ko code{font-size:.92em;opacity:.85}
+.alert-op-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text-dim);font-weight:600;flex:none}
+
+/* relevé des planches dans la liste des travaux */
+.filtre-releve{display:flex;align-items:center;gap:6px;font-size:12px;
+  color:var(--text-muted);cursor:pointer;white-space:nowrap;
+  border:1px solid var(--border);border-radius:8px;padding:7px 11px;
+  background:var(--surface)}
+.filtre-releve:hover{color:var(--text)}
+.filtre-releve input{accent-color:var(--accent);cursor:pointer}
+.ligne-releve{background:rgba(240,165,0,.045)}
+.tag-releve{display:inline-block;margin-left:6px;font-size:9.5px;
+  text-transform:uppercase;letter-spacing:.07em;font-weight:600;
+  color:var(--accent);background:rgba(240,165,0,.13);
+  border-radius:4px;padding:1px 5px;vertical-align:1px}
+
+/* =====================================================================
+   Impression de la carte
+   ---------------------------------------------------------------------
+   Le cadrage écran est converti en viewBox par Carte.preparerImpression() :
+   la feuille reprend exactement la portion de plan affichée. Ici on ne fait
+   que dégager la place et rendre le fond imprimable.
+   ===================================================================== */
+@media print {
+  /* Le bandeau de connexion n'a rien à faire sur un document imprimé. */
+  .cpt,
+  #page-carte .carte-outils,
+  #page-carte .carte-panneau,
+  #page-carte .carte-zoom,
+  #page-carte #carte-bulle          { display: none !important; }
+
+  #carte-print-resume               { display: block !important;
+    margin: 0 0 8px; font-size: 10.5px; color: #333; line-height: 1.6; }
+  #carte-print-resume .cpr-l b      { color: #000; }
+
+  #page-carte .carte-wrap           { display: block !important; }
+  #page-carte .carte-zone           { width: 100% !important; height: 165mm !important;
+    background: #fff !important; border: 1px solid #bbb !important;
+    border-radius: 0 !important; page-break-inside: avoid; }
+  #page-carte #carte-svg            { width: 100% !important; height: 100% !important; }
+
+  /* Traits un peu plus appuyés : « non-scaling-stroke » donne un cheveu à la
+     résolution d'impression. */
+  #carte-svg .c-mk path             { stroke-width: 1.6px; }
+  #carte-svg .c-voirie              { stroke: #c9d2dc !important; }
+  #carte-svg .c-etiq                { fill: #55606c !important; }
+
+  #page-carte #carte-legende        { page-break-inside: avoid; margin-top: 7px;
+    color: #333 !important; font-size: 10px; }
+  #page-carte #carte-legende .c-lg-note { color: #666 !important; }
+}

@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPI Écoles — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #2a3441;
+    --accent: #f0a500;
+    --accent2: #3ecfcf;
+    --accent3: #e05c5c;
+    --accent4: #6ab04c;
+    --text: #e2e8f0;
+    --text-muted: #7a8fa6;
+    --text-dim: #4a5568;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon {
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; }
+  .logo-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .nav { display: flex; gap: 4px; }
+  .nav-btn {
+    background: none; border: none; color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { color: var(--text); background: var(--surface2); }
+  .nav-btn.active { color: var(--accent); background: rgba(240,165,0,0.1); font-weight: 500; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .tag-year {
+    background: rgba(240,165,0,0.15); color: var(--accent);
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px; letter-spacing: 0.05em;
+  }
+
+  /* LAYOUT */
+  .main { padding: 28px 32px; max-width: 1600px; margin: 0 auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* KPI ROW */
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 28px; }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .kpi-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .kpi-card.yellow::before { background: var(--accent); }
+  .kpi-card.teal::before { background: var(--accent2); }
+  .kpi-card.red::before { background: var(--accent3); }
+  .kpi-card.green::before { background: var(--accent4); }
+  .kpi-card.blue::before { background: #5b8dee; }
+  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; }
+  .kpi-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; line-height: 1; }
+  .kpi-value.yellow { color: var(--accent); }
+  .kpi-value.teal { color: var(--accent2); }
+  .kpi-value.red { color: var(--accent3); }
+  .kpi-value.green { color: var(--accent4); }
+  .kpi-value.blue { color: #5b8dee; }
+  .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+  /* GRID 2COL */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+    color: var(--text); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title span { color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-weight: 400; font-size: 12px; }
+
+  /* BAR CHART */
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .bar-label { width: 140px; font-size: 12px; color: var(--text-muted); flex-shrink: 0; text-align: right; }
+  .bar-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 10px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .bar-amount { width: 80px; font-size: 12px; color: var(--text); text-align: right; flex-shrink: 0; }
+
+  /* YEAR BARS */
+  .year-compare { display: flex; gap: 20px; margin-top: 10px; }
+  .year-col { flex: 1; }
+  .year-header { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 12px; }
+  .year-bar-item { margin-bottom: 8px; }
+  .year-bar-name { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .year-bar-track { background: var(--surface2); border-radius: 3px; height: 8px; overflow: hidden; }
+  .year-bar-fill { height: 100%; border-radius: 3px; }
+
+  /* REPORT BADGE */
+  .report-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(224,92,92,0.12); color: var(--accent3);
+    font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500;
+    border: 1px solid rgba(224,92,92,0.25);
+  }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th {
+    text-align: left; padding: 10px 12px;
+    color: var(--text-muted); font-weight: 500; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--surface);
+  }
+  .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(42,52,65,0.5); }
+  .data-table tr:hover td { background: var(--surface2); }
+  .data-table tr:last-child td { border-bottom: none; }
+
+  /* STATUS BADGES */
+  .badge {
+    display: inline-flex; align-items: center;
+    font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge-done { background: rgba(106,176,76,0.12); color: var(--accent4); border: 1px solid rgba(106,176,76,0.25); }
+  .badge-progress { background: rgba(91,141,238,0.12); color: #5b8dee; border: 1px solid rgba(91,141,238,0.25); }
+  .badge-consult { background: rgba(240,165,0,0.12); color: var(--accent); border: 1px solid rgba(240,165,0,0.25); }
+  .badge-todo { background: rgba(122,143,166,0.12); color: var(--text-muted); border: 1px solid rgba(122,143,166,0.2); }
+  .badge-urgent { background: rgba(224,92,92,0.12); color: var(--accent3); border: 1px solid rgba(224,92,92,0.25); }
+  .badge-reporte { background: rgba(232,130,12,0.12); color: #e8820c; border: 1px solid rgba(232,130,12,0.25); }
+
+  /* TABLE WRAPPER */
+  .table-wrap { overflow-x: auto; max-height: 520px; overflow-y: auto; border-radius: 8px; }
+  .table-wrap::-webkit-scrollbar { width: 4px; height: 4px; }
+  .table-wrap::-webkit-scrollbar-track { background: transparent; }
+  .table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* FILTERS */
+  .filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filter-select, .filter-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 8px 12px; border-radius: 8px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .filter-select:focus, .filter-input:focus { border-color: var(--accent); }
+  .filter-input { min-width: 220px; }
+  .filter-count { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+  /* PROGRAMMING PAGE */
+  .prog-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .prog-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; }
+  .btn-primary {
+    background: var(--accent); color: #000;
+    border: none; font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 13px; padding: 10px 20px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary:hover { background: #fbbf24; }
+  .btn-secondary {
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* GANTT */
+  .gantt-wrap { overflow-x: auto; }
+  .gantt-grid {
+    display: grid;
+    grid-template-columns: 200px repeat(4, 1fr);
+    min-width: 800px;
+    gap: 0;
+  }
+  .gantt-header {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px;
+    padding: 10px 14px; background: var(--surface2);
+    border-bottom: 2px solid var(--border);
+    text-align: center;
+  }
+  .gantt-header:first-child { text-align: left; }
+  .gantt-row-label {
+    padding: 10px 14px; font-size: 12px; color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+  }
+  .gantt-cell {
+    padding: 6px; border-bottom: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+    position: relative; min-height: 44px;
+  }
+  .gantt-pill {
+    padding: 4px 10px; border-radius: 4px; font-size: 11px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-weight: 500; cursor: default;
+    margin: 2px 0;
+  }
+
+  /* PRIORITY MATRIX */
+  .matrix-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .matrix-quadrant {
+    border: 1px solid var(--border); border-radius: 10px; padding: 16px;
+    background: var(--surface2);
+  }
+  .matrix-q-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .matrix-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .matrix-item { font-size: 12px; color: var(--text-muted); padding: 5px 0; border-bottom: 1px solid rgba(42,52,65,0.5); display: flex; justify-content: space-between; align-items: center; }
+  .matrix-item:last-child { border-bottom: none; }
+  .matrix-amount { font-size: 11px; color: var(--text); font-weight: 500; }
+
+  /* DONUT */
+  .donut-wrap { display: flex; align-items: center; gap: 20px; }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { flex: 1; }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { color: var(--text-muted); flex: 1; }
+  .legend-val { color: var(--text); font-weight: 500; }
+  .legend-pct { color: var(--text-muted); font-size: 11px; }
+
+  /* ALERT CARDS */
+  .alerts { display: flex; flex-direction: column; gap: 10px; }
+  .alert-item {
+    background: var(--surface2); border-radius: 8px; padding: 14px;
+    border-left: 3px solid var(--accent3); display: flex; gap: 12px; align-items: flex-start;
+  }
+  .alert-item.warning { border-left-color: var(--accent); }
+  .alert-item.info { border-left-color: var(--accent2); }
+  .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .alert-title { font-weight: 500; font-size: 13px; margin-bottom: 3px; }
+  .alert-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px; width: 560px; max-width: 95vw;
+    max-height: 85vh; overflow-y: auto;
+  }
+  .modal-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; margin-bottom: 20px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+    padding: 10px 12px; border-radius: 8px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+  .btn-close { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 13px; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+
+  /* TOOLTIP */
+  [title]:hover::after {
+    content: attr(title);
+    position: absolute; background: #1a2332; color: var(--text);
+    font-size: 11px; padding: 4px 8px; border-radius: 4px;
+    white-space: nowrap; z-index: 999; pointer-events: none;
+    border: 1px solid var(--border); top: -28px; left: 50%; transform: translateX(-50%);
+  }
+
+  /* PROGRESS CIRCLE */
+  .prog-ring { transform: rotate(-90deg); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px;
+    margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* TABS */
+  .tab-row { display: flex; gap: 4px; margin-bottom: 20px; background: var(--surface2); padding: 4px; border-radius: 10px; display: inline-flex; }
+  .tab-btn {
+    background: none; border: none; color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 7px 16px; border-radius: 7px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab-btn.active { background: var(--surface); color: var(--text); font-weight: 500; }
+
+  /* EXPORT */
+  .export-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 12px; padding: 6px 12px;
+    border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;
+    transition: all 0.15s;
+  }
+  .export-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* MODALE FICHE ÉCOLE */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+    z-index:8000; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-box {
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    width:100%; max-width:720px; max-height:85vh; overflow-y:auto;
+    box-shadow:0 24px 64px rgba(0,0,0,0.5);
+  }
+  .modal-header {
+    display:flex; align-items:flex-start; justify-content:space-between;
+    padding:24px 28px 16px; border-bottom:1px solid var(--border); position:sticky; top:0;
+    background:var(--surface); z-index:1;
+  }
+  .modal-title { font-family:'Syne',sans-serif; font-weight:800; font-size:18px; }
+  .modal-sub { font-size:12px; color:var(--text-muted); margin-top:4px; }
+  .modal-close {
+    background:none; border:none; color:var(--text-muted); font-size:22px;
+    cursor:pointer; padding:2px 6px; border-radius:6px; line-height:1;
+    transition:all 0.15s;
+  }
+  .modal-close:hover { color:var(--text); background:var(--surface2); }
+  .modal-body { padding:20px 28px 28px; }
+  .modal-kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+  .modal-kpi { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .modal-kpi-label { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin-bottom:6px; }
+  .modal-kpi-val { font-family:'Syne',sans-serif; font-weight:800; font-size:20px; }
+  .modal-ops-title { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin-bottom:10px; }
+  .modal-op-row {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:10px 14px; border-radius:8px; margin-bottom:6px;
+    background:var(--surface2); border:1px solid var(--border);
+  }
+  .modal-op-left { flex:1; }
+  .modal-op-type { font-size:13px; font-weight:500; }
+  .modal-op-meta { font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .modal-op-right { display:flex; align-items:center; gap:10px; }
+  .modal-op-montant { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--accent); }
+
+  /* PRINT BUTTON */
+  .print-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 12px; padding: 6px 14px;
+    border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+  }
+  .print-btn:hover { color: var(--accent2); border-color: var(--accent2); }
+
+  #avis-connexion {
+    background: rgba(62,207,207,0.07); border: 1px solid rgba(62,207,207,0.28);
+    border-radius: 10px; padding: 13px 17px; margin: 0 32px 4px;
+    font-size: 13px; line-height: 1.65; color: var(--text-muted);
+  }
+  #avis-connexion b { color: var(--accent2); font-weight: 600; }
+
+  /* ===== PRINT STYLES ===== */
+  @media print {
+    /* Reset page */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    @page { margin: 15mm 12mm; size: A4 landscape; }
+
+    /* Hide everything not needed */
+    header, #loading-overlay, #error-overlay,
+    .print-btn, .export-btn, .btn-secondary, .btn-primary,
+    .nav, .header-right, .filters,
+    #gantt-group, label[for="gantt-group"],
+    .alert-filter, #alert-filter-annee, #alert-filter-niveau,
+    select#select-annee-dash,
+    .page:not(.active) { display: none !important; }
+
+    /* White background for all */
+    body { background: #fff !important; color: #111 !important; font-size: 11px; }
+    .main { padding: 0 !important; max-width: 100% !important; }
+    .page.active { display: block !important; }
+
+    /* Cards / surfaces → white with border */
+    .card, .kpi-card, .alert-card {
+      background: #fff !important;
+      border: 1px solid #ccc !important;
+      box-shadow: none !important;
+    }
+
+    /* KPI values keep their colors */
+    .kpi-value.yellow { color: #c47d00 !important; }
+    .kpi-value.teal   { color: #0d9f9f !important; }
+    .kpi-value.green  { color: #3a7a20 !important; }
+    .kpi-value.red    { color: #b83030 !important; }
+    .kpi-value.blue   { color: #2a5cbf !important; }
+
+    /* Textes mutés lisibles */
+    .kpi-label, .kpi-sub, .card-title,
+    .prog-title, .alert-col-title { color: #333 !important; }
+
+    /* Grids : passer à 2 cols max sur A4 */
+    .kpi-row { grid-template-columns: repeat(5, 1fr) !important; gap: 8px !important; }
+    .grid-3  { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+    .grid-2  { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+
+    /* Table */
+    .data-table th { background: #f0f0f0 !important; color: #111 !important; }
+    .data-table td, .data-table th { border-color: #ddd !important; color: #111 !important; }
+    .data-table tr:nth-child(even) td { background: #f9f9f9 !important; }
+    .table-wrap { overflow: visible !important; }
+
+    /* Gantt */
+    .gantt-wrap, #gantt-body { overflow: visible !important; }
+    .gantt-grid { color: #111 !important; }
+
+    /* Print header band */
+    .print-header-band {
+      display: flex !important;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #c47d00;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .print-header-band .ph-logo {
+      font-weight: 800; font-size: 15px; color: #c47d00;
+    }
+    .print-header-band .ph-meta {
+      font-size: 10px; color: #555; text-align: right;
+    }
+
+    /* Badges état */
+    .badge { border: 1px solid #aaa !important; }
+
+    /* No page breaks inside cards */
+    .kpi-card, .card { break-inside: avoid; }
+
+    /* Masquer les conteneurs de contrôles devenus vides */
+    .prog-header { margin-bottom: 12px !important; }
+    .prog-header > div:last-child { display: none !important; }
+
+    /* Masquer le conteneur flex du sélecteur d'année (vue annuelle) */
+    #page-dashboard-annee > div:first-of-type > div:last-child,
+    #page-dashboard-global > div:first-of-type > div:last-child { display: none !important; }
+
+    /* Alerts grid → 1 col */
+    #page-alertes > div[style*="grid"] {
+      display: block !important;
+    }
+    #page-alertes > div[style*="grid"] > div {
+      margin-bottom: 16px;
+    }
+
+    /* Masquer le header des alertes (filtres) */
+    #page-alertes > div:first-of-type > div:last-child { display: none !important; }
+  }
+
+  /* INLINE EDITABLE CELLS */
+  .inline-select {
+    background: transparent; border: 1px solid transparent;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 12px;
+    padding: 4px 20px 4px 6px; border-radius: 6px; outline: none; cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%234a5568'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 5px center;
+    transition: all 0.15s; max-width: 180px;
+  }
+  .inline-select:hover, .inline-select:focus {
+    border-color: var(--accent); background-color: rgba(240,165,0,0.07);
+  }
+  .inline-select-year {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px;
+    color: var(--text); max-width: 80px;
+  }
+  .inline-input-num {
+    background: transparent; border: 1px solid transparent;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px;
+    font-weight: 500; padding: 4px 6px; border-radius: 6px; outline: none;
+    width: 100px; transition: all 0.15s;
+    -moz-appearance: textfield;
+  }
+  .inline-input-num::-webkit-outer-spin-button,
+  .inline-input-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .inline-input-num:hover, .inline-input-num:focus {
+    border-color: var(--accent); background: rgba(240,165,0,0.07);
+  }
+  .inline-input-num::placeholder { color: var(--text-dim); font-weight: 400; }
+  .etat-select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 500;
+    padding: 4px 24px 4px 9px;
+    border-radius: 20px; border: 1px solid;
+    outline: none; cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a8fa6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    transition: all 0.15s;
+    min-width: 130px;
+  }
+  .etat-select:hover { filter: brightness(1.2); }
+
+  /* DELETE BUTTON */
+  .btn-delete {
+    background: none; border: none;
+    color: var(--text-dim); font-size: 12px;
+    cursor: pointer; padding: 4px 8px; border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .btn-delete:hover { color: var(--accent3); background: rgba(224,92,92,0.1); }
+
+  /* ANIMATION */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .page.active { animation: fadeIn 0.25s ease; }
+
+  /* ALERT SYSTEM */
+  .alert-col-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .alert-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+    margin-bottom: 12px; position: relative;
+    transition: box-shadow 0.2s;
+    animation: fadeIn 0.2s ease;
+  }
+  .alert-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+  .alert-card.urgence  { border-left: 4px solid var(--accent3); }
+  .alert-card.vigilance{ border-left: 4px solid var(--accent); }
+  .alert-card.decision { border-left: 4px solid var(--accent2); }
+  .alert-card.info     { border-left: 4px solid #7a8fa6; }
+
+  .alert-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .alert-card-title { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; color:var(--text); line-height:1.4; flex:1; }
+  .alert-card-titres { flex:1; min-width:0; }
+  /* L'école se lit juste sous l'intitulé : c'est la première question qu'on se
+     pose devant une alerte. Elle figurait avant en petite étiquette en bas. */
+  .alert-card-ecole { display:flex; align-items:baseline; gap:5px; flex-wrap:wrap;
+    margin-top:4px; font-size:12px; color:var(--accent2); font-weight:600; }
+  .alert-card-ecole .ae-ic { font-size:11px; }
+  .alert-card-ecole .ae-q { color:var(--text-muted); font-weight:400;
+    font-size:11px; letter-spacing:.04em; }
+  .alert-card-ecole.ae-sans { color:var(--text-dim); font-weight:400;
+    font-style:italic; }
+  .alert-card-actions { display:flex; gap:8px; flex-shrink:0; align-items:baseline; }
+  /* Mêmes tons que les actions de la fiche école : lisibles, sans crier. */
+  .alert-act { background:none; border:none; color:var(--text-muted); font-size:11px;
+    cursor:pointer; font-family:'DM Sans',sans-serif; text-decoration:underline;
+    text-underline-offset:2px; padding:0; }
+  .alert-act:hover { color:var(--accent); }
+  .alert-act-suppr:hover { color:var(--accent3); }
+
+  /* Formulaire d'édition, à la place de la carte */
+  .alert-card-edit { border-left-color:var(--accent) !important; }
+  .alert-card-edit form { display:flex; flex-direction:column; gap:10px; }
+  .al-e-l label { display:block; font-size:10px; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--text-muted); font-weight:600; margin-bottom:4px; }
+  .al-e-l input, .al-e-l select, .al-e-l textarea { width:100%; background:var(--bg);
+    border:1px solid var(--border); color:var(--text); border-radius:7px;
+    padding:7px 9px; font-size:12.5px; font-family:'DM Sans',sans-serif; }
+  .al-e-l textarea { resize:vertical; line-height:1.5; }
+  .al-e-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .al-e-detach { display:flex; align-items:center; gap:7px; font-size:12px;
+    color:var(--text-muted); cursor:pointer; }
+  .al-e-detach input { accent-color:var(--accent); }
+  .al-e-b { display:flex; gap:8px; align-items:center; margin-top:2px; }
+  .al-e-suppr { margin-left:auto; background:none; border:none; color:var(--accent3);
+    font-size:11.5px; cursor:pointer; font-family:'DM Sans',sans-serif;
+    text-decoration:underline; text-underline-offset:2px; padding:0; }
+  .al-e-err:not(:empty) { font-size:11.5px; color:var(--accent3); line-height:1.5; }
+  .alert-card-desc { font-size:13px; color:var(--text-muted); line-height:1.6; margin-top:8px; }
+  .alert-card-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+
+  .alert-tag {
+    font-size:11px; padding:3px 9px; border-radius:20px;
+    font-weight:500; white-space:nowrap;
+  }
+  .alert-tag.annee   { background:rgba(91,141,238,0.15); color:#5b8dee; }
+  .alert-tag.ecole   { background:rgba(62,207,207,0.1);  color:#3ecfcf; }
+  .alert-tag.ouvert      { background:rgba(224,92,92,0.15);  color:#e05c5c; }
+  .alert-tag.en-cours    { background:rgba(240,165,0,0.15);  color:#f0a500; }
+  .alert-tag.resolu      { background:rgba(106,176,76,0.15); color:#6ab04c; }
+
+  .alert-kpi-badge {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 18px;
+    display:flex; align-items:center; gap:10px;
+    font-family:'Syne',sans-serif;
+  }
+  .alert-kpi-count { font-size:22px; font-weight:800; }
+  .alert-kpi-label { font-size:11px; color:var(--text-muted); }
+
+  .btn-alert-edit {
+    background:rgba(91,141,238,0.12); border:none; color:#5b8dee;
+    font-size:11px; padding:4px 10px; border-radius:6px; cursor:pointer;
+    transition:all 0.15s;
+  }
+  .btn-alert-edit:hover { background:rgba(91,141,238,0.25); }
+  .btn-alert-del {
+    background:rgba(224,92,92,0.1); border:none; color:var(--accent3);
+    font-size:11px; padding:4px 10px; border-radius:6px; cursor:pointer;
+    transition:all 0.15s;
+  }
+  .btn-alert-del:hover { background:rgba(224,92,92,0.22); }
+
+  .form-textarea {
+    width:100%; background:var(--input-bg); border:1px solid var(--border);
+    border-radius:8px; color:var(--text); font-family:'DM Sans',sans-serif;
+    font-size:13px; padding:10px 12px; resize:vertical; box-sizing:border-box;
+    transition:border-color 0.15s;
+  }
+  .form-textarea:focus { outline:none; border-color:var(--accent); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1100px) {
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+  <link rel="stylesheet" href="carte.css?v=33">
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+        <rect width="44" height="44" rx="10" fill="#161b22" stroke="#2a3441" stroke-width="1"/>
+        <rect width="44" height="3" rx="1.5" fill="#f0a500"/>
+        <!-- Barres -->
+        <rect x="8"  y="20" width="7" height="16" rx="2" fill="#f0a500"/>
+        <rect x="18" y="14" width="7" height="22" rx="2" fill="#3ecfcf"/>
+        <rect x="28" y="24" width="7" height="12" rx="2" fill="#f0a500" opacity="0.5"/>
+        <!-- Ligne de tendance -->
+        <polyline points="11.5,18 21.5,11 31.5,22" fill="none" stroke="#f0a500" stroke-width="1.2" stroke-dasharray="2 1.5" stroke-linecap="round" opacity="0.8"/>
+        <circle cx="11.5" cy="18" r="1.5" fill="#f0a500"/>
+        <circle cx="21.5" cy="11" r="1.5" fill="#f0a500"/>
+        <circle cx="31.5" cy="22" r="1.5" fill="#f0a500"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Direction de l'Éducation</div>
+      <div class="logo-sub">Programmation Pluriannuelle des Investissements</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showPage('dashboard-global')">🌐 Vue globale</button>
+    <button class="nav-btn" onclick="showPage('dashboard-annee')">📅 Vue annuelle</button>
+    <button class="nav-btn" onclick="showPage('programmation')">📋 Programmation</button>
+    <button class="nav-btn" onclick="showPage('travaux')">🔨 Travaux</button>
+    <button class="nav-btn" onclick="showPage('alertes')">🚨 Alertes</button>
+    <button class="nav-btn" onclick="showPage('carte')">🗺 Carte</button>
+    <button class="nav-btn" onclick="showPage('controle')">🔎 Contrôle</button>
+  </nav>
+  <div class="header-right">
+    <div class="tag-year">2025 – 2032</div>
+    <span id="sync-badge" style="font-size:11px;color:#6ab04c;opacity:0;transition:opacity 0.5s;white-space:nowrap"></span>
+    <span id="next-sync-badge" style="font-size:10px;color:var(--text-muted);white-space:nowrap"></span>
+    <button id="btn-sync" class="btn-secondary" onclick="reloadData()" title="Recharger les données">↻ Sync</button>
+  </div>
+</header>
+
+<!-- MODALE FICHE ÉCOLE -->
+<div id="modal-ecole" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-ecole-nom">—</div>
+        <div class="modal-sub" id="modal-ecole-secteur">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-kpi-row">
+        <div class="modal-kpi">
+          <div class="modal-kpi-label">Budget total</div>
+          <div class="modal-kpi-val yellow" id="modal-kpi-budget">—</div>
+        </div>
+        <div class="modal-kpi">
+          <div class="modal-kpi-label">Opérations</div>
+          <div class="modal-kpi-val teal" id="modal-kpi-ops">—</div>
+        </div>
+        <div class="modal-kpi">
+          <div class="modal-kpi-label">Avancement</div>
+          <div class="modal-kpi-val green" id="modal-kpi-pct">—</div>
+        </div>
+      </div>
+      <!-- Mini barre de progression école -->
+      <div style="height:8px;background:var(--surface2);border-radius:8px;overflow:hidden;display:flex;gap:1px;margin-bottom:20px">
+        <div id="modal-bar-realise" style="height:100%;background:#10b981;transition:width 0.6s ease;width:0%"></div>
+        <div id="modal-bar-cours"   style="height:100%;background:#3b82f6;transition:width 0.6s ease;width:0%"></div>
+        <div id="modal-bar-consult" style="height:100%;background:#f59e0b;transition:width 0.6s ease;width:0%"></div>
+        <div id="modal-bar-urgent"  style="height:100%;background:#ef4444;transition:width 0.6s ease;width:0%"></div>
+      </div>
+      <div class="modal-ops-title">Détail des opérations</div>
+      <div id="modal-ops-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay" style="display:flex;position:fixed;inset:0;background:rgba(13,17,23,0.92);z-index:9000;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+  <div style="width:48px;height:48px;border:4px solid #2a3441;border-top-color:#f0a500;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+  <div id="loading-msg" style="font-family:'Syne',sans-serif;font-size:15px;color:#e2e8f0">Chargement...</div>
+  <div style="font-size:12px;color:#7a8fa6">Connexion au Google Sheet en cours</div>
+</div>
+
+<!-- ERROR OVERLAY -->
+<div id="error-overlay" style="display:none;position:fixed;inset:0;background:rgba(13,17,23,0.95);z-index:9000;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px">
+  <div style="font-size:48px">⚠</div>
+  <div style="font-family:'Syne',sans-serif;font-size:18px;color:#e05c5c;font-weight:700">Impossible de charger les données</div>
+  <div id="error-msg" style="font-size:13px;color:#7a8fa6;max-width:540px;text-align:center;line-height:1.7;white-space:pre-line"></div>
+  <div id="error-aide-gsheet" style="margin-top:8px;background:#1c2230;border:1px solid #2a3441;border-radius:10px;padding:16px 24px;max-width:540px">
+    <div style="font-size:12px;color:#f0a500;font-weight:600;margin-bottom:8px">Comment trouver l'ID du Google Sheet ?</div>
+    <div style="font-size:12px;color:#7a8fa6;line-height:1.8">
+      1. Ouvrez votre Google Sheet<br>
+      2. L'URL ressemble à : <span style="color:#3ecfcf">docs.google.com/spreadsheets/d/<strong style="color:#f0a500">SHEET_ID</strong>/edit</span><br>
+      3. Copiez la partie en surbrillance<br>
+      4. Ouvrez ce fichier HTML dans un éditeur et remplacez <span style="color:#e05c5c">VOTRE_SHEET_ID_ICI</span>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="reloadData()" style="margin-top:8px">↻ Réessayer</button>
+</div>
+
+<style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
+<!-- ===================== DASHBOARD GLOBAL ===================== -->
+<div id="page-dashboard-global" class="page active">
+
+  <!-- Bandeau visible uniquement à l'impression -->
+  <div class="print-header-band" style="display:none">
+    <div class="ph-logo">PPI — Direction de l'Éducation · Saint-Denis de La Réunion</div>
+    <div class="ph-meta" id="print-date-global"></div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px">Vue globale PPI</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Ensemble de la programmation pluriannuelle — toutes années confondues</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div style="background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.25);border-radius:8px;padding:6px 14px;font-size:12px;color:var(--accent)">
+        📊 Toutes les années
+      </div>
+      <button class="print-btn" onclick="printPage('dashboard-global')" title="Imprimer cette page">🖨 Imprimer</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Budget total PPI</div>
+      <div class="kpi-value yellow" id="g-kpi-budget">—</div>
+      <div class="kpi-sub" id="g-kpi-budget-sub">—</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-label">Nb opérations</div>
+      <div class="kpi-value teal" id="g-kpi-ops">—</div>
+      <div class="kpi-sub" id="g-kpi-ops-sub">—</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Réalisé</div>
+      <div class="kpi-value green" id="g-kpi-realise">—</div>
+      <div class="kpi-sub" id="g-kpi-realise-sub">—</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">En cours</div>
+      <div class="kpi-value blue" id="g-kpi-cours">—</div>
+      <div class="kpi-sub" id="g-kpi-cours-sub">—</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Planifié / Consultation</div>
+      <div class="kpi-value red" id="g-kpi-planifie">—</div>
+      <div class="kpi-sub" id="g-kpi-planifie-sub">—</div>
+    </div>
+  </div>
+
+  <!-- BARRE DE PROGRESSION GLOBALE -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 24px;margin-bottom:28px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px">Avancement global du PPI</div>
+      <div style="font-size:12px;color:var(--text-muted)" id="g-progress-label">—</div>
+    </div>
+    <div style="height:10px;background:var(--surface2);border-radius:10px;overflow:hidden;display:flex;gap:1px">
+      <div id="g-bar-realise" style="height:100%;background:#10b981;transition:width 0.8s ease;width:0%"></div>
+      <div id="g-bar-cours"   style="height:100%;background:#3b82f6;transition:width 0.8s ease;width:0%"></div>
+      <div id="g-bar-consult" style="height:100%;background:#f59e0b;transition:width 0.8s ease;width:0%"></div>
+      <div id="g-bar-urgent"  style="height:100%;background:#ef4444;transition:width 0.8s ease;width:0%"></div>
+      <div id="g-bar-reporte" style="height:100%;background:#e8820c;transition:width 0.8s ease;width:0%"></div>
+    </div>
+    <div style="display:flex;gap:20px;margin-top:10px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:2px;background:#10b981"></div><span id="g-leg-realise">Réalisé —</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:2px;background:#3b82f6"></div><span id="g-leg-cours">En cours —</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:2px;background:#f59e0b"></div><span id="g-leg-consult">Consultation —</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:2px;background:#ef4444"></div><span id="g-leg-urgent">Urgent —</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--surface2);border:1px solid var(--border)"></div><span id="g-leg-planifie">Planifié —</span></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:2px;background:#e8820c"></div><span id="g-leg-reporte">Reporté —</span></div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">Budget par type de travaux <span>toutes années</span></div>
+      <div id="g-chart-types"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Répartition par programme</div>
+      <div id="g-chart-donut"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Répartition par état</div>
+      <div id="g-chart-etat"></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Budget par année <span>évolution pluriannuelle</span></div>
+      <div id="g-chart-annees"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Budget par secteur <span>toutes années</span></div>
+      <div id="g-chart-secteurs"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== DASHBOARD ANNUEL ===================== -->
+<div id="page-dashboard-annee" class="page">
+
+  <!-- Bandeau visible uniquement à l'impression -->
+  <div class="print-header-band" style="display:none">
+    <div class="ph-logo">PPI — Direction de l'Éducation · Saint-Denis de La Réunion</div>
+    <div class="ph-meta" id="print-date-annee"></div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px">Vue annuelle PPI</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Zoom sur un exercice budgétaire</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;color:var(--text-muted)">Année :</span>
+      <select id="select-annee-dash" class="filter-select" onchange="refreshAnnualDashboard()" style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--accent);border-color:rgba(240,165,0,0.4);background:rgba(240,165,0,0.08);padding:8px 16px">
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+        <option value="2028">2028</option>
+        <option value="2029">2029</option>
+        <option value="2030">2030</option>
+        <option value="2031">2031</option>
+        <option value="2032">2032</option>
+      </select>
+      <button class="print-btn" onclick="printPage('dashboard-annee')" title="Imprimer cette page">🖨 Imprimer</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Budget de l'année</div>
+      <div class="kpi-value yellow" id="a-kpi-budget">—</div>
+      <div class="kpi-sub" id="a-kpi-budget-sub">—</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-label">Nb opérations</div>
+      <div class="kpi-value teal" id="a-kpi-ops">—</div>
+      <div class="kpi-sub" id="a-kpi-ops-sub">—</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Réalisé</div>
+      <div class="kpi-value green" id="a-kpi-realise">—</div>
+      <div class="kpi-sub" id="a-kpi-realise-sub">—</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">En cours</div>
+      <div class="kpi-value blue" id="a-kpi-cours">—</div>
+      <div class="kpi-sub" id="a-kpi-cours-sub">—</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Planifié / Consultation</div>
+      <div class="kpi-value red" id="a-kpi-planifie">—</div>
+      <div class="kpi-sub" id="a-kpi-planifie-sub">—</div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">Budget par type de travaux <span id="a-label-types">—</span></div>
+      <div id="a-chart-types"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Répartition par programme <span id="a-label-prog">—</span></div>
+      <div id="a-chart-donut"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Répartition par état <span id="a-label-etat">—</span></div>
+      <div id="a-chart-etat"></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Budget par secteur <span id="a-label-sect">—</span></div>
+      <div id="a-chart-secteurs"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Top 10 opérations <span id="a-label-top">—</span></div>
+      <div id="a-chart-top"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== PROGRAMMATION ===================== -->
+<div id="page-programmation" class="page">
+  <!-- Bandeau visible uniquement à l'impression -->
+  <div class="print-header-band" style="display:none">
+    <div class="ph-logo">PPI — Direction de l'Éducation · Saint-Denis de La Réunion</div>
+    <div class="ph-meta" id="print-date-programmation"></div>
+  </div>
+  <div class="prog-header">
+    <div class="prog-title">Planning PPI <span style="font-size:13px;font-weight:400;color:var(--text-muted)">2025 – 2032</span></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <label style="font-size:12px;color:var(--text-muted)">Grouper par</label>
+      <select id="gantt-group" onchange="renderGantt()" style="font-size:12px;padding:5px 10px">
+        <option value="type">Type de travaux</option>
+        <option value="programme">Programme</option>
+        <option value="secteur">Secteur</option>
+      </select>
+      <button class="print-btn" onclick="printPage('programmation')" title="Imprimer cette page">🖨 Imprimer</button>
+    </div>
+  </div>
+
+  <!-- Légende état -->
+  <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;padding:0 2px">
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:12px;height:12px;border-radius:3px;background:#10b981"></div>Réalisé</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:12px;height:12px;border-radius:3px;background:#3b82f6"></div>En cours</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:12px;height:12px;border-radius:3px;background:#f59e0b"></div>Consultation</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:12px;height:12px;border-radius:3px;background:#6366f1"></div>Planifié</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:12px;height:12px;border-radius:3px;background:#e05c5c"></div>Urgent</div>
+  </div>
+
+  <div id="gantt-body" style="overflow-x:auto;width:100%"></div>
+</div>
+
+<!-- ===================== TRAVAUX ===================== -->
+<div id="page-travaux" class="page">
+  <!-- Bandeau visible uniquement à l'impression -->
+  <div class="print-header-band" style="display:none">
+    <div class="ph-logo">PPI — Direction de l'Éducation · Saint-Denis de La Réunion</div>
+    <div class="ph-meta" id="print-date-travaux"></div>
+  </div>
+  <div class="prog-header">
+    <div class="prog-title">Liste des travaux</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="export-btn" onclick="exportCSV()">⬇ Exporter CSV</button>
+      <button class="export-btn" onclick="printPage('travaux')" style="border-color:rgba(62,207,207,0.3);color:var(--accent2)">🖨 Export PDF</button>
+      <button class="print-btn" onclick="printPage('travaux')" title="Imprimer cette page">🖨 Imprimer</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input type="text" class="filter-input" id="search-travaux" placeholder="🔍 Rechercher..." oninput="filterTable()">
+    <select class="filter-select" id="filter-quartier" onchange="onQuartierChange('filter')" style="min-width:160px">
+      <option value="">Tous les quartiers</option>
+    </select>
+    <select class="filter-select" id="filter-ecole" onchange="filterTable()" style="min-width:180px">
+      <option value="">Toutes les écoles</option>
+    </select>
+    <select class="filter-select" id="filter-annee" onchange="filterTable()">
+      <option value="">Toutes les années</option>
+      <option>2025</option><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option><option>2031</option><option>2032</option>
+    </select>
+    <!-- Options remplies par remplirTypesTravaux() depuis la liste de
+         référence de donnees/source.js : une seule liste pour tout le site. -->
+    <select class="filter-select" id="filter-type" onchange="filterTable()">
+      <option value="">Tous les types</option>
+    </select>
+    <label class="filtre-releve" title="Pergolas et végétalisation relevés sur les planches ArcMap 2026. Sans ligne budgétaire au PPI : ils ne comptent dans aucun total.">
+      <input type="checkbox" id="filter-releve" onchange="filterTable()">
+      Relevé planches
+    </label>
+    <select class="filter-select" id="filter-etat" onchange="filterTable()">
+      <option value="">Tous les états</option>
+      <option value="realise">Réalisé</option>
+      <option value="cours">En cours</option>
+      <option value="consult">Consultation</option>
+      <option value="planifie">Planifié</option>
+      <option value="reporte">Reporté</option>
+    </select>
+    <span class="filter-count" id="filter-count"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>École</th>
+          <th>Secteur</th>
+          <th>Type de travaux</th>
+          <th>Programme</th>
+          <th>Année</th>
+          <th>Montant</th>
+          <th>État</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== ALERTES ===================== -->
+<div id="page-alertes" class="page">
+
+  <!-- Bandeau visible uniquement à l'impression -->
+  <div class="print-header-band" style="display:none">
+    <div class="ph-logo">PPI — Direction de l'Éducation · Saint-Denis de La Réunion</div>
+    <div class="ph-meta" id="print-date-alertes"></div>
+  </div>
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px">Alertes & points d'attention</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Suivi manuel des signalements, risques et décisions en attente</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <select class="filter-select" id="alert-filter-annee" onchange="renderAlertes()">
+        <option value="">Toutes les années</option>
+        <option>2025</option><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option><option>2031</option><option>2032</option><option>2028</option>
+      </select>
+      <select class="filter-select" id="alert-filter-lien" onchange="renderAlertes()">
+        <option value="">Rattachées ou non</option>
+        <option value="oui">Liées à une opération</option>
+        <option value="non">Sans opération</option>
+      </select>
+      <select class="filter-select" id="alert-filter-niveau" onchange="renderAlertes()">
+        <option value="">Tous les niveaux</option>
+        <option value="urgence">🚨 Urgence</option>
+        <option value="vigilance">⚠ Vigilance</option>
+        <option value="decision">ℹ Décision</option>
+        <option value="info">💬 Information</option>
+      </select>
+      <button class="print-btn" onclick="printPage('alertes')" title="Imprimer cette page">🖨 Imprimer</button>
+    </div>
+  </div>
+
+  <!-- Compteurs par niveau -->
+  <div style="display:flex;gap:12px;margin-bottom:24px" id="alert-kpis"></div>
+
+  <!-- Colonnes par niveau -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <div class="alert-col-title" style="color:var(--accent3)">🚨 Urgences</div>
+      <div id="alerts-urgence" class="alerts"></div>
+    </div>
+    <div>
+      <div class="alert-col-title" style="color:var(--accent)">⚠ Vigilance</div>
+      <div id="alerts-vigilance" class="alerts"></div>
+    </div>
+    <div>
+      <div class="alert-col-title" style="color:var(--accent2)">ℹ Décisions en attente</div>
+      <div id="alerts-decision" class="alerts"></div>
+    </div>
+    <div>
+      <div class="alert-col-title" style="color:#7a8fa6">💬 Informations</div>
+      <div id="alerts-info" class="alerts"></div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="alerts-empty" style="display:none;text-align:center;padding:60px 20px">
+    <div style="font-size:40px;margin-bottom:12px">🔔</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:8px">Aucune alerte pour ce filtre</div>
+    <div style="font-size:13px;color:var(--text-muted)">Ajoutez une alerte avec le bouton ci-dessus</div>
+  </div>
+
+</div>
+
+
+<!-- ===================== CARTE ===================== -->
+<div id="page-carte" class="page">
+  <div class="prog-header">
+    <div class="prog-title">Carte des opérations</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select class="filter-select" onchange="Carte.theme(this.value)">
+        <option value="clair">Fond clair</option>
+        <option value="sombre">Fond sombre</option>
+      </select>
+      <select class="filter-select" onchange="Carte.colorer(this.value)">
+        <option value="etat">Colorer par état</option>
+        <option value="type">Colorer par type de travaux</option>
+      </select>
+      <button class="export-btn" onclick="Carte.exporter()">⬇ Exporter la vue</button>
+      <button class="print-btn" onclick="printPage('carte')"
+        title="Imprimer la vue affichée — choisissez « Enregistrer au format PDF » dans la fenêtre d’impression">🖨 Imprimer / PDF</button>
+    </div>
+  </div>
+
+  <!-- Visible seulement à l'impression : rappelle ce que montre la carte. -->
+  <div class="print-header-band" style="display:none">
+    <div class="ph-logo">PPI — Direction de l'Éducation · Saint-Denis de La Réunion</div>
+    <div class="ph-meta" id="print-date-carte"></div>
+  </div>
+  <div id="carte-print-resume" style="display:none"></div>
+
+  <div class="carte-outils">
+    <input type="text" class="filter-input" placeholder="🔍 Rechercher une école, un quartier…"
+           oninput="Carte.chercher(this.value)">
+    <select class="filter-select" id="carte-f-annee"     onchange="Carte.filtrer('annee',this.value)"></select>
+    <select class="filter-select" id="carte-f-programme" onchange="Carte.filtrer('programme',this.value)"></select>
+    <select class="filter-select" id="carte-f-type"      onchange="Carte.filtrer('type',this.value)"></select>
+    <select class="filter-select" id="carte-f-etat"      onchange="Carte.filtrer('etat',this.value)"></select>
+    <select class="filter-select" id="carte-f-secteur"   onchange="Carte.filtrer('secteur',this.value)"></select>
+    <select class="filter-select" onchange="Carte.filtrer('niveau',this.value)">
+      <option value="">Tous les niveaux</option>
+      <option value="Maternelle">Maternelle</option>
+      <option value="Élémentaire">Élémentaire</option>
+      <option value="Primaire">Primaire</option>
+    </select>
+    <select class="filter-select" onchange="Carte.filtrer('planches',this.value)" title="Relevé des planches ArcMap, hors PPI">
+      <option value="">Relevé planches : tout</option>
+      <option value="pergolas">Pergolas seulement</option>
+      <option value="vegetalisation">Végétalisation seulement</option>
+    </select>
+    <div class="carte-calques">
+      <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('bati',a)">Bâti</button>
+      <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('voirie',a)">Voirie</button>
+      <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('rues',a)">Noms de rues</button>
+      <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('planches',a)">Relevé planches</button>
+    </div>
+    <div id="carte-compteurs"></div>
+  </div>
+
+  <div class="carte-wrap">
+    <div class="carte-zone">
+      <svg id="carte-svg" aria-label="Carte des écoles de Saint-Denis"></svg>
+      <div id="carte-bulle"></div>
+      <div class="carte-zoom">
+        <button type="button" onclick="Carte.zoom(1.5)"   aria-label="Zoomer">+</button>
+        <button type="button" onclick="Carte.zoom(1/1.5)" aria-label="Dézoomer">–</button>
+        <button type="button" onclick="Carte.vueGenerale()" aria-label="Vue générale">⤢</button>
+      </div>
+    </div>
+    <aside class="carte-panneau" id="carte-panneau"></aside>
+  </div>
+
+  <div id="carte-legende"></div>
+  <div id="carte-etat"></div>
+  <div style="margin-top:10px;font-size:11px;color:var(--text-dim);line-height:1.6">
+    La taille du point suit le montant cumulé des opérations retenues ; chaque secteur est
+    une opération, disque plein pour les travaux réalisés. Les noms de rues apparaissent à
+    l'échelle du quartier. Les opérations se modifient dans la feuille Google ; la saisie
+    depuis l'application viendra avec Supabase.
+  </div>
+</div>
+
+
+<!-- ===================== CONTRÔLE ===================== -->
+<div id="page-controle" class="page">
+  <div class="prog-header">
+    <div class="prog-title">Contrôle de cohérence</div>
+    <button class="export-btn" onclick="Carte.controle()">↻ Recalculer</button>
+  </div>
+  <div id="page-controle-corps"><div class="ctl-rien">Chargement…</div></div>
+</div>
+
+<script>
+/* Ouverte depuis le disque, la page envoie une origine « null » : ni Google ni les
+   fichiers du dossier ne sont alors accessibles. Plutôt qu'une erreur réseau
+   obscure, on explique quoi faire. */
+if (location.protocol === 'file:') {
+  document.addEventListener('DOMContentLoaded', function () {
+    var dossier = decodeURI(location.pathname).replace(/\/[^/]*$/, '');
+    var d = document.createElement('div');
+    d.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0d1117;' +
+      'color:#e2e8f0;display:flex;align-items:center;justify-content:center;' +
+      "font-family:'DM Sans',system-ui,sans-serif;padding:24px";
+    d.innerHTML =
+      '<div style="max-width:33rem">' +
+      '<div style="font-size:34px;margin-bottom:14px">🚦</div>' +
+      '<h1 style="font-family:Syne,sans-serif;font-size:22px;margin:0 0 10px">' +
+        'Ouvrez le dossier, pas le fichier</h1>' +
+      '<p style="color:#7a8fa6;line-height:1.6;margin:0 0 18px">' +
+        'Cette page est ouverte directement depuis le disque. Le navigateur lui ' +
+        'refuse alors l’accès au réseau et aux fichiers voisins&nbsp;: ni la feuille ' +
+        'Google, ni le fond de carte ne peuvent être chargés. Ce n’est pas un ' +
+        'problème de configuration.</p>' +
+      '<div style="background:#161b22;border:1px solid #2a3441;border-radius:10px;' +
+        'padding:16px 18px;margin-bottom:16px">' +
+        '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;' +
+          'color:#7a8fa6;margin-bottom:8px">La marche à suivre</div>' +
+        '<div style="line-height:1.7">Dans le dossier <code>ppi</code>, double-cliquez ' +
+        '<b style="color:#f0a500">demarrer.command</b>.<br>' +
+        'Une fenêtre de terminal s’ouvre et le navigateur s’ouvre sur la bonne adresse.' +
+        '</div></div>' +
+      '<div style="font-size:12px;color:#4a5568;line-height:1.7">' +
+        'Si le double-clic est bloqué, ouvrez le Terminal, placez-vous dans le dossier ' +
+        (dossier ? '<code style="color:#3ecfcf">' + dossier + '</code> ' : '') +
+        'et tapez&nbsp;:<br>' +
+        '<code style="color:#3ecfcf">python3 -m http.server 8000</code><br>' +
+        'puis rendez-vous sur <code style="color:#3ecfcf">http://localhost:8000</code>.' +
+      '</div></div>';
+    document.body.appendChild(d);
+  });
+}
+</script>
+<script src="donnees/config.js?v=33"></script>
+<script src="donnees/source.js?v=33"></script>
+<script src="carte.js?v=33"></script>
+<script src="compte.js?v=33"></script>
+<script>
+// ===== DATA =====
+let rawData = [];
+
+const typeColors = {
+  "Étanchéité / sur-toiture":"#e05c5c",
+  "Menuiserie":"#3ecfcf",
+  "Ravalement":"#f0a500",
+  "Restauration":"#5b8dee",
+  "Sanitaire":"#6ab04c",
+  "Sol souple":"#fd79a8",
+  "Sol synthétique":"#a29bfe",
+  "Brasseur d'air":"#00cec9",
+  "Aménagement paysagé":"#55efc4",
+  "Réfection des coursives":"#e05c5c",
+  "Création salle de classe":"#fab1a0",
+  "Isolation préau":"#dfe6e9",
+};
+
+// ===== ECOLES PAR SECTEUR =====
+const ecolesBySecteur = {
+  "BELLEPIERRE": ["Elém. Les Topazes","Mat. Rubis","Prim. Appl. Bellepierre"],
+  "BOIS NEFLES": ["Elém. Bois de Nèfles","Elém. Bringelliers","Mat. Bois de Nèfles","Prim. Pit. B. de Nèfles"],
+  "BRETAGNE": ["Mat. Aurore","Prim. Bory Saint Vincent","Prim. Grand Canal","Prim. Maxime Laope","Prim. Phil. Commerson"],
+  "BRULE": ["Brûlé","BRULE Centre de lecture"],
+  "CAMELIAS": ["Elém. Les Camélias","Elém. Raymond Mondon","Mat. Les Camélias","Mat. Providence"],
+  "CENTRE VILLE": ["Elém. Appli. Léon Dierx","Elém. Centrale","Mat. Centrale","Mat. Gisèle Calmy","Mat. Les Flamboyants","Prim. Ancien Théâtre"],
+  "CHAUDRON": ["Élém. Badamiers","Elém. Damase Legros","Elém. H. Lebert","Elem. Michel Debré","Mat. Damase Legros","Mat. H. Lebert","Mat. Michel Debré","Prim. Eudoxie Nonge","Prim. Primat"],
+  "DOMENJOD": ["Elém. Domenjod","Mat. Cocotiers"],
+  "MONTAGNE 8ème": ["Elém. Philip Vinson","Elém. Ruisseau Blanc","Mat. 8è Philip. Vinson","Mat. Ruisseau Blanc"],
+  "MONTAGNE 15ème": ["Elém. St-Bernard","Mat. 15è St Bernard","Prim. Les Affouches"],
+  "MONTGAILLARD": ["Elém. Candide Azéma A","Elém. Candide Azéma B","Elém. H. Dunant","Mat. Bouvet","Mat. Françoise Mollard","Mat. Montgaillard","Prim. La Chaumière"],
+  "MOUFIA": ["Annexe Tulipiers","Elém. Alain Lorraine","Elém. Bancouliers","Mat. Bancouliers","Mat. Tulipiers","Prim. Baies Roses","Prim. Eglantines"],
+  "RIVIERE / PETITE ILE": ["Elém. J.Reydellet A","Elém. J.Reydellet B","Mat. Petite ile","Mat. Riviere 2","Mat. Ylang Ylang","Maternelle Riviere2"],
+  "SAINT FRANCOIS": ["Elém. St-François PK7","Mat. Saint François PK7"],
+  "SAINTE CLOTILDE": ["Elém. Champ Fleuri","Elém. Les Lilas","Elém. Les Tamarins","Mat. Champ-Fleuri","Mat. Débussy","Mat. Les Jacarandas","Mat. Les Tamarins","Prim JB Bossard"],
+  "SOURCE": ["Elém. G. Macé","Mat. Source"],
+};
+
+function initDropdowns() {
+  // Peupler secteurs — vider d'abord pour éviter les doublons à chaque sync
+  const secteurs = Object.keys(ecolesBySecteur).sort();
+  const fq = document.getElementById('filter-quartier');
+  if(fq) {
+    // Garder uniquement la première option "Tous les secteurs"
+    while(fq.options.length > 1) fq.remove(1);
+    secteurs.forEach(s => { const o = document.createElement('option'); o.value=s; o.textContent=s; fq.appendChild(o); });
+  }
+  // Peupler toutes les écoles dès le départ (sans filtre secteur)
+  populateEcoles('');
+}
+
+function populateEcoles(secteur) {
+  const sel = document.getElementById('filter-ecole');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">Toutes les écoles</option>';
+  // Construire la liste depuis rawData (écoles réellement présentes dans le Sheet)
+  let ecoles;
+  if(secteur && ecolesBySecteur[secteur]) {
+    ecoles = ecolesBySecteur[secteur];
+  } else {
+    // Toutes les écoles présentes dans les données, triées
+    ecoles = [...new Set(rawData.map(d=>d.ecole))].sort();
+  }
+  ecoles.forEach(e => {
+    const o = document.createElement('option'); o.value=e; o.textContent=e; sel.appendChild(o);
+  });
+}
+
+function onQuartierChange(ctx) {
+  const q = document.getElementById('filter-quartier').value;
+  populateEcoles(q);
+  filterTable();
+}
+
+
+// ===== RENDER CHARTS =====
+function fmt(n) {
+  if(n >= 1000000) return (n/1000000).toFixed(2).replace('.',',') + ' M€';
+  if(n >= 1000) return Math.round(n/1000) + ' k€';
+  return n.toLocaleString('fr-FR') + ' €';
+}
+
+function barRow(label, val, max, color, extra='') {
+  const pct = max > 0 ? Math.round(val/max*100) : 0;
+  return `<div class="bar-row" ${extra}>
+    <div class="bar-label" style="font-size:11px">${label}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    <div class="bar-amount">${fmt(val)}</div>
+  </div>`;
+}
+
+function renderKpis(prefix, data) {
+  const total        = data.reduce((s,d)=>s+d.montant,0);
+  const totalRealise = data.filter(d=>d.etat==='realise').reduce((s,d)=>s+d.montant,0);
+  const totalCours   = data.filter(d=>d.etat==='cours').reduce((s,d)=>s+d.montant,0);
+  const totalPlanifie= data.filter(d=>['planifie','consult','urgent','reporte'].includes(d.etat)).reduce((s,d)=>s+d.montant,0);
+  const nbRealise    = data.filter(d=>d.etat==='realise').length;
+  const nbCours      = data.filter(d=>d.etat==='cours').length;
+  const nbPlanifie   = data.filter(d=>['planifie','consult','urgent','reporte'].includes(d.etat)).length;
+  const secteurs     = new Set(data.map(d=>d.secteur.trim())).size;
+  document.getElementById(`${prefix}-kpi-budget`).textContent     = fmt(total);
+  document.getElementById(`${prefix}-kpi-budget-sub`).textContent = data.length + ' opérations';
+  document.getElementById(`${prefix}-kpi-ops`).textContent        = data.length;
+  document.getElementById(`${prefix}-kpi-ops-sub`).textContent    = secteurs + ' secteurs';
+  document.getElementById(`${prefix}-kpi-realise`).textContent    = fmt(totalRealise);
+  document.getElementById(`${prefix}-kpi-realise-sub`).textContent= nbRealise + ' opération(s)';
+  document.getElementById(`${prefix}-kpi-cours`).textContent      = fmt(totalCours);
+  document.getElementById(`${prefix}-kpi-cours-sub`).textContent  = nbCours + ' opération(s)';
+  document.getElementById(`${prefix}-kpi-planifie`).textContent   = fmt(totalPlanifie);
+  document.getElementById(`${prefix}-kpi-planifie-sub`).textContent= nbPlanifie + ' opération(s)';
+}
+
+function renderChartTypes(elId, data) {
+  const types = {};
+  data.forEach(d => { if(d.montant) types[d.type] = (types[d.type]||0) + d.montant; });
+  const sorted = Object.entries(types).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max = sorted[0]?.[1]||1;
+  document.getElementById(elId).innerHTML = sorted.map(([t,v])=>barRow(t,v,max,typeColors[t]||'#7a8fa6')).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
+}
+
+function renderChartDonut(elId, data) {
+  const progs = {};
+  data.forEach(d => { const p = d.programme||'Non défini'; progs[p] = (progs[p]||0) + d.montant; });
+  const progColors = {'Confort thermique':'#3ecfcf','Maintenance - PPI':'#f0a500','Maintenance':'#f0a500','Non défini':'#7a8fa6'};
+  const entries = Object.entries(progs).sort((a,b)=>b[1]-a[1]);
+  const total = entries.reduce((s,[,v])=>s+v,0)||1;
+  document.getElementById(elId).innerHTML = entries.map(([p,v])=>`
+    <div class="legend-item" style="margin-bottom:6px">
+      <div class="legend-dot" style="background:${progColors[p]||'#a29bfe'}"></div>
+      <span class="legend-label">${p}</span>
+      <span class="legend-val">${fmt(v)}</span>
+      <span class="legend-pct"> ${Math.round(v/total*100)}%</span>
+    </div>
+    <div class="bar-track" style="margin-bottom:8px"><div class="bar-fill" style="width:${Math.round(v/total*100)}%;background:${progColors[p]||'#a29bfe'}"></div></div>`).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
+}
+
+function renderChartEtat(elId, data) {
+  const etats = {realise:0,cours:0,consult:0,planifie:0,urgent:0};
+  data.forEach(d => { etats[d.etat] = (etats[d.etat]||0) + d.montant; });
+  const etatColors = {realise:'#6ab04c',cours:'#5b8dee',consult:'#f0a500',planifie:'#7a8fa6',urgent:'#e05c5c',reporte:'#e8820c'};
+  // « reporte » manquait : la barre correspondante s'affichait « undefined ».
+  const etatLabels = {realise:'Réalisé',cours:'En cours',consult:'Consultation',planifie:'Planifié',urgent:'Urgent',reporte:'Reporté'};
+  const filtered = Object.entries(etats).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const max = filtered[0]?.[1]||1;
+  document.getElementById(elId).innerHTML = filtered.map(([e,v])=>barRow(etatLabels[e],v,max,etatColors[e])).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
+}
+
+function renderChartSecteurs(elId, data) {
+  const sects = {};
+  data.forEach(d => { if(d.montant){ const s=d.secteur.trim(); sects[s]=(sects[s]||0)+d.montant; } });
+  const sorted = Object.entries(sects).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const max = sorted[0]?.[1]||1;
+  document.getElementById(elId).innerHTML =
+    `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px 24px">` +
+    sorted.map(([s,v])=>barRow(s,v,max,'linear-gradient(90deg,#3ecfcf,#5b8dee)')).join('') +
+    `</div>` || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
+}
+
+function renderChartAnnees(elId, data) {
+  const annees = {};
+  data.forEach(d => { if(d.montant) annees[d.annee]=(annees[d.annee]||0)+d.montant; });
+  const sorted = Object.entries(annees).sort((a,b)=>a[0]-b[0]);
+  const max = Math.max(...sorted.map(([,v])=>v))||1;
+  const anneeColors = {2025:'#f0a500',2026:'#3ecfcf',2027:'#5b8dee',2028:'#a29bfe',2029:'#fd79a8',2030:'#55efc4',2031:'#e17055',2032:'#74b9ff'};
+  document.getElementById(elId).innerHTML = sorted.map(([y,v])=>barRow(y,v,max,anneeColors[y]||'#7a8fa6')).join('');
+}
+
+function renderChartTopOps(elId, data) {
+  const sorted = [...data].filter(d=>d.montant>0).sort((a,b)=>b.montant-a.montant).slice(0,10);
+  const max = sorted[0]?.montant||1;
+  document.getElementById(elId).innerHTML = sorted.map(d=>
+    barRow(`${d.ecole} — ${d.type}`, d.montant, max, typeColors[d.type]||'#7a8fa6')
+  ).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
+}
+
+// ===== GLOBAL DASHBOARD =====
+function refreshDashboard() {
+  const data = rawData;
+  renderKpis('g', data);
+  renderChartTypes('g-chart-types', data);
+  renderChartDonut('g-chart-donut', data);
+  renderChartEtat('g-chart-etat', data);
+  renderChartAnnees('g-chart-annees', data);
+  renderChartSecteurs('g-chart-secteurs', data);
+}
+
+// ===== ANNUAL DASHBOARD =====
+function refreshAnnualDashboard() {
+  const annee = parseInt(document.getElementById('select-annee-dash').value);
+  const data = rawData.filter(d => d.annee === annee);
+  renderKpis('a', data);
+  renderChartTypes('a-chart-types', data);
+  renderChartDonut('a-chart-donut', data);
+  renderChartEtat('a-chart-etat', data);
+  renderChartSecteurs('a-chart-secteurs', data);
+  renderChartTopOps('a-chart-top', data);
+  const lbl = `${annee}`;
+  ['a-label-types','a-label-prog','a-label-etat','a-label-sect','a-label-top'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.textContent = lbl;
+  });
+}
+
+function renderTypeChart() { refreshDashboard(); refreshAnnualDashboard(); }
+function renderSecteursChart() {}
+
+
+function renderGantt() {
+  const groupBy = document.getElementById('gantt-group')?.value || 'type';
+  const annees = [2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
+  const etatColor = {realise:'#6ab04c', cours:'#5b8dee', consult:'#f0a500', planifie:'#7a8fa6', urgent:'#e05c5c', reporte:'#e8820c'};
+  const etatOrder = {realise:0, cours:1, consult:2, planifie:3, urgent:4, reporte:5};
+
+  // Grouper les opérations
+  const groups = {};
+  rawData.forEach(d => {
+    const key = groupBy === 'type' ? d.type :
+                groupBy === 'programme' ? (d.programme || 'Non défini') :
+                d.secteur.trim();
+    if (!groups[key]) groups[key] = {};
+    const yr = d.annee;
+    if (!groups[key][yr]) groups[key][yr] = [];
+    groups[key][yr].push(d);
+  });
+
+  // Trier les groupes par budget total décroissant
+  const sortedGroups = Object.entries(groups).sort((a,b) => {
+    const sumA = Object.values(a[1]).flat().reduce((s,d)=>s+d.montant,0);
+    const sumB = Object.values(b[1]).flat().reduce((s,d)=>s+d.montant,0);
+    return sumB - sumA;
+  });
+
+  const colW = 130;
+  const labelW = groupBy === 'secteur' ? 140 : 170;
+  const totalW = labelW + annees.length * colW;
+
+  // Couleur dominante d'un groupe = état le plus fréquent
+  function dominantColor(ops) {
+    if (!ops || ops.length === 0) return '#2a3347';
+    const counts = {};
+    ops.forEach(o => counts[o.etat] = (counts[o.etat]||0) + 1);
+    const dom = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+    return etatColor[dom] || '#7a8fa6';
+  }
+
+  // Barre de progression état (mini-segments colorés)
+  function etatBar(ops) {
+    const total = ops.reduce((s,d)=>s+d.montant,0)||1;
+    const byEtat = {};
+    ops.forEach(d => byEtat[d.etat] = (byEtat[d.etat]||0) + d.montant);
+    const segs = Object.entries(byEtat).sort((a,b)=>(etatOrder[a[0]]||9)-(etatOrder[b[0]]||9));
+    return `<div style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:5px;gap:1px">` +
+      segs.map(([e,v])=>`<div style="flex:${v};background:${etatColor[e]||'#7a8fa6'};min-width:4px" title="${e}: ${fmt(v)}"></div>`).join('') +
+    `</div>`;
+  }
+
+  let html = `<div style="min-width:${totalW}px">`;
+
+  // En-tête
+  html += `<div style="display:grid;grid-template-columns:${labelW}px repeat(${annees.length},${colW}px);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px">`;
+  html += `<div style="font-size:11px;font-weight:600;color:var(--text-muted);padding:0 8px">${groupBy === 'type' ? 'Type de travaux' : groupBy === 'programme' ? 'Programme' : 'Secteur'}</div>`;
+  const anneeAccents = {2024:'#f0a500',2025:'#3ecfcf',2026:'#5b8dee',2027:'#a29bfe'};
+  annees.forEach(y => {
+    const total = rawData.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
+    html += `<div style="text-align:center;padding:0 8px">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:${anneeAccents[y]}">${y}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:1px">${fmt(total)}</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // Lignes
+  sortedGroups.forEach(([key, byYear]) => {
+    const rowTotal = Object.values(byYear).flat().reduce((s,d)=>s+d.montant,0);
+    const baseColor = groupBy === 'type' ? (typeColors[key]||'#7a8fa6') : dominantColor(Object.values(byYear).flat());
+
+    html += `<div style="display:grid;grid-template-columns:${labelW}px repeat(${annees.length},${colW}px);border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;padding:6px 0;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">`;
+
+    // Label
+    html += `<div style="padding:0 8px;display:flex;align-items:center;gap:8px">
+      <div style="width:10px;height:10px;border-radius:2px;background:${baseColor};flex-shrink:0"></div>
+      <div style="font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${key}">${key}</div>
+    </div>`;
+
+    // Cellules par année
+    annees.forEach(y => {
+      const ops = byYear[y];
+      if (!ops || ops.length === 0) {
+        html += `<div style="padding:4px 8px;text-align:center"><span style="color:var(--border);font-size:18px">·</span></div>`;
+      } else {
+        const total = ops.reduce((s,d)=>s+d.montant,0);
+        const nb = ops.length;
+        const domColor = dominantColor(ops);
+        html += `<div style="padding:4px 8px">
+          <div style="background:${domColor}18;border:1px solid ${domColor}35;border-radius:8px;padding:6px 10px">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:${domColor}">${fmt(total)}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${nb} opération${nb>1?'s':''}</div>
+            ${etatBar(ops)}
+          </div>
+        </div>`;
+      }
+    });
+
+    html += `</div>`;
+  });
+
+  // Ligne total
+  html += `<div style="display:grid;grid-template-columns:${labelW}px repeat(${annees.length},${colW}px);border-top:2px solid var(--border);margin-top:4px;padding-top:8px;align-items:center">`;
+  html += `<div style="padding:0 8px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text-muted)">TOTAL</div>`;
+  annees.forEach(y => {
+    const total = rawData.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
+    const nb = rawData.filter(d=>d.annee===y).length;
+    html += `<div style="padding:4px 8px;text-align:center">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:${anneeAccents[y]}">${fmt(total)}</div>
+      <div style="font-size:10px;color:var(--text-dim)">${nb} op.</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  html += `</div>`;
+  document.getElementById('gantt-body').innerHTML = html;
+}
+
+function renderTable() {
+  filterTable();
+}
+
+// ===== FILTER TABLE =====
+function filterTable() {
+  const search = document.getElementById('search-travaux').value.toLowerCase();
+  const quartier = document.getElementById('filter-quartier').value;
+  const ecoleF = document.getElementById('filter-ecole').value;
+  const annee = document.getElementById('filter-annee').value;
+  const type = document.getElementById('filter-type').value;
+  const etatF = document.getElementById('filter-etat').value;
+
+  const avecReleve = (document.getElementById('filter-releve') || {}).checked;
+  const source = avecReleve ? rawData.concat(relevesPlanches) : rawData;
+
+  const filtered = source.filter(d => {
+    if(search && !d.ecole.toLowerCase().includes(search) && !d.type.toLowerCase().includes(search) && !d.secteur.toLowerCase().includes(search)) return false;
+    if(quartier && !d.secteur.toUpperCase().includes(quartier.split(' ')[0])) return false;
+    if(ecoleF && d.ecole !== ecoleF) return false;
+    if(annee && d.annee != annee) return false;
+    if(type && d.type !== type) return false;
+    if(etatF && d.etat !== etatF) return false;
+    return true;
+  });
+
+  const nbReleve = filtered.filter(d => d.releve).length;
+  document.getElementById('filter-count').textContent =
+    `${filtered.length - nbReleve} opération(s)` +
+    (nbReleve ? ` · ${nbReleve} relevé(s) hors PPI` : '');
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = filtered.map((d,i)=>{
+    const realIdx = rawData.indexOf(d);
+    return `
+    <tr id="row-${realIdx}" class="${d.releve ? 'ligne-releve' : ''}" style="cursor:pointer"
+        onclick="openModalEcole('${d.ecole.replace(/'/g,"\\'")}')">
+      <td style="font-weight:500;color:var(--accent2)">${esc(d.ecole)}</td>
+      <td style="color:var(--text-muted);font-size:12px">${esc(d.secteur)}</td>
+      <td style="font-size:12px">${esc(d.type)||'—'}
+        ${d.releve ? '<span class="tag-releve" title="Relevé sur les planches ArcMap 2026, hors PPI">relevé</span>' : ''}</td>
+      <td style="color:var(--text-muted);font-size:12px">${esc(d.programme)||'—'}</td>
+      <td style="text-align:center;font-weight:600">${esc(d.anneeLabel || d.annee)||'—'}</td>
+      <td style="text-align:right;font-weight:600">${d.montant?fmt(d.montant):'—'}</td>
+      <td>${etatBadge(d.etat)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function etatBadge(etat) {
+  const cfg = {
+    realise:  {color:'#10b981', label:'Réalisé'},
+    cours:    {color:'#3b82f6', label:'En cours'},
+    consult:  {color:'#f59e0b', label:'Consultation'},
+    planifie: {color:'#6366f1', label:'Planifié'},
+    urgent:   {color:'#ef4444', label:'Urgent'},
+    reporte:  {color:'#e8820c', label:'Reporté'}
+  };
+  const c = cfg[etat] || cfg['planifie'];
+  return `<span style="background:${c.color};color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600">${c.label}</span>`;
+}
+
+
+
+function previewMontant(el) {
+  // live formatting hint — no data change until onchange fires
+}
+
+
+function badgeHTML(etat) {
+  const map = {
+    realise:['badge-done','Réalisé'],
+    cours:['badge-progress','En cours'],
+    consult:['badge-consult','Consultation'],
+    planifie:['badge-todo','Planifié'],
+    urgent:['badge-urgent','Urgent'],
+    reporte:['badge-reporte','Reporté'],
+  };
+  const [cls,lbl] = map[etat]||['badge-todo',etat];
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+
+// ===== NAVIGATION =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const names = ['dashboard-global','dashboard-annee','programmation','travaux','alertes','carte','controle'];
+  const idx = names.indexOf(name);
+  if(idx>=0) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  if(name!=='carte' && donneesPerimees) {
+    donneesPerimees = false;
+    loadFromGSheets(true);          // sans voile : la vue se met à jour seule
+  }
+  if(name==='dashboard-annee') refreshAnnualDashboard();
+  if(name==='carte' && window.Carte) Carte.demarrer();
+  if(name==='controle' && window.Carte) Carte.controle();
+}
+
+// ===== IMPRESSION =====
+function printPage(pageName) {
+  // Labels lisibles pour chaque page
+  const labels = {
+    'dashboard-global':  'Vue globale PPI — Toutes années',
+    'dashboard-annee':   'Vue annuelle PPI — ' + (document.getElementById('select-annee-dash')?.value || ''),
+    'programmation':     'Planning PPI — Programmation pluriannuelle',
+    'travaux':           'Liste des travaux PPI',
+    'alertes':           'Alertes & points d\'attention PPI',
+    'carte':             'Carte des opérations PPI'
+  };
+
+  // S'assurer que la bonne page est active
+  showPage(pageName);
+
+  // Remplir les bandeaux d'impression
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR', {day:'2-digit', month:'long', year:'numeric'});
+  const timeStr = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  const meta = `${labels[pageName]}\nImprimé le ${dateStr} à ${timeStr}`;
+
+  // Mettre à jour tous les bandeaux (seul l'actif sera visible)
+  // La carte demande une préparation : cadrage et rappel des filtres.
+  if (pageName === 'carte' && window.Carte && Carte.resumeVue) {
+    const r = Carte.resumeVue();
+    const el = document.getElementById('carte-print-resume');
+    if (el) el.innerHTML =
+      `<div class="cpr-l"><b>Vue :</b> ${esc(r.filtres)}</div>` +
+      `<div class="cpr-l"><b>Total :</b> ${esc(r.chiffres)} · coloration par ${esc(r.colorePar)}</div>`;
+  }
+
+  ['global','annee','programmation','travaux','alertes','carte'].forEach(id => {
+    const el = document.getElementById('print-date-' + id);
+    if (el) el.innerText = meta;
+  });
+
+  // Déclencher l'impression native du navigateur. « Enregistrer au format
+  // PDF » y est proposé comme destination.
+  window.print();
+}
+
+// La carte doit convertir son cadrage écran en viewBox avant l'impression, et
+// le rétablir ensuite. On écoute les événements du navigateur plutôt que de le
+// faire seulement dans printPage() : l'utilisateur peut aussi imprimer par
+// Cmd+P, ou depuis le menu.
+window.addEventListener('beforeprint', () => {
+  const carteActive = document.getElementById('page-carte');
+  if (carteActive && carteActive.classList.contains('active') &&
+      window.Carte && Carte.preparerImpression) Carte.preparerImpression();
+});
+window.addEventListener('afterprint', () => {
+  if (window.Carte && Carte.finImpression) Carte.finImpression();
+});
+
+// ===== EXPORT CSV =====
+function exportCSV() {
+  // L'export suit l'interrupteur « Relevé planches » : une colonne Origine
+  // distingue les opérations du PPI du relevé ArcMap, qui n'a pas de budget.
+  const avecReleve = (document.getElementById('filter-releve') || {}).checked;
+  const source = avecReleve ? rawData.concat(relevesPlanches) : rawData;
+  const headers = ['École','Secteur','Programme','Année','Type','Montant','État','Origine'];
+  const rows = source.map(d=>[d.ecole,d.secteur,d.programme,
+    d.anneeLabel || d.annee, d.type, d.montant, d.etat,
+    d.releve ? 'Relevé planches 2026' : 'PPI']);
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download = 'PPI_ecoles_export.csv';
+  a.click();
+}
+
+// ===== ALERTES MANUELLES =====
+let alertes = [];
+let alerteIdCounter = 1;
+
+
+const niveauMeta = {
+  urgence:   { label:'🚨 Urgence',   color:'var(--accent3)', cls:'urgence'  },
+  vigilance: { label:'⚠ Vigilance',  color:'var(--accent)',  cls:'vigilance'},
+  decision:  { label:'ℹ Décision',   color:'var(--accent2)', cls:'decision' },
+  info:      { label:'💬 Info',       color:'#7a8fa6',        cls:'info'     },
+};
+const statutLabel = { ouvert:'🔴 Ouvert', 'en-cours':'🟡 En cours', resolu:'🟢 Résolu' };
+
+function renderAlertes() {
+  const filtreAnnee  = document.getElementById('alert-filter-annee').value;
+  const filtreNiveau = document.getElementById('alert-filter-niveau').value;
+
+  const filtreLien = (document.getElementById('alert-filter-lien')||{}).value || '';
+
+  const filtered = alertes.filter(a =>
+    (!filtreAnnee  || a.annee === filtreAnnee) &&
+    (!filtreNiveau || a.niveau === filtreNiveau) &&
+    (!filtreLien   || (filtreLien === 'oui') === (a.operation_id != null))
+  );
+
+  // KPI badges
+  const counts = { urgence:0, vigilance:0, decision:0, info:0 };
+  filtered.forEach(a => counts[a.niveau]++);
+  document.getElementById('alert-kpis').innerHTML = Object.entries(niveauMeta).map(([k,m])=>`
+    <div class="alert-kpi-badge">
+      <div class="alert-kpi-count" style="color:${m.color}">${counts[k]}</div>
+      <div class="alert-kpi-label">${m.label}</div>
+    </div>`).join('');
+
+  // Render par colonne
+  ['urgence','vigilance','decision','info'].forEach(niveau => {
+    const items = filtered.filter(a => a.niveau === niveau);
+    const el = document.getElementById('alerts-'+niveau);
+    if (!el) return;
+    el.innerHTML = items.length === 0
+      ? `<div style="font-size:12px;color:var(--text-dim);padding:12px 0">Aucune alerte</div>`
+      : items.map(a => alerteCard(a)).join('');
+  });
+
+  // Empty global
+  document.getElementById('alerts-empty').style.display = filtered.length === 0 ? 'block' : 'none';
+}
+
+// Les intitulés d'alerte et les noms d'opération sont saisis par des humains :
+// ils passent par un échappement avant d'entrer dans le HTML.
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+// Référentiel des écoles, pour nommer une alerte autrement que par
+// l'abréviation du PPI (« Mat. Michel Debré » → « Ecole maternelle Michel
+// Debré · CHAUDRON »). Chargé une fois, en même temps que le reste.
+let ecolesParId = {};
+// Une seule liste de types pour tout le site : le filtre des travaux se
+// remplit depuis la même source que le formulaire de saisie de la carte.
+function remplirTypesTravaux() {
+  const sel = document.getElementById('filter-type');
+  if (!sel || !window.Source || !Source.typesTravaux) return;
+  const courant = sel.value;
+  sel.innerHTML = '<option value="">Tous les types</option>' +
+    Source.typesTravaux(rawData).map(t =>
+      `<option${t === courant ? ' selected' : ''}>${esc(t)}</option>`).join('');
+}
+
+// Relevé des planches ArcMap 2026 : pergolas et végétalisation. Ces
+// dispositifs ne figurent pas au PPI — ils n'ont pas de ligne budgétaire — mais
+// ils doivent rester identifiables partout. On les tient donc à part de
+// rawData, pour ne fausser aucun total, et on les ajoute à la liste des travaux
+// à la demande.
+let relevesPlanches = [];
+const LIB_PLANCHE = { pergolas: 'Pergola', vegetalisation: 'Aménagement paysager' };
+const ETAT_PLANCHE = { realise: 'realise', encours: 'cours', programme: 'planifie' };
+
+async function chargerReferentielEcoles() {
+  try {
+    const es = await Source.ecoles();
+    ecolesParId = {};
+    es.forEach(e => { ecolesParId[e.id] = e; });
+    relevesPlanches = [];
+    es.forEach(e => {
+      Object.entries(e.planches || {}).forEach(([k, v]) => {
+        // « 2024-2025 » : on retient la dernière année pour le filtre, en
+        // gardant l'intitulé complet pour l'affichage.
+        const annees = String(v.a || '').match(/\d{4}/g) || [];
+        relevesPlanches.push({
+          ecole: e.court || e.nom, ecole_id: e.id, secteur: e.q || '',
+          type: LIB_PLANCHE[k] || k, programme: 'Relevé planches (hors PPI)',
+          annee: annees.length ? parseInt(annees[annees.length - 1]) : '',
+          anneeLabel: String(v.a || ''), montant: 0,
+          etat: ETAT_PLANCHE[v.s] || 'planifie', notes: '', releve: true
+        });
+      });
+    });
+  } catch (e) { ecolesParId = {}; relevesPlanches = []; }
+}
+
+// L'école concernée par une alerte : celle de l'opération si elle est
+// rattachée — c'est la plus sûre —, sinon le nom saisi sur l'alerte.
+function ecoleDeAlerte(a) {
+  const o = operationDeAlerte(a);
+  const ref = o && o.ecole_id ? ecolesParId[o.ecole_id] : null;
+  if (ref) return { nom: ref.nom, quartier: ref.q || '', sur: true };
+  const nom = (a.ecole || (o && o.ecole) || '').trim();
+  return nom ? { nom: nom, quartier: '', sur: false } : null;
+}
+
+// Retrouve l'opération visée par une alerte. rawData porte l'identifiant
+// depuis la bascule Supabase ; avant, il n'y a rien à rattacher.
+function operationDeAlerte(a) {
+  if (a.operation_id == null) return null;
+  return (rawData || []).find(o => o.id === a.operation_id) || null;
+}
+const etatLabelsAlerte = { realise:'Réalisé', cours:'En cours', consult:'Consultation',
+  planifie:'Planifié', urgent:'Urgent', reporte:'Reporté' };
+
+function blocOperationAlerte(a) {
+  const o = operationDeAlerte(a);
+  if (!o) {
+    // Une alerte peut viser une opération supprimée depuis : le dire, plutôt
+    // que de laisser croire qu'elle n'a jamais été rattachée.
+    return a.operation_id == null ? ''
+      : `<div class="alert-op alert-op-perdue">Opération rattachée introuvable
+         (supprimée ?)</div>`;
+  }
+  const montant = o.montant ? fmt(o.montant) : '—';
+  return `<div class="alert-op">
+    <span class="alert-op-lbl">Opération</span>
+    <span class="alert-op-t">${esc(o.type)}</span>
+    <span class="alert-op-d">${esc(o.programme || '')}${o.programme ? ' · ' : ''}${o.annee} · ${montant} · ${etatLabelsAlerte[o.etat]||o.etat}</span>
+    ${o.ecole_id ? `<button class="alert-op-lien"
+        onclick="ouvrirSurLaCarte('${esc(o.ecole_id)}')">voir sur la carte</button>` : ''}
+  </div>`;
+}
+
+function ouvrirSurLaCarte(ecoleId) {
+  showPage('carte');
+  // La carte peut n'avoir jamais été affichée : on lui laisse le temps de se
+  // construire avant de lui demander d'ouvrir une fiche.
+  const essayer = (reste) => {
+    if (window.Carte && Carte.ouvrirEcole && Carte.ouvrirEcole(ecoleId)) return;
+    if (reste > 0) setTimeout(() => essayer(reste - 1), 250);
+  };
+  essayer(20);
+}
+
+// Alerte en cours d'édition dans l'onglet, s'il y en a une.
+let alerteEditee = null;
+
+const NIVEAUX_ALERTE = [
+  ['urgence',  '🚨 Urgence'], ['vigilance', '⚠ Vigilance'],
+  ['decision', 'ℹ Décision'], ['info',      '💬 Information']];
+const STATUTS_ALERTE = [
+  ['ouvert', 'Ouvert'], ['en-cours', 'En cours'], ['resolu', 'Résolu']];
+
+function alerteForm(a) {
+  const opt = (liste, sel) => liste.map(([v, l]) =>
+    `<option value="${v}"${v === sel ? ' selected' : ''}>${l}</option>`).join('');
+  const o = operationDeAlerte(a);
+  return `<div class="alert-card alert-card-edit">
+    <form onsubmit="enregistrerAlerteEdition(this); return false;">
+      <input type="hidden" name="id" value="${a.id}">
+      <div class="al-e-l"><label>Degré d’attention</label>
+        <select name="niveau">${opt(NIVEAUX_ALERTE, a.niveau)}</select></div>
+      <div class="al-e-l"><label>Intitulé</label>
+        <input name="titre" required maxlength="120" value="${esc(a.titre)}"></div>
+      <div class="al-e-l"><label>Précision</label>
+        <textarea name="descr" rows="3">${esc(a.desc)}</textarea></div>
+      <div class="al-e-2">
+        <div class="al-e-l"><label>Suivi</label>
+          <select name="statut">${opt(STATUTS_ALERTE, a.statut)}</select></div>
+        <div class="al-e-l"><label>Année</label>
+          <input name="annee" value="${esc(a.annee)}" maxlength="4"></div>
+      </div>
+      ${o ? `<label class="al-e-detach"><input type="checkbox" name="detacher">
+          Détacher de l’opération « ${esc(o.type)} ${o.annee} »</label>`
+        : `<div class="al-e-l"><label>École concernée</label>
+            <input name="ecole" list="al-e-ecoles" value="${esc(a.ecole)}"
+              placeholder="Laisser vide si l’alerte ne vise aucune école"></div>
+           <datalist id="al-e-ecoles">${
+             Object.values(ecolesParId).map(e =>
+               `<option value="${esc(e.nom)}">`).join('')}</datalist>`}
+      <div class="al-e-b">
+        <button class="btn-primary" type="submit">Enregistrer</button>
+        <button type="button" class="btn-secondary"
+          onclick="alerteEditee=null; renderAlertes()">Annuler</button>
+        <button type="button" class="al-e-suppr"
+          onclick="supprimerAlerteDepuisOnglet(${a.id})">Supprimer</button>
+      </div>
+      <div class="al-e-err" id="al-e-err"></div>
+    </form>
+  </div>`;
+}
+
+function modifierAlerte(id) {
+  alerteEditee = id; renderAlertes();
+  // La carte remplacée par le formulaire peut être hors écran.
+  setTimeout(() => {
+    const f = document.querySelector('.alert-card-edit');
+    if (f) f.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, 30);
+}
+
+async function rafraichirAlertes() {
+  alertes = await Source.alertes();
+  alerteEditee = null;
+  renderAlertes();
+  // La carte tient sa propre copie : sans cela, une alerte supprimée ici
+  // resterait affichée sous son opération jusqu'au prochain rechargement.
+  if (window.Carte && Carte.rafraichirAlertes) Carte.rafraichirAlertes();
+}
+
+async function enregistrerAlerteEdition(form) {
+  const b = form.querySelector('button[type=submit]');
+  const err = form.querySelector('.al-e-err');
+  b.disabled = true; b.textContent = 'Enregistrement…'; err.textContent = '';
+  const a = alertes.find(x => x.id === parseInt(form.id.value)) || {};
+  const corps = {
+    id: parseInt(form.id.value),
+    niveau: form.niveau.value,
+    titre: form.titre.value.trim(),
+    descr: form.descr.value.trim(),
+    statut: form.statut.value,
+    annee: form.annee.value.trim(),
+    // Rattachée : le nom vient de l'opération, on n'y touche pas. Sinon il est
+    // saisi ici, avec la liste du référentiel en suggestion.
+    ecole: form.ecole ? form.ecole.value.trim() : (a.ecole || '')
+  };
+  // On ne renvoie le rattachement que s'il change : inutile de l'écrire à
+  // chaque enregistrement, et cela reste compatible avec une base d'avant la
+  // migration.
+  if (form.detacher && form.detacher.checked) corps.operation_id = null;
+  try {
+    await Source.enregistrerAlerte(corps);
+    await rafraichirAlertes();
+  } catch (e) {
+    b.disabled = false; b.textContent = 'Enregistrer';
+    err.textContent = e.message;
+  }
+}
+
+async function supprimerAlerteDepuisOnglet(id) {
+  const a = alertes.find(x => x.id === id);
+  if (!confirm('Supprimer définitivement l’alerte « ' + (a ? a.titre : '') + ' » ?')) return;
+  try {
+    await Source.supprimerAlerte(id);
+    await rafraichirAlertes();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+function alerteCard(a) {
+  if (alerteEditee === a.id) return alerteForm(a);
+  const m = niveauMeta[a.niveau] || niveauMeta['info'];
+  const ec = ecoleDeAlerte(a);
+  return `<div class="alert-card ${m.cls}" id="alert-card-${a.id}">
+    <div class="alert-card-header">
+      <div class="alert-card-titres">
+        <div class="alert-card-title">${esc(a.titre)}</div>
+        ${ec ? `<div class="alert-card-ecole"${ec.sur ? '' :
+            ' title="Nom tel qu’il est saisi sur l’alerte, non rattaché au référentiel"'}>
+          <span class="ae-ic">🏫</span>${esc(ec.nom)}${ec.quartier
+            ? `<span class="ae-q">· ${esc(ec.quartier)}</span>` : ''}
+          </div>` : '<div class="alert-card-ecole ae-sans">Aucune école désignée</div>'}
+      </div>
+      <div class="alert-card-actions">
+        ${Source.peutEcrire() ? `
+        <button class="alert-act" onclick="modifierAlerte(${a.id})">modifier</button>
+        <button class="alert-act alert-act-suppr"
+          onclick="supprimerAlerteDepuisOnglet(${a.id})">supprimer</button>` : ''}
+      </div>
+    </div>
+    ${a.desc ? `<div class="alert-card-desc">${esc(a.desc)}</div>` : ''}
+    ${blocOperationAlerte(a)}
+    <div class="alert-card-meta">
+      ${a.annee ? `<span class="alert-tag annee">📅 ${a.annee}</span>` : ''}
+
+      <span class="alert-tag ${a.statut}">${statutLabel[a.statut]||a.statut}</span>
+    </div>
+  </div>`;
+}
+
+// ===== GOOGLE SHEETS INTEGRATION =====
+// 👇 COLLER ICI l'ID de votre Google Sheet (entre les guillemets)
+const SHEET_ID = '1oY6JadaIwVrM85UBv9hJZra3iHl3bUyC8FEO2WjNX7c';
+const SHEET_TRAVAUX = 'Travaux';
+const SHEET_ALERTES = 'Alertes';
+
+function gsheetUrl(sheet) {
+  let url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID
+    + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(sheet);
+  if(sheet === SHEET_ALERTES) url += '&headers=1&range=A2:F50';
+  return url;
+}
+function parseGSheet(text) {
+  const m = text.match(/setResponse\(([\s\S]*)\)/);
+  return m ? JSON.parse(m[1]) : null;
+}
+function normalizeEtat(val) {
+  const v = String(val||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(v.includes('non realise')||v.includes('reporte')) return 'reporte';
+  if(v.includes('cours')) return 'cours';
+  if(v.includes('consult')) return 'consult';
+  if(v.includes('urgent')) return 'urgent';
+  if(v.includes('planif')) return 'planifie';
+  if(v.includes('realise')||v.includes('termine')) return 'realise';
+  return 'planifie';
+}
+function normalizeNiveau(val) {
+  const v = String(val||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(v.includes('urgent') || v==='urgence') return 'urgence';
+  if(v.includes('vigil')) return 'vigilance';
+  if(v.includes('decis') || v.includes('attente')) return 'decision';
+  if(v.includes('info')) return 'info';
+  return null; // valeur inconnue → sera filtrée
+}
+function normalizeStatut(val) {
+  const v = String(val).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(v.includes('resolu')||v.includes('ferme')) return 'resolu';
+  if(v.includes('cours')||v.includes('progress')) return 'en-cours';
+  return 'ouvert';
+}
+function toTravaux(data) {
+  return (data.table.rows||[]).filter(r=>r.c&&r.c[0]&&r.c[0].v).map(row=>{
+    const g=i=>row.c[i]?(row.c[i].v??''):'';
+    return {ecole:String(g(0)).trim(),secteur:String(g(1)).trim(),programme:String(g(2)).trim(),
+            annee:parseInt(g(3))||2025,type:String(g(4)).trim(),montant:parseFloat(g(5))||0,
+            etat:normalizeEtat(g(6)),notes:String(g(7)).trim()};
+  });
+}
+function toAlertes(data) {
+  const NIVEAUX_VALIDES = ['urgence','vigilance','decision','info'];
+  const res=(data.table.rows||[]).filter(r=>{
+    if(!r.c) return false;
+    const niveau = r.c[0] ? String(r.c[0].v||'').trim() : '';
+    const titre  = r.c[2] ? String(r.c[2].v||'').trim() : '';
+    if(!niveau || niveau.length < 2) return false;
+    if(!titre  || titre.length  < 2) return false;
+    if(niveau.toLowerCase() === 'niveau') return false;
+    if(titre.toLowerCase()  === 'titre')  return false;
+    const niv = normalizeNiveau(niveau);
+    if(!niv || !NIVEAUX_VALIDES.includes(niv)) return false;
+    return true;
+  }).map((row,i)=>{
+    const g=idx=>row.c[idx]?(row.c[idx].v??''):'';
+    return {id:i+1,niveau:normalizeNiveau(String(g(0)).trim()),annee:String(g(1)).trim(),
+            titre:String(g(2)).trim(),desc:String(g(3)).trim(),
+            ecole:String(g(4)).trim(),statut:normalizeStatut(g(5))};
+  });
+  alerteIdCounter = res.length+1;
+  return res;
+}
+function showLoading(msg) {
+  document.getElementById('loading-overlay').style.display='flex';
+  document.getElementById('loading-msg').textContent=msg;
+}
+function hideLoading() { document.getElementById('loading-overlay').style.display='none'; }
+/* Sur le site publié, un visiteur non connecté ne voit rien : les règles
+   d'accès filtrent tout. Un tableau de bord à zéro se lit comme une panne —
+   on dit donc ce qui se passe, sans alarmer. */
+function majAvisConnexion() {
+  let el = document.getElementById('avis-connexion');
+  const besoin = window.Source && Source.mode === 'supabase' &&
+                 (!Source.session() || !Source.session().role) &&
+                 (rawData || []).length === 0;
+  if (!besoin) { if (el) el.remove(); return; }
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'avis-connexion';
+    // Juste sous le bandeau de connexion : c'est là que se fait le geste.
+    const ancre = document.querySelector('.cpt') || document.querySelector('header');
+    if (ancre && ancre.parentNode) ancre.parentNode.insertBefore(el, ancre.nextSibling);
+    else document.body.insertBefore(el, document.body.firstChild);
+  }
+  const s = Source.session();
+  el.innerHTML = s && !s.role
+    ? '<b>Votre compte n’est pas encore inscrit.</b> Demandez à un ' +
+      'administrateur de la Direction de vous ajouter : sans cela, les données ' +
+      'restent invisibles, y compris pour lui.'
+    : '<b>Connectez-vous pour voir les données.</b> Saisissez votre adresse ' +
+      'professionnelle dans le bandeau ci-dessus : vous recevrez un lien, sans ' +
+      'mot de passe à retenir. Les opérations et les montants ne sont visibles ' +
+      'que des comptes inscrits.';
+}
+
+function showError(msg) {
+  hideLoading();
+  document.getElementById('error-overlay').style.display='flex';
+  document.getElementById('error-msg').textContent=msg;
+  // L'aide « ID du Google Sheet » n'a de sens que si l'application lit encore
+  // la feuille. Sur Supabase elle égarerait.
+  var aide = document.getElementById('error-aide-gsheet');
+  if (aide) aide.style.display = (window.Source && Source.mode === 'gsheet') ? '' : 'none';
+}
+function showSyncBadge(msg) {
+  const b=document.getElementById('sync-badge');
+  b.textContent=msg; b.style.opacity='1';
+  setTimeout(()=>b.style.opacity='0',5000);
+}
+
+// ===== BARRE DE PROGRESSION GLOBALE =====
+function renderProgressBar(data) {
+  const total = data.reduce((s,d)=>s+d.montant,0)||1;
+  const byEtat = {realise:0,cours:0,consult:0,urgent:0,planifie:0,reporte:0};
+  data.forEach(d=>{ byEtat[d.etat]=(byEtat[d.etat]||0)+d.montant; });
+  const pct = v => (v/total*100).toFixed(1);
+  document.getElementById('g-bar-realise').style.width = pct(byEtat.realise)+'%';
+  document.getElementById('g-bar-cours').style.width   = pct(byEtat.cours)+'%';
+  document.getElementById('g-bar-consult').style.width = pct(byEtat.consult)+'%';
+  document.getElementById('g-bar-urgent').style.width  = pct(byEtat.urgent)+'%';
+  document.getElementById('g-bar-reporte').style.width = pct(byEtat.reporte)+'%';
+  document.getElementById('g-progress-label').textContent =
+    pct(byEtat.realise)+'% réalisé · '+pct(byEtat.cours)+'% en cours · '+fmt(total)+' total';
+  document.getElementById('g-leg-realise').textContent = 'Réalisé '+pct(byEtat.realise)+'%';
+  document.getElementById('g-leg-cours').textContent   = 'En cours '+pct(byEtat.cours)+'%';
+  document.getElementById('g-leg-consult').textContent = 'Consultation '+pct(byEtat.consult)+'%';
+  document.getElementById('g-leg-urgent').textContent  = 'Urgent '+pct(byEtat.urgent)+'%';
+  document.getElementById('g-leg-planifie').textContent= 'Planifié '+pct(byEtat.planifie)+'%';
+  document.getElementById('g-leg-reporte').textContent = 'Reporté '+pct(byEtat.reporte)+'%';
+}
+
+// ===== MODALE FICHE ÉCOLE =====
+function openModalEcole(nomEcole) {
+  const ops = rawData.filter(d=>d.ecole===nomEcole);
+  if(!ops.length) return;
+  const totalBudget = ops.reduce((s,d)=>s+d.montant,0);
+  const nbRealise   = ops.filter(d=>d.etat==='realise').length;
+  const pctRealise  = Math.round(nbRealise/ops.length*100);
+  document.getElementById('modal-ecole-nom').textContent     = nomEcole;
+  document.getElementById('modal-ecole-secteur').textContent = ops[0].secteur+' · '+ops.length+' opération(s)';
+  document.getElementById('modal-kpi-budget').textContent    = fmt(totalBudget);
+  document.getElementById('modal-kpi-ops').textContent       = ops.length;
+  document.getElementById('modal-kpi-pct').textContent       = pctRealise+'%';
+  const t = totalBudget||1;
+  const byEtat = {realise:0,cours:0,consult:0,urgent:0,reporte:0};
+  ops.forEach(d=>{ if(byEtat[d.etat]!==undefined) byEtat[d.etat]+=d.montant; });
+  document.getElementById('modal-bar-realise').style.width = (byEtat.realise/t*100)+'%';
+  document.getElementById('modal-bar-cours').style.width   = (byEtat.cours/t*100)+'%';
+  document.getElementById('modal-bar-consult').style.width = (byEtat.consult/t*100)+'%';
+  document.getElementById('modal-bar-urgent').style.width  = (byEtat.urgent/t*100)+'%';
+  const sorted = [...ops].sort((a,b)=>a.annee-b.annee);
+  document.getElementById('modal-ops-list').innerHTML = sorted.map(d=>`
+    <div class="modal-op-row">
+      <div class="modal-op-left">
+        <div class="modal-op-type">${d.type||'—'}</div>
+        <div class="modal-op-meta">${d.programme||'—'} · ${d.annee}${d.notes?' · '+d.notes:''}</div>
+      </div>
+      <div class="modal-op-right">
+        <span class="modal-op-montant">${d.montant?fmt(d.montant):'—'}</span>
+        ${etatBadge(d.etat)}
+      </div>
+    </div>`).join('');
+  document.getElementById('modal-ecole').classList.add('open');
+  document.addEventListener('keydown', closeOnEscape);
+}
+function closeModal() {
+  document.getElementById('modal-ecole').classList.remove('open');
+  document.removeEventListener('keydown', closeOnEscape);
+}
+function closeOnEscape(e) { if(e.key==='Escape') closeModal(); }
+
+// ===== AUTO-REFRESH (toutes les 5 minutes) =====
+let autoRefreshTimer = null;
+let nextRefreshAt = null;
+function startAutoRefresh() {
+  if(autoRefreshTimer) clearInterval(autoRefreshTimer);
+  const INTERVAL = 5*60*1000;
+  nextRefreshAt = Date.now()+INTERVAL;
+  updateNextSyncBadge();
+  autoRefreshTimer = setInterval(async()=>{
+    await loadFromGSheets();
+    nextRefreshAt = Date.now()+INTERVAL;
+  }, INTERVAL);
+  setInterval(updateNextSyncBadge, 60000);
+}
+function updateNextSyncBadge() {
+  const el = document.getElementById('next-sync-badge');
+  if(!el||!nextRefreshAt) return;
+  const mins = Math.max(0,Math.round((nextRefreshAt-Date.now())/60000));
+  el.textContent = mins>0 ? 'Sync dans '+mins+' min' : '';
+}
+
+function initApp() {
+  initDropdowns();
+  const anneeSelect = document.getElementById('select-annee-dash');
+  const currentYear = new Date().getFullYear();
+  const validYears = [2025,2026,2027,2028,2029,2030,2031,2032];
+  anneeSelect.value = validYears.includes(currentYear) ? currentYear : 2026;
+  refreshDashboard(); refreshAnnualDashboard();
+  renderGantt(); renderTable(); renderAlertes();
+  renderProgressBar(rawData);
+  startAutoRefresh();
+}
+async function reloadData() { await loadFromGSheets(); }
+// Une écriture faite depuis la carte périme les totaux du tableau de bord.
+// On les rafraîchit sans bruit au moment où l'utilisateur quitte la carte,
+// plutôt que d'imposer un voile de chargement au milieu de sa saisie.
+let donneesPerimees = false;
+window.signalerEcriture = function () { donneesPerimees = true; };
+
+async function loadFromGSheets(silencieux) {
+  if(!SHEET_ID||SHEET_ID==='VOTRE_SHEET_ID_ICI'){
+    showError('Configuration requise : ouvrez ce fichier dans un éditeur de texte et remplacez VOTRE_SHEET_ID_ICI par l ID de votre Google Sheet (visible dans l URL du Sheet).');
+    return;
+  }
+  // Toutes les vues lisent la même source que la carte : sans quoi le tableau de
+  // bord et la carte afficheraient deux totaux différents dès la bascule.
+  const viaSupabase = window.Source && Source.mode === 'supabase';
+  if (!silencieux) {
+    showLoading(viaSupabase ? 'Connexion à la base…' : 'Connexion au Google Sheet...');
+  }
+  try {
+    if (!silencieux) showLoading('Chargement des opérations PPI...');
+    rawData = await Source.travaux();
+    await chargerReferentielEcoles();
+    remplirTypesTravaux();
+    if (!silencieux) showLoading('Chargement des alertes...');
+    try { alertes = await Source.alertes(); } catch(e) { alertes = []; }
+    hideLoading();
+    initApp();
+    majAvisConnexion();
+    var NOM = { supabase: 'Base', gsheet: 'Feuille', instantane: 'Instantané' };
+    showSyncBadge('✓ ' + (NOM[Source.mode] || 'Données') + ' — ' +
+                  new Date().toLocaleTimeString('fr-FR'));
+    // L'infobulle doit nommer la source réelle : parler de Google Sheets une
+    // fois la base branchée entretiendrait le doute sur qui fait foi.
+    var bs = document.getElementById('btn-sync');
+    if (bs) bs.title = viaSupabase ? 'Recharger depuis la base Supabase'
+                                   : 'Recharger depuis la feuille Google';
+  } catch(e){ showError(e.reseau ? e.message : 'Erreur de connexion : ' + e.message); }
+}
+// ===== INIT =====
+if (window.Compte) Compte.init();
+loadFromGSheets();
+
+</script>
+</body>
+</html>

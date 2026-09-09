@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PPI Écoles — contrôle d'installation</title>
+<style>
+body{margin:0;font:15px/1.5 system-ui,sans-serif;background:#f2f5f3;color:#14201c}
+main{max-width:46rem;margin:7vh auto;padding:0 1.5rem}
+h1{font-size:1.4rem;margin:0 0 .3rem}
+p.sous{color:#5a6b66;margin:0 0 2rem}
+.etat{border:1px solid #cfd9d3;background:#fff;border-radius:10px;padding:.9rem 1.1rem;margin-bottom:.6rem}
+.etat b{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#77877f;margin-bottom:.15rem}
+.ok{color:#2f6d35}.ko{color:#a3282a}.att{color:#8a6d1f}
+code{background:#e8ede9;padding:.1rem .35rem;border-radius:4px;font-size:.9em}
+a.retour{display:inline-block;margin-top:1.6rem;color:#2f6d35}
+</style></head><body><main>
+<h1>PPI Écoles — contrôle d'installation</h1>
+<p class="sous">Cette page dit ce qui fonctionne et ce qui manque. Elle ne modifie rien.</p>
+<div class="etat"><b>Dossier servi</b><span id="orig">…</span></div>
+<div class="etat"><b>Référentiel des écoles</b><span id="eco">…</span></div>
+<div class="etat"><b>Fond de plan</b><span id="fond">…</span></div>
+<div class="etat"><b>Source des données</b><span id="src">…</span></div>
+<div class="etat"><b>Base joignable</b><span id="base">…</span></div>
+<div class="etat"><b>Tables attendues</b><span id="tables">…</span></div>
+<div class="etat"><b>Votre session</b><span id="moi">…</span></div>
+<a class="retour" href="index.html">→ ouvrir l'application</a>
+</main>
+<script src="donnees/config.js"></script>
+<script src="donnees/source.js"></script>
+<script>
+const dire=(id,txt,etat)=>{const e=document.getElementById(id);
+  e.textContent=txt;e.className=etat||'ok';};
+const servi = location.protocol==='http:'||location.protocol==='https:';
+dire('orig', servi ? location.origin
+     : "null — page ouverte depuis le disque : lancez demarrer.command", servi?'ok':'ko');
+
+fetch('donnees/ecoles.json').then(r=>r.json())
+  .then(d=>dire('eco', d.ecoles.length+' écoles chargées'))
+  .catch(e=>dire('eco','échec : '+e.message,'ko'));
+fetch('donnees/fond.json').then(r=>r.json())
+  .then(d=>dire('fond', d.quartiers.length+' quartiers, '+d.routes.length+' tronçons de voirie'))
+  .catch(e=>dire('fond','échec : '+e.message,'ko'));
+
+(async function () {
+  const LIB = { supabase:'Supabase — lecture et écriture',
+                gsheet:'feuille Google — lecture seule',
+                instantane:'instantané local — lecture seule' };
+  dire('src', LIB[Source.mode] || Source.mode,
+       Source.mode==='supabase' ? 'ok' : 'att');
+
+  if (Source.mode !== 'supabase') {
+    const m = "donnees/config.js ne porte pas encore d'adresse : lancez "
+            + "supabase/installer.command pour basculer sur la base.";
+    dire('base', m, 'att'); dire('tables','—','att'); dire('moi','—','att');
+    return;
+  }
+
+  // La session d'abord : sonder avant de l'avoir reprise ferait dire à cette
+  // page que la lecture est refusée alors qu'elle ne l'est pas.
+  let s = null, panneReseau = null;
+  try { s = await Source.reprendreSession(); }
+  catch (e) { if (e.reseau) panneReseau = e; }
+
+  let debout = false;
+  try {
+    await Source.ecoles();
+    debout = true;
+    dire('base', CONFIG.SUPABASE_URL + " — répond");
+  } catch (e) {
+    if (e.reseau) { dire('base', e.message, 'ko'); }
+    else if (/ 404 /.test(e.message)) {
+      debout = true;
+      dire('base', CONFIG.SUPABASE_URL + " — répond, mais les tables n'existent pas "
+        + "encore : exécutez supabase/schema.sql dans l'éditeur SQL.", 'ko');
+    } else {
+      debout = true;
+      dire('base', CONFIG.SUPABASE_URL + ' — répond, mais la lecture est refusée'
+        + (s ? " : votre compte n'est pas inscrit dans « membres »."
+             : ' tant que vous n’êtes pas connecté.'), s ? 'ko' : 'att');
+    }
+  }
+  if (!debout) { dire('tables','non vérifiable','ko'); dire('moi','—','ko'); return; }
+
+  const manque = [];
+  for (const t of ['ecoles','operations','observations','alertes','membres']) {
+    const r = await fetch(CONFIG.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/'+t+'?select=*&limit=1',
+      { headers:{ apikey:CONFIG.SUPABASE_CLE_PUBLIQUE,
+                  Authorization:'Bearer '+CONFIG.SUPABASE_CLE_PUBLIQUE } });
+    if (r.status === 404) manque.push(t);      // 401/403 = la table existe
+  }
+  dire('tables', manque.length
+    ? 'manquantes : '+manque.join(', ')+" — exécutez supabase/schema.sql"
+    : 'les cinq tables existent', manque.length?'ko':'ok');
+
+  if (panneReseau) dire('moi', 'non vérifiable : la base ne répond pas', 'ko');
+  else if (!s)     dire('moi', "pas connecté — connectez-vous depuis l'application", 'att');
+  else if (!s.role) dire('moi', s.email+" — compte non inscrit dans « membres »", 'ko');
+  else              dire('moi', s.email+' — '+s.role);
+})();
+</script></body></html>
