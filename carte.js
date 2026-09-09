@@ -733,6 +733,10 @@ window.Carte = (function () {
   }
   function blocObservations(e) {
     if (!Source.configure || Source.mode !== 'supabase') return '';
+    // Les observations restent réservées aux membres. Sans session, la base
+    // n'en renvoie aucune : afficher « aucune observation » serait un mensonge.
+    var s2 = Source.session();
+    if (!s2 || !s2.role) return '';
     var liste = obsCache[e.id];
     var connecte = !!(Source.session() && Source.session().role);
     var h = '<div class="c-bloc"><div class="c-bloc-t">Observations' +

@@ -14,7 +14,7 @@ window.Compte = (function () {
     redacteur: 'rédacteur',
     lecteur:   'lecteur'
   };
-  var boite, collage = false;
+  var boite, collage = false, deplie = false;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -44,6 +44,15 @@ window.Compte = (function () {
         '<button class="cpt-btn" onclick="Compte.sortir()">Se déconnecter</button>';
       return;
     }
+    // Consultation ouverte : la connexion ne concerne que ceux qui écrivent.
+    // On ne montre donc qu'un lien discret, dépliable.
+    if (!deplie && !collage) {
+      boite.innerHTML =
+        (message ? '<span class="cpt-info">' + esc(message) + '</span>' : '') +
+        '<button class="cpt-btn cpt-discret" onclick="Compte.deplier(true)">' +
+        'Se connecter pour modifier</button>';
+      return;
+    }
     boite.innerHTML =
       (message ? '<span class="cpt-info">' + esc(message) + '</span>' : '') +
       (collage
@@ -58,6 +67,7 @@ window.Compte = (function () {
           '<input type="email" name="email" required placeholder="prenom.nom@saintdenis.re" ' +
           'autocomplete="email">' +
           '<button class="cpt-btn cpt-primaire" type="submit">Se connecter</button>' +
+          '<button class="cpt-btn" type="button" onclick="Compte.deplier(false)">Annuler</button>' +
           '<button class="cpt-btn cpt-lien" type="button" onclick="Compte.collage(true)" ' +
           'title="Si le lien reçu vous mène à une page d’erreur, collez son adresse ici">' +
           'Le lien ne fonctionne pas ?</button></form>');
@@ -133,5 +143,6 @@ window.Compte = (function () {
 
   return { init: init, entrer: entrer, sortir: sortir, majDroits: majDroits,
            coller: coller,
-           collage: function (v) { collage = v; rendre(); } };
+           collage: function (v) { collage = v; deplie = true; rendre(); },
+           deplier: function (v) { deplie = v; collage = false; rendre(); } };
 })();
