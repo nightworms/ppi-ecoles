@@ -196,6 +196,43 @@ window.Source = (function () {
     } catch (e) { return false; }
   }
 
+  /* Reprise depuis une adresse collée à la main.
+
+     Quand l'adresse du site n'est pas encore déclarée dans Supabase, le lien
+     reçu par courriel renvoie vers l'adresse de repli du projet — souvent
+     localhost:3000 — qui n'existe pas sur le poste du destinataire. La page
+     échoue, mais **son adresse porte déjà les jetons** : les coller ici suffit
+     à ouvrir la session, sans rien attendre d'un réglage. */
+  async function adopterLien(texte) {
+    var t = String(texte || '').trim();
+    if (!t) throw new Error('Collez l’adresse complète de la page.');
+    var frag = t.indexOf('#') >= 0 ? t.slice(t.indexOf('#') + 1) : t;
+    var p = new URLSearchParams(frag);
+    if (!p.get('access_token')) {
+      if (/\/auth\/v1\/verify|[?&]token=/.test(t)) {
+        throw new Error('Ceci est le lien du courriel, pas encore la page ' +
+          'd’arrivée. Ouvrez d’abord ce lien : la page affichera une erreur, ' +
+          'c’est normal. Copiez alors l’adresse de cette page d’erreur et ' +
+          'collez-la ici.');
+      }
+      throw new Error('Cette adresse ne contient pas de jeton de connexion. ' +
+        'Copiez l’adresse complète de la page sur laquelle le lien vous a mené.');
+    }
+    session = {
+      token: p.get('access_token'),
+      refresh: p.get('refresh_token'),
+      expire: parseInt(p.get('expires_at')) ||
+              Math.floor(Date.now() / 1000) + (parseInt(p.get('expires_in')) || 3600)
+    };
+    memoriserSession();
+    var moi = await lireIdentite();
+    if (!moi) {
+      throw new Error('Le jeton n’est plus valable — un lien de connexion ' +
+        'expire au bout d’une heure. Demandez-en un nouveau.');
+    }
+    return moi;
+  }
+
   /* Au retour du lien magique, les jetons arrivent dans le fragment d'adresse. */
   async function reprendreSession() {
     var frag = new URLSearchParams(location.hash.replace(/^#/, ''));
@@ -520,6 +557,7 @@ window.Source = (function () {
     session: function () { return session; },
     connecter: connecter,
     reprendreSession: reprendreSession,
+    adopterLien: adopterLien,
     deconnecter: deconnecter,
     observations: observations,
     supprimerOperation: supprimerOperation,

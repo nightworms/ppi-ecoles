@@ -193,6 +193,9 @@
 .cpt-lecteur{color:var(--text-dim)}
 .cpt-info{color:var(--text-dim)}
 .cpt-alerte{color:var(--accent3)}
+.cpt-lien{font-size:11px;opacity:.75;text-decoration:underline;text-underline-offset:2px}
+.cpt-lien:hover{opacity:1}
+.cpt-collage input{min-width:min(58vw,420px)}
 
 /* ---- saisie d'une opération ---- */
 /* Actions d'une opération. --text-dim (#4a5568) sur --surface donnait un

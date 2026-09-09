@@ -14,7 +14,7 @@ window.Compte = (function () {
     redacteur: 'rédacteur',
     lecteur:   'lecteur'
   };
-  var boite;
+  var boite, collage = false;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -46,10 +46,21 @@ window.Compte = (function () {
     }
     boite.innerHTML =
       (message ? '<span class="cpt-info">' + esc(message) + '</span>' : '') +
-      '<form class="cpt-form" onsubmit="return Compte.entrer(this)">' +
-      '<input type="email" name="email" required placeholder="prenom.nom@saintdenis.re" ' +
-      'autocomplete="email">' +
-      '<button class="cpt-btn cpt-primaire" type="submit">Se connecter</button></form>';
+      (collage
+        ? '<form class="cpt-form cpt-collage" onsubmit="return Compte.coller(this)">' +
+          '<input type="text" name="lien" required ' +
+          'placeholder="Collez ici l’adresse de la page où le lien vous a mené" ' +
+          'autocomplete="off" spellcheck="false">' +
+          '<button class="cpt-btn cpt-primaire" type="submit">Ouvrir la session</button>' +
+          '<button class="cpt-btn" type="button" onclick="Compte.collage(false)">Retour</button>' +
+          '</form>'
+        : '<form class="cpt-form" onsubmit="return Compte.entrer(this)">' +
+          '<input type="email" name="email" required placeholder="prenom.nom@saintdenis.re" ' +
+          'autocomplete="email">' +
+          '<button class="cpt-btn cpt-primaire" type="submit">Se connecter</button>' +
+          '<button class="cpt-btn cpt-lien" type="button" onclick="Compte.collage(true)" ' +
+          'title="Si le lien reçu vous mène à une page d’erreur, collez son adresse ici">' +
+          'Le lien ne fonctionne pas ?</button></form>');
   }
 
   async function init() {
@@ -94,6 +105,25 @@ window.Compte = (function () {
     return false;
   }
 
+  /* Secours quand l'adresse du site n'est pas encore déclarée dans Supabase :
+     le lien mène à une page d'erreur, mais son adresse porte les jetons. */
+  async function coller(form) {
+    var v = form.lien.value.trim();
+    if (!v) return false;
+    boite.innerHTML = '<span class="cpt-info">Ouverture de la session…</span>';
+    try {
+      await Source.adopterLien(v);
+      collage = false;
+      rendre();
+      majDroits();
+      location.reload();
+    } catch (e) {
+      collage = true;
+      rendre(e.message);
+    }
+    return false;
+  }
+
   function sortir() {
     Source.deconnecter();
     rendre();
@@ -101,5 +131,7 @@ window.Compte = (function () {
     location.reload();
   }
 
-  return { init: init, entrer: entrer, sortir: sortir, majDroits: majDroits };
+  return { init: init, entrer: entrer, sortir: sortir, majDroits: majDroits,
+           coller: coller,
+           collage: function (v) { collage = v; rendre(); } };
 })();
