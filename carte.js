@@ -131,6 +131,72 @@ window.Carte = (function () {
 
   // --- projection ------------------------------------------------------
   var B, PW, PH, svg, gRoot, gMark, gRues, gBati, gVoirie, vue = { x: 0, y: 0, k: 1 };
+
+  /* ==================================================================
+     Vue aérienne — orthophotographie de l'IGN
+     ------------------------------------------------------------------
+     La carte projette linéairement latitude et longitude ; c'est très
+     exactement ce que rend un WMS en EPSG:4326. L'image se pose donc sur
+     le plan sans reprojection, au pixel près.
+
+     Service public, sans clé ni compte : data.geopf.fr. Google Maps
+     aurait demandé une clé, un compte de facturation, et interdit de
+     superposer ses tuiles à un dessin fait ailleurs.
+     ================================================================== */
+  var ORTHO_WMS = 'https://data.geopf.fr/wms-r/wms';
+  var ORTHO_COUCHE = 'ORTHOIMAGERY.ORTHOPHOTOS';
+  var gOrtho = null, orthoAttente = null, orthoDerniere = '';
+
+  function lonDe(x) { return B.lo0 + x / PW * (B.lo1 - B.lo0); }
+  function latDe(y) { return B.la1 - y / PH * (B.la1 - B.la0); }
+
+  function urlOrtho(x0, y0, w, h, px, py) {
+    // WMS 1.3.0 en EPSG:4326 : l'ordre des axes est latitude puis longitude.
+    var bbox = [latDe(y0 + h), lonDe(x0), latDe(y0), lonDe(x0 + w)]
+                 .map(function (v) { return v.toFixed(6); }).join(',');
+    return ORTHO_WMS + '?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap' +
+      '&LAYERS=' + ORTHO_COUCHE + '&STYLES=&FORMAT=image/jpeg&CRS=EPSG:4326' +
+      '&BBOX=' + bbox + '&WIDTH=' + Math.round(px) + '&HEIGHT=' + Math.round(py);
+  }
+
+  /* On demande l'image de la portion visible, à la définition de l'écran :
+     une seule image pour toute la commune serait floue dès qu'on zoome. */
+  function majOrtho(immediat) {
+    if (!gOrtho) return;
+    if (theme !== 'photo') {
+      // On oublie la dernière adresse en même temps qu'on efface l'image :
+      // sans cela, revenir à la vue aérienne se heurterait au test « même
+      // adresse qu'avant » et laisserait le fond vide.
+      gOrtho.setAttribute('href', ''); orthoDerniere = '';
+      return;
+    }
+    clearTimeout(orthoAttente);
+    var essais = 0;
+    var faire = function () {
+      var r = svg.getBoundingClientRect();
+      // La carte peut n'avoir aucune mise en page au moment du basculement —
+      // onglet qui vient de s'afficher, fenêtre redimensionnée. On réessaie
+      // à la trame suivante plutôt que d'abandonner sans image.
+      if (r.width < 2) {
+        if (essais++ < 60) requestAnimationFrame(faire);
+        return;
+      }
+      // Une marge d'un quart d'écran évite un bord blanc au premier
+      // déplacement, le temps que la nouvelle image arrive.
+      var mx = r.width / vue.k * 0.25, my = r.height / vue.k * 0.25;
+      var x0 = -vue.x / vue.k - mx, y0 = -vue.y / vue.k - my;
+      var w = r.width / vue.k + 2 * mx, h = r.height / vue.k + 2 * my;
+      var lp = Math.min(2048, Math.round(r.width * 1.5));
+      var hp = Math.max(1, Math.round(lp * h / w));
+      var u = urlOrtho(x0, y0, w, h, lp, hp);
+      if (u === orthoDerniere) return;
+      orthoDerniere = u;
+      gOrtho.setAttribute('x', x0); gOrtho.setAttribute('y', y0);
+      gOrtho.setAttribute('width', w); gOrtho.setAttribute('height', h);
+      gOrtho.setAttribute('href', u);
+    };
+    if (immediat) faire(); else orthoAttente = setTimeout(faire, 260);
+  }
   function px(lon) { return (lon - B.lo0) / (B.lo1 - B.lo0) * PW; }
   function py(lat) { return (B.la1 - lat) / (B.la1 - B.la0) * PH; }
   function ns(t) { return document.createElementNS('http://www.w3.org/2000/svg', t); }
@@ -182,6 +248,10 @@ window.Carte = (function () {
     svg.textContent = '';
     gRoot = ns('g'); svg.appendChild(gRoot);
     var f = D.fond;
+    // L'orthophotographie se glisse sous tout le reste.
+    gOrtho = ns('image'); gOrtho.setAttribute('class', 'c-ortho');
+    gOrtho.setAttribute('preserveAspectRatio', 'none');
+    gRoot.appendChild(gOrtho);
     var mer = ns('path'); mer.setAttribute('class', 'c-mer');
     mer.setAttribute('d', f.mer.map(function (r) { return trace(r, true); }).join(' '));
     gRoot.appendChild(mer);
@@ -421,6 +491,7 @@ window.Carte = (function () {
     gRoot.setAttribute('transform',
       'translate(' + vue.x + ',' + vue.y + ') scale(' + vue.k + ')');
     marques();
+    majOrtho();
   }
   function cadrer() {
     var r = svg.getBoundingClientRect();
@@ -874,6 +945,12 @@ window.Carte = (function () {
           couleurPlanche(kk) + '"></i>' + PLANCHES[kk].nom + '</span>';
       }).join('') + '<span class="c-lg-note">relevé des planches, en couronne</span>';
     }
+    // Mention de la source, exigée par l'IGN pour l'usage de ses images.
+    if (theme === 'photo') {
+      h += '<span class="c-lg-sep"></span>' +
+           '<span class="c-lg-note">vue aérienne : orthophotographie ' +
+           '© IGN — Géoplateforme</span>';
+    }
     d.innerHTML = h;
   }
 
@@ -951,9 +1028,13 @@ window.Carte = (function () {
 
   function appliquerTheme() {
     var z = document.querySelector('#page-carte .carte-zone');
-    if (z) z.classList.toggle('clair', theme === 'clair');
+    if (z) {
+      z.classList.toggle('clair', theme === 'clair');
+      z.classList.toggle('photo', theme === 'photo');
+    }
     var b = document.getElementById('carte-bulle');
-    if (b) b.classList.toggle('clair', theme === 'clair');
+    if (b) b.classList.toggle('clair', theme !== 'sombre');
+    majOrtho(true);
     legende(); marques(); panneau();
   }
 

@@ -351,3 +351,31 @@ body.jour .carte-zone.clair #carte-svg .c-traits path{stroke:#cec4b0}
     color: #333 !important; font-size: 10px; }
   #page-carte #carte-legende .c-lg-note { color: #666 !important; }
 }
+
+/* ------------------------------------------------------------------
+   Vue aérienne — orthophotographie IGN
+   ------------------------------------------------------------------
+   La photographie montre le réel : on efface ce que le dessin en disait
+   — mer, remplissage des quartiers, bâti, communes voisines — et on ne
+   garde que ce qu'elle ne peut pas dire : les limites de quartier, les
+   noms, et les opérations.  */
+#page-carte .carte-zone.photo { background: #2b3a34; border-color: var(--border); }
+.carte-zone.photo #carte-svg .c-mer,
+.carte-zone.photo #carte-svg .c-quartiers path,
+.carte-zone.photo #carte-svg .c-voisins path,
+.carte-zone.photo #carte-svg .c-bati { display: none; }
+.carte-zone.photo #carte-svg .c-voirie { display: none; }
+.carte-zone.photo #carte-svg .c-traits path {
+  stroke: rgba(255,255,255,.72); stroke-width: 1.3px; }
+.carte-zone.photo #carte-svg .c-etiq {
+  fill: #ffffff; stroke: rgba(0,0,0,.7); stroke-width: 2.6px;
+  paint-order: stroke fill; }
+.carte-zone.photo #carte-svg .c-rues {
+  fill: #ffffff; stroke: rgba(0,0,0,.65); }
+.carte-zone.photo #carte-svg .c-vide {
+  fill: rgba(255,255,255,.9); stroke: #1d3c33; }
+.carte-zone.photo .carte-zoom { background: rgba(20,32,28,.82);
+  border-color: rgba(255,255,255,.25); }
+.carte-zone.photo .carte-zoom button { color: #ffffff; }
+.carte-zone.photo .carte-zoom button + button { border-top-color: rgba(255,255,255,.2); }
+.c-ortho { pointer-events: none; }

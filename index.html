@@ -872,7 +872,7 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=45">
+  <link rel="stylesheet" href="carte.css?v=46">
 </head>
 <body>
 <script>
@@ -1389,6 +1389,7 @@
       <select class="filter-select" id="carte-f-theme" onchange="Carte.theme(this.value)">
         <option value="clair">Fond clair</option>
         <option value="sombre">Fond sombre</option>
+        <option value="photo">Vue aérienne</option>
       </select>
       <select class="filter-select" onchange="Carte.colorer(this.value)">
         <option value="etat">Colorer par état</option>
@@ -1508,10 +1509,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=45"></script>
-<script src="donnees/source.js?v=45"></script>
-<script src="carte.js?v=45"></script>
-<script src="compte.js?v=45"></script>
+<script src="donnees/config.js?v=46"></script>
+<script src="donnees/source.js?v=46"></script>
+<script src="carte.js?v=46"></script>
+<script src="compte.js?v=46"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
@@ -2220,8 +2221,12 @@ function appliquerTheme(t, memoriser) {
   // Le fond de carte suit la page : une carte sombre sur une page ivoire
   // jurerait. Le sélecteur de la vue Carte reste libre de le redéfinir.
   const sel = document.getElementById('carte-f-theme');
-  if (sel) sel.value = t === 'jour' ? 'clair' : 'sombre';
-  if (window.Carte && Carte.theme) Carte.theme(t === 'jour' ? 'clair' : 'sombre');
+  // La vue aérienne est un choix délibéré : changer le thème de la page ne
+  // doit pas y ramener un fond dessiné.
+  if (sel && sel.value !== 'photo') {
+    sel.value = t === 'jour' ? 'clair' : 'sombre';
+    if (window.Carte && Carte.theme) Carte.theme(sel.value);
+  }
   if (memoriser) { try { localStorage.setItem('ppi:theme', t); } catch (e) {} }
   // Les graphiques portent leurs couleurs en dur dans le HTML produit : sans
   // nouveau rendu, ils garderaient la palette de l'autre thème.
