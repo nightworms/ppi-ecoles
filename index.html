@@ -721,7 +721,7 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=40">
+  <link rel="stylesheet" href="carte.css?v=41">
 </head>
 <body>
 <script>
@@ -730,7 +730,9 @@
   (function () {
     var t;
     try { t = localStorage.getItem('ppi:theme'); } catch (e) {}
-    if (t === 'jour') document.body.classList.add('jour');
+    // L'ivoire est le mode par défaut ; la nuit reste à un clic, et le choix
+    // se retient. Un visiteur qui n'a jamais rien choisi arrive en jour.
+    if (t !== 'nuit') document.body.classList.add('jour');
   })();
 </script>
 
@@ -1322,10 +1324,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=40"></script>
-<script src="donnees/source.js?v=40"></script>
-<script src="carte.js?v=40"></script>
-<script src="compte.js?v=40"></script>
+<script src="donnees/config.js?v=41"></script>
+<script src="donnees/source.js?v=41"></script>
+<script src="carte.js?v=41"></script>
+<script src="compte.js?v=41"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
