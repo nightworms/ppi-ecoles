@@ -114,7 +114,7 @@
    "q": "CAMELIAS PROVIDENCE",
    "lat": -20.89543,
    "lon": 55.461124,
-   "verif": true
+   "pos": "geocodage"
   },
   {
    "id": "ecole-maternelle-gisele-calmy",
@@ -328,7 +328,7 @@
    "q": "MONTAGNE 8ème",
    "lat": -20.889082,
    "lon": 55.422426,
-   "verif": true
+   "pos": "geocodage"
   },
   {
    "id": "ecole-maternelle-providence",
@@ -353,7 +353,7 @@
    "q": "MONTAGNE 8ème",
    "lat": -20.90064,
    "lon": 55.409399,
-   "verif": true
+   "pos": "saisie"
   },
   {
    "id": "ecole-maternelle-saint-francois",
@@ -433,7 +433,7 @@
    "q": "BRETAGNE",
    "lat": -20.90968,
    "lon": 55.496649,
-   "verif": true
+   "pos": "geocodage"
   },
   {
    "id": "ecole-primaire-jean-baptiste-bossard",
@@ -461,7 +461,7 @@
    "q": "BRULE",
    "lat": -20.923923,
    "lon": 55.434687,
-   "verif": true
+   "pos": "geocodage"
   },
   {
    "id": "ecole-primaire-les-baies-roses",
@@ -589,7 +589,7 @@
    "q": "BRETAGNE",
    "lat": -20.919415,
    "lon": 55.49349,
-   "verif": true
+   "pos": "geocodage"
   },
   {
    "id": "ecole-elementaire-bouvet",
@@ -674,7 +674,7 @@
    "q": "CHAUDRON",
    "lat": -20.89845,
    "lon": 55.49435,
-   "verif": true
+   "pos": "geocodage"
   },
   {
    "id": "ecole-elementaire-gabriel-mace",
@@ -926,7 +926,7 @@
    "q": "SAINT-FRANCOIS",
    "lat": -20.919165,
    "lon": 55.45966,
-   "verif": true
+   "pos": "geocodage"
   },
   {
    "id": "ecole-elementaire-saint-bernard",

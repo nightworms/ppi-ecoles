@@ -1147,9 +1147,15 @@ window.Carte = (function () {
         carte(aVerifier.length, 'à confirmer : adresse imprécise ou secteur discordant',
               aVerifier.length > 0) +
       '</div>' +
-      tableau(['École', 'Quartier', 'Origine de la position'],
-        aVerifier.map(function (e) {
-          return [esc(e.nom), esc(e.q), 'géocodage de l’adresse']; }));
+      // Un tableau vide se lit comme un oubli. Quand il n'y a plus rien à
+      // confirmer, on le dit — c'est un résultat, pas une absence de données.
+      (aVerifier.length
+        ? tableau(['École', 'Quartier', 'Origine de la position'],
+            aVerifier.map(function (e) {
+              return [esc(e.nom), esc(e.q), 'géocodage de l’adresse']; }))
+        : '<p class="ctl-note">Les 76 positions ont été vérifiées une à une sur la ' +
+          'vue aérienne. Une école ajoutée par la suite, dont les coordonnées ' +
+          'viendraient du géocodage de son adresse, réapparaîtrait ici.</p>');
   }
 
   // --- interface publique ---------------------------------------------
