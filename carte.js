@@ -1140,9 +1140,12 @@ window.Carte = (function () {
         ? tableau(['École', 'Quartier', 'Origine de la position'],
             aVerifier.map(function (e) {
               return [esc(e.nom), esc(e.q), 'géocodage de l’adresse']; }))
-        : '<p class="ctl-note">Les 76 positions ont été vérifiées une à une sur la ' +
-          'vue aérienne. Une école ajoutée par la suite, dont les coordonnées ' +
-          'viendraient du géocodage de son adresse, réapparaîtrait ici.</p>');
+        // Le nombre se calcule : écrit en dur, il se périmait à la première
+        // fusion de fiches.
+        : '<p class="ctl-note">Les ' + D.ecoles.length + ' positions ont été ' +
+          'vérifiées une à une sur la vue aérienne. Une école ajoutée par la ' +
+          'suite, dont les coordonnées viendraient du géocodage de son adresse, ' +
+          'réapparaîtrait ici.</p>');
   }
 
   // --- interface publique ---------------------------------------------
