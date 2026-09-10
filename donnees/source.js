@@ -424,7 +424,8 @@ window.Source = (function () {
         return { id: e.id, nom: e.nom, court: e.court, niveau: e.niveau, q: e.quartier,
                  lat: e.lat, lon: e.lon, planches: e.planches || undefined,
                  verif: e.position_a_confirmer || undefined,
-                 pos: e.position_source === 'registre' ? 'registre' : undefined };
+                 pos: e.position_source === 'registre' ? 'registre'
+                    : e.position_source === 'saisie' ? 'saisie' : undefined };
       });
     } else {
       cache.ecoles = (await json('donnees/ecoles.json')).ecoles;
@@ -452,6 +453,27 @@ window.Source = (function () {
   function peutEcrire() {
     return mode === 'supabase' && session &&
            (session.role === 'redacteur' || session.role === 'admin');
+  }
+  /* Le référentiel des écoles n'est modifiable que par un administrateur —
+     c'est ce que disent les règles de la base, et l'interface doit le refléter
+     plutôt que d'offrir un geste que le serveur refusera. */
+  function estAdmin() {
+    return mode === 'supabase' && session && session.role === 'admin';
+  }
+  async function deplacerEcole(id, lat, lon) {
+    if (!estAdmin()) {
+      throw new Error('Seul un administrateur peut déplacer une école : ' +
+                      'le référentiel vaut pour toute la Direction.');
+    }
+    cache.ecoles = null;
+    return sbRest('/ecoles?id=eq.' + encodeURIComponent(id), {
+      method: 'PATCH',
+      corps: { lat: lat, lon: lon,
+               // La position devient un relevé délibéré : elle n'est plus « à
+               // confirmer », et son origine cesse d'être le géocodage.
+               position_source: 'saisie', position_a_confirmer: false },
+      entetes: { Prefer: 'return=representation' }
+    });
   }
   function refusEcriture() {
     if (mode !== 'supabase') {
@@ -576,6 +598,8 @@ window.Source = (function () {
     etiquettesQuartiers: etiquettesQuartiers,
     fond: fond,
     peutEcrire: peutEcrire,
+    estAdmin: estAdmin,
+    deplacerEcole: deplacerEcole,
     enregistrerOperation: enregistrerOperation,
     normaliserEtat: normaliserEtat
   };

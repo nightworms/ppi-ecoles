@@ -198,6 +198,8 @@ window.Carte = (function () {
     if (immediat) faire(); else orthoAttente = setTimeout(faire, 260);
   }
   function px(lon) { return (lon - B.lo0) / (B.lo1 - B.lo0) * PW; }
+  function lonInv(x) { return B.lo0 + x / PW * (B.lo1 - B.lo0); }
+  function latInv(y) { return B.la1 - y / PH * (B.la1 - B.la0); }
   function py(lat) { return (B.la1 - lat) / (B.la1 - B.la0) * PH; }
   function ns(t) { return document.createElementNS('http://www.w3.org/2000/svg', t); }
   function trace(anneau, ferme) {
@@ -351,6 +353,15 @@ window.Carte = (function () {
         h.setAttribute('class', 'c-halo'); g.appendChild(h);
       }
       // couronne du relevé des planches
+      if (deplacement && deplacement.id === e.id && deplacement.lat != null) {
+        // Point provisoire : on le montre avant d'écrire quoi que ce soit.
+        var pv = ns('circle');
+        pv.setAttribute('cx', px(deplacement.lon));
+        pv.setAttribute('cy', py(deplacement.lat));
+        pv.setAttribute('r', (7 / k).toFixed(2));
+        pv.setAttribute('class', 'c-deplace');
+        gMark.appendChild(pv);
+      }
       var pk = calques.planches && e.planches ? Object.keys(e.planches) : [];
       if (filtre.planches) pk = pk.filter(function (x) { return x === filtre.planches; });
       pk.forEach(function (kk, i) {
@@ -535,6 +546,17 @@ window.Carte = (function () {
     }
     svg.addEventListener('pointerup', function (ev) {
       if (fin(ev)) return;
+      if (deplacement) {
+        // En mode repositionnement, le clic pose le point au lieu d'ouvrir
+        // une fiche. On convertit la position écran en coordonnées du plan.
+        var rr = svg.getBoundingClientRect();
+        var mx = (ev.clientX - rr.left - vue.x) / vue.k;
+        var my = (ev.clientY - rr.top - vue.y) / vue.k;
+        deplacement.lat = latInv(my);
+        deplacement.lon = lonInv(mx);
+        marques(); panneau();
+        return;
+      }
       // setPointerCapture, posé au pointerdown pour que le glissement survive
       // à une sortie de la carte, redirige aussi le relâchement vers le <svg> :
       // ev.target ne désigne alors plus le marqueur cliqué. On redemande donc
@@ -727,6 +749,12 @@ window.Carte = (function () {
   var obsCache = {}, obsErreur = {}, obsEnCours = null;
   var alertes = [], alerteSaisie = null, lienAlerteDispo = null;
 
+  /* Repositionnement d'une école. Le géocodage d'adresse place parfois un
+     point à côté du vrai bâtiment ; sur la vue aérienne, qui connaît le
+     terrain peut le poser exactement. Réservé aux administrateurs : le
+     référentiel vaut pour toute la Direction. */
+  var deplacement = null;   // { id, lat, lon } — lat/lon nuls tant qu'on n'a pas cliqué
+
   /* Les alertes sont chargées une fois avec le reste, puis relues après chaque
      écriture. Elles sont peu nombreuses : inutile d'interroger la base école
      par école. */
@@ -842,6 +870,42 @@ window.Carte = (function () {
     }
     return h + '</div>';
   }
+  /* Bloc « position » de la fiche : n'apparaît que pour un administrateur,
+     seul habilité à modifier le référentiel. */
+  /* Le curseur en croix dit qu'on attend un clic sur le plan, pas sur un
+     marqueur. */
+  function curseurDeplacement() {
+    var z = document.querySelector('#page-carte .carte-zone');
+    if (z) z.classList.toggle('deplacement', !!deplacement);
+  }
+
+  function blocPosition(e) {
+    if (!Source.estAdmin || !Source.estAdmin()) return '';
+    var h = '<div class="c-bloc"><div class="c-bloc-t">Position</div>';
+    if (deplacement && deplacement.id === e.id) {
+      h += deplacement.lat == null
+        ? '<div class="c-consigne">Cliquez sur la carte à l’emplacement exact ' +
+          'de l’école. La vue aérienne vous montrera les bâtiments.</div>' +
+          '<div class="op-b"><button class="btn-gris" onclick="Carte.annulerDeplacement()">' +
+          'Annuler</button></div>'
+        : '<div class="c-coord">' + deplacement.lat.toFixed(6) + ', ' +
+          deplacement.lon.toFixed(6) + '</div>' +
+          '<div class="c-consigne">Cliquez ailleurs pour corriger, ou validez.</div>' +
+          '<div class="op-b"><button class="btn-ok" onclick="Carte.validerDeplacement()">' +
+          'Enregistrer la position</button>' +
+          '<button class="btn-gris" onclick="Carte.annulerDeplacement()">Annuler</button></div>';
+      return h + '</div>';
+    }
+    h += '<div class="c-coord">' + e.lat.toFixed(6) + ', ' + e.lon.toFixed(6) + '</div>' +
+         '<div class="c-note">' + (e.verif
+            ? 'Position issue du géocodage d’adresse — à confirmer sur le terrain.'
+            : e.pos === 'saisie' ? 'Position posée à la main sur la carte.'
+            : e.pos === 'registre' ? 'Position du registre national.'
+            : 'Position relevée sur les planches ArcMap.') + '</div>' +
+         '<button class="btn-ajout" onclick="Carte.deplacerEcole()">Repositionner</button>';
+    return h + '</div>';
+  }
+
   function auteurParDefaut() {
     var s2 = Source.session();
     return (s2 && s2.email) ? s2.email.split('@')[0].replace(/[._]/g, ' ') : '';
@@ -904,6 +968,7 @@ window.Carte = (function () {
         '<div class="c-note">Pergolas et végétalisation ne figurent pas au PPI : ' +
         'relevé conservé depuis les planches ArcMap.</div></div>' : '') +
       blocObservations(e) +
+      blocPosition(e) +
       '</div>';
   }
 
@@ -1171,6 +1236,29 @@ window.Carte = (function () {
     // la carte tient sa propre copie, qui serait sinon en retard.
     rafraichirAlertes: function () {
       return chargerAlertes().then(function () { if (pret) panneau(); });
+    },
+    deplacerEcole: function () {
+      if (!selection) return;
+      deplacement = { id: selection, lat: null, lon: null };
+      curseurDeplacement(); panneau();
+    },
+    annulerDeplacement: function () {
+      deplacement = null; curseurDeplacement(); marques(); panneau();
+    },
+    validerDeplacement: function () {
+      if (!deplacement || deplacement.lat == null) return;
+      var d = deplacement, e = parId(d.id);
+      Source.deplacerEcole(d.id, d.lat, d.lon)
+        .then(function () {
+          // On met à jour la copie locale : la carte se redessine aussitôt,
+          // sans attendre une relecture complète du référentiel.
+          e.lat = d.lat; e.lon = d.lon; e.verif = undefined; e.pos = 'saisie';
+          deplacement = null; curseurDeplacement();
+          if (window.signalerEcriture) window.signalerEcriture();
+          marques(); panneau();
+          avertir('Position enregistrée.');
+        })
+        .catch(function (err) { avertir(err.message); });
     },
     nouvelleAlerte: function (opId) { alerteSaisie = opId; panneau(); },
     annulerAlerte: function () { alerteSaisie = null; panneau(); },
