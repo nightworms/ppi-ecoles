@@ -33,18 +33,7 @@ window.Carte = (function () {
                    '#2c4f9c', '#97316b', '#4a6570', '#8a4b1f', '#2f6d35', '#7a6a12'];
   var couleursType = {}, couleursTypeC = {};   // remplis à la lecture des opérations
   var theme = 'clair';                          // fond de carte : 'clair' | 'photo'
-  var calques = { bati: true, voirie: true, rues: true, planches: true };
-
-  // Relevé des planches ArcMap : deux dispositifs que le PPI ne suit pas. Ils sont
-  // dessinés en couronne autour du disque, pour ne pas se confondre avec les
-  // opérations PPI qui, elles, en occupent les secteurs.
-  var PLANCHES = {
-    pergolas:       { nom: 'Pergolas',      c: '#e0a552', cc: '#a8620d' },
-    vegetalisation: { nom: 'Végétalisation', c: '#8bc25f', cc: '#3d7a1e' }
-  };
-  function couleurPlanche(k) {
-    var d = PLANCHES[k]; return theme === 'clair' ? d.cc : d.c;
-  }
+  var calques = { bati: true, voirie: true, rues: true };
 
   // --- rapprochement des noms -----------------------------------------
   var PREFIXES = { 'mat': 'Maternelle', 'elem': 'Élémentaire', 'elém': 'Élémentaire',
@@ -212,7 +201,7 @@ window.Carte = (function () {
   var D = { ecoles: [], fond: null, etiq: [], ops: [], parEcole: {},
             orphelines: [], approx: [] };
   var filtre = { annee: '', programme: '', type: '', etat: '', secteur: '',
-                 niveau: '', planches: '', q: '' };
+                 niveau: '', q: '' };
   var colorerPar = 'etat';
   var selection = null, pret = false;
 
@@ -229,9 +218,7 @@ window.Carte = (function () {
       if (filtre.secteur && e.q !== filtre.secteur) return false;
       if (filtre.niveau && e.niveau !== filtre.niveau) return false;
       if (filtre.q && sansAccent(e.nom + ' ' + e.q).indexOf(sansAccent(filtre.q)) < 0) return false;
-      if (filtre.planches && !(e.planches && e.planches[filtre.planches])) return false;
       if (opsVisibles(e).length) return true;
-      if (filtre.planches) return true;   // le relevé des planches suffit à montrer l'école
       // sans opération : visible seulement si aucun filtre de contenu n'est posé
       return !filtre.annee && !filtre.programme && !filtre.type && !filtre.etat;
     });
@@ -352,7 +339,6 @@ window.Carte = (function () {
         h.setAttribute('r', (r + 5 / k).toFixed(2));
         h.setAttribute('class', 'c-halo'); g.appendChild(h);
       }
-      // couronne du relevé des planches
       if (deplacement && deplacement.id === e.id && deplacement.lat != null) {
         // Point provisoire : on le montre avant d'écrire quoi que ce soit.
         var pv = ns('circle');
@@ -362,23 +348,6 @@ window.Carte = (function () {
         pv.setAttribute('class', 'c-deplace');
         gMark.appendChild(pv);
       }
-      var pk = calques.planches && e.planches ? Object.keys(e.planches) : [];
-      if (filtre.planches) pk = pk.filter(function (x) { return x === filtre.planches; });
-      pk.forEach(function (kk, i) {
-        var rr = r + 4 / k, ecart = 0.12;
-        var a0 = -Math.PI / 2 + i * 2 * Math.PI / pk.length + ecart;
-        var a1 = -Math.PI / 2 + (i + 1) * 2 * Math.PI / pk.length - ecart;
-        var arc = ns('path');
-        var grand = (a1 - a0) > Math.PI ? 1 : 0;
-        arc.setAttribute('d', 'M' + (cx + rr * Math.cos(a0)).toFixed(2) + ' ' +
-          (cy + rr * Math.sin(a0)).toFixed(2) + 'A' + rr.toFixed(2) + ' ' + rr.toFixed(2) +
-          ' 0 ' + grand + ' 1 ' + (cx + rr * Math.cos(a1)).toFixed(2) + ' ' +
-          (cy + rr * Math.sin(a1)).toFixed(2));
-        arc.setAttribute('class', 'c-planche');
-        arc.setAttribute('stroke', couleurPlanche(kk));
-        arc.setAttribute('stroke-dasharray', e.planches[kk].s === 'realise' ? '' : '3 2.5');
-        g.appendChild(arc);
-      });
       if (!ops.length) {
         var c = ns('circle');
         c.setAttribute('cx', cx); c.setAttribute('cy', cy);
@@ -482,10 +451,6 @@ window.Carte = (function () {
     Object.keys(LIB).forEach(function (k) {
       if (filtre[k]) parts.push(LIB[k] + ' : ' + filtre[k]);
     });
-    if (filtre.planches) {
-      parts.push('Relevé planches : ' + (filtre.planches === 'aucun'
-        ? 'écoles sans relevé' : filtre.planches));
-    }
     if (filtre.q) parts.push('Recherche : « ' + filtre.q + ' »');
     var liste = ecolesVisibles(), ops = 0, montant = 0;
     liste.forEach(function (e) {
@@ -619,31 +584,16 @@ window.Carte = (function () {
       '<span class="c-et" style="color:' + col + '">' +
         esc((ETATS[o.etat] || {}).nom || o.etat) + '</span></li>';
   }
-  function lignesPlanches(e) {
-    if (!e.planches) return '';
-    return Object.keys(e.planches).map(function (kk) {
-      var f = e.planches[kk];
-      return '<li><span class="c-pt" style="' +
-        (f.s === 'realise' ? 'background:' + couleurPlanche(kk)
-                           : 'box-shadow:inset 0 0 0 1.6px ' + couleurPlanche(kk)) + '"></span>' +
-        '<span class="c-nom">' + PLANCHES[kk].nom + '</span>' +
-        '<span class="c-an">' + esc(f.a) + '</span><span class="c-mt"></span>' +
-        '<span class="c-et">' + (f.s === 'realise' ? 'relevé' : 'prévu') + '</span></li>';
-    }).join('');
-  }
   function contenuBulle(e) {
     var ops = opsVisibles(e);
     var h = '<b>' + esc(e.nom) + '</b><span class="c-q">' + esc(e.q || '') + '</span>';
-    var pl = lignesPlanches(e);
     if (!ops.length) {
-      return h + (pl ? '<ul class="c-ops">' + pl + '</ul>' +
-                       '<div class="c-tot">relevé des planches</div>'
-                     : '<div class="c-rien">Aucune opération programmée</div>');
+      return h + '<div class="c-rien">Aucune opération programmée</div>';
     }
     var tot = ops.reduce(function (s, o) { return s + (o.montant || 0); }, 0);
-    return h + '<ul class="c-ops">' + ops.map(ligneOp).join('') + pl + '</ul>' +
+    return h + '<ul class="c-ops">' + ops.map(ligneOp).join('') + '</ul>' +
       '<div class="c-tot">' + ops.length + ' opération' + (ops.length > 1 ? 's' : '') +
-      ' · ' + euros(tot) + (pl ? ' · relevé planches' : '') + '</div>';
+      ' · ' + euros(tot) + '</div>';
   }
   /* ----------------------------------------------------------------
      Saisie. Les commandes n'apparaissent que si la source accepte
@@ -937,8 +887,6 @@ window.Carte = (function () {
     var toutes = D.parEcole[e.id] || [];
     var ops = opsVisibles(e);
     var tot = toutes.reduce(function (s, o) { return s + (o.montant || 0); }, 0);
-    var planches = e.planches || {};
-    var LIB = { pergolas: 'Pergolas', vegetalisation: 'Végétalisation' };
     if (Source.mode === 'supabase') chargerObservations(e.id);
     d.innerHTML =
       '<div class="c-fiche">' +
@@ -963,11 +911,6 @@ window.Carte = (function () {
         (Source.peutEcrire() && !saisie
           ? '<button class="btn-ajout" onclick="Carte.nouvelle()">+ Opération</button>' : '') +
         '</div>' +
-      (Object.keys(planches).length ?
-        '<div class="c-bloc"><div class="c-bloc-t">Relevé des planches 2026</div>' +
-        '<ul class="c-ops">' + lignesPlanches(e) + '</ul>' +
-        '<div class="c-note">Pergolas et végétalisation ne figurent pas au PPI : ' +
-        'relevé conservé depuis les planches ArcMap.</div></div>' : '') +
       blocObservations(e) +
       blocPosition(e) +
       '</div>';
@@ -1005,12 +948,6 @@ window.Carte = (function () {
     var h = items.map(function (i) {
       return '<span class="c-lg"><i style="background:' + i.c + '"></i>' + esc(i.n) + '</span>';
     }).join('');
-    if (calques.planches) {
-      h += '<span class="c-lg-sep"></span>' + Object.keys(PLANCHES).map(function (kk) {
-        return '<span class="c-lg"><i class="anneau" style="border-color:' +
-          couleurPlanche(kk) + '"></i>' + PLANCHES[kk].nom + '</span>';
-      }).join('') + '<span class="c-lg-note">relevé des planches, en couronne</span>';
-    }
     // Mention de la source, exigée par l'IGN pour l'usage de ses images.
     if (theme === 'photo') {
       h += '<span class="c-lg-sep"></span>' +
@@ -1168,10 +1105,6 @@ window.Carte = (function () {
     var perdues = D.ops.filter(function (o) {
       return D.orphelines.some(function (x) { return x.nom === o.ecole; });
     });
-    var planches = { pergolas: 0, vegetalisation: 0 };
-    D.ecoles.forEach(function (e) {
-      Object.keys(e.planches || {}).forEach(function (k) { planches[k]++; });
-    });
 
     d.innerHTML =
       '<p class="ctl-intro">Rapprochement entre ' + origineDonnees() + ' et le référentiel ' +
@@ -1200,11 +1133,9 @@ window.Carte = (function () {
 
       '<h3 class="ctl-t">Écoles sans opération au PPI <span class="ctl-n">' +
         sansOp.length + '</span></h3>' +
-      tableau(['École', 'Niveau', 'Quartier', 'Relevé des planches'],
+      tableau(['École', 'Niveau', 'Quartier'],
         sansOp.map(function (e) {
-          var pl = Object.keys(e.planches || {}).map(function (k) {
-            return PLANCHES[k].nom; }).join(', ');
-          return [esc(e.nom), esc(e.niveau), esc(e.q), pl || '—']; })) +
+          return [esc(e.nom), esc(e.niveau), esc(e.q)]; })) +
 
       '<h3 class="ctl-t">Positions</h3>' +
       '<div class="ctl-cartes">' +
@@ -1214,16 +1145,7 @@ window.Carte = (function () {
       '</div>' +
       tableau(['École', 'Quartier', 'Origine de la position'],
         aVerifier.map(function (e) {
-          return [esc(e.nom), esc(e.q), 'géocodage de l’adresse']; })) +
-
-      '<h3 class="ctl-t">Relevé des planches, hors PPI</h3>' +
-      '<p class="ctl-note">Le PPI ne suit ni les pergolas ni la végétalisation. Ces ' +
-      'chiffres viennent des planches ArcMap de 2026 et ne sont pas mis à jour par la ' +
-      'feuille.</p>' +
-      '<div class="ctl-cartes">' +
-        carte(planches.pergolas, 'écoles équipées de pergolas') +
-        carte(planches.vegetalisation, 'écoles végétalisées') +
-      '</div>';
+          return [esc(e.nom), esc(e.q), 'géocodage de l’adresse']; }));
   }
 
   // --- interface publique ---------------------------------------------

@@ -872,7 +872,7 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=52">
+  <link rel="stylesheet" href="carte.css?v=53">
 </head>
 <body>
 <script>
@@ -1278,10 +1278,6 @@
     <select class="filter-select" id="filter-type" onchange="filterTable()">
       <option value="">Tous les types</option>
     </select>
-    <label class="filtre-releve" title="Pergolas et végétalisation relevés sur les planches ArcMap 2026. Sans ligne budgétaire au PPI : ils ne comptent dans aucun total.">
-      <input type="checkbox" id="filter-releve" onchange="filterTable()">
-      Relevé planches
-    </label>
     <select class="filter-select" id="filter-etat" onchange="filterTable()">
       <option value="">Tous les états</option>
       <option value="realise">Réalisé</option>
@@ -1431,16 +1427,10 @@
       <option value="Élémentaire">Élémentaire</option>
       <option value="Primaire">Primaire</option>
     </select>
-    <select class="filter-select" onchange="Carte.filtrer('planches',this.value)" title="Relevé des planches ArcMap, hors PPI">
-      <option value="">Relevé planches : tout</option>
-      <option value="pergolas">Pergolas seulement</option>
-      <option value="vegetalisation">Végétalisation seulement</option>
-    </select>
     <div class="carte-calques">
       <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('bati',a)">Bâti</button>
       <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('voirie',a)">Voirie</button>
       <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('rues',a)">Noms de rues</button>
-      <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('planches',a)">Relevé planches</button>
     </div>
     <div id="carte-compteurs"></div>
   </div>
@@ -1518,10 +1508,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=52"></script>
-<script src="donnees/source.js?v=52"></script>
-<script src="carte.js?v=52"></script>
-<script src="compte.js?v=52"></script>
+<script src="donnees/config.js?v=53"></script>
+<script src="donnees/source.js?v=53"></script>
+<script src="carte.js?v=53"></script>
+<script src="compte.js?v=53"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
@@ -2078,10 +2068,7 @@ function filterTable() {
   const type = document.getElementById('filter-type').value;
   const etatF = document.getElementById('filter-etat').value;
 
-  const avecReleve = (document.getElementById('filter-releve') || {}).checked;
-  const source = avecReleve ? rawData.concat(relevesPlanches) : rawData;
-
-  const filtered = source.filter(d => {
+  const filtered = rawData.filter(d => {
     if(search && !d.ecole.toLowerCase().includes(search) && !d.type.toLowerCase().includes(search) && !d.secteur.toLowerCase().includes(search)) return false;
     if(quartier && !d.secteur.toUpperCase().includes(quartier.split(' ')[0])) return false;
     if(ecoleF && d.ecole !== ecoleF) return false;
@@ -2091,20 +2078,17 @@ function filterTable() {
     return true;
   });
 
-  const nbReleve = filtered.filter(d => d.releve).length;
   document.getElementById('filter-count').textContent =
-    `${filtered.length - nbReleve} opération(s)` +
-    (nbReleve ? ` · ${nbReleve} relevé(s) hors PPI` : '');
+    `${filtered.length} opération` + (filtered.length > 1 ? 's' : '');
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = filtered.map((d,i)=>{
     const realIdx = rawData.indexOf(d);
     return `
-    <tr id="row-${realIdx}" class="${d.releve ? 'ligne-releve' : ''}" style="cursor:pointer"
+    <tr id="row-${realIdx}" style="cursor:pointer"
         onclick="openModalEcole('${d.ecole.replace(/'/g,"\\'")}')">
       <td style="font-weight:500;color:var(--accent2)">${esc(d.ecole)}</td>
       <td style="color:var(--text-muted);font-size:12px">${esc(d.secteur)}</td>
-      <td style="font-size:12px">${esc(d.type)||'—'}
-        ${d.releve ? '<span class="tag-releve" title="Relevé sur les planches ArcMap 2026, hors PPI">relevé</span>' : ''}</td>
+      <td style="font-size:12px">${esc(d.type)||'—'}</td>
       <td style="color:var(--text-muted);font-size:12px">${esc(d.programme)||'—'}</td>
       <td style="text-align:center;font-weight:600">${esc(d.anneeLabel || d.annee)||'—'}</td>
       <td style="text-align:right;font-weight:600">${d.montant?fmt(d.montant):'—'}</td>
@@ -2242,14 +2226,10 @@ function basculerTheme() {
 
 // ===== EXPORT CSV =====
 function exportCSV() {
-  // L'export suit l'interrupteur « Relevé planches » : une colonne Origine
-  // distingue les opérations du PPI du relevé ArcMap, qui n'a pas de budget.
-  const avecReleve = (document.getElementById('filter-releve') || {}).checked;
-  const source = avecReleve ? rawData.concat(relevesPlanches) : rawData;
-  const headers = ['École','Secteur','Programme','Année','Type','Montant','État','Origine'];
+  const source = rawData;
+  const headers = ['École','Secteur','Programme','Année','Type','Montant','État'];
   const rows = source.map(d=>[d.ecole,d.secteur,d.programme,
-    d.anneeLabel || d.annee, d.type, d.montant, d.etat,
-    d.releve ? 'Relevé planches 2026' : 'PPI']);
+    d.anneeLabel || d.annee, d.type, d.montant, d.etat]);
   const csv = [headers,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
@@ -2327,36 +2307,12 @@ function remplirTypesTravaux() {
       `<option${t === courant ? ' selected' : ''}>${esc(t)}</option>`).join('');
 }
 
-// Relevé des planches ArcMap 2026 : pergolas et végétalisation. Ces
-// dispositifs ne figurent pas au PPI — ils n'ont pas de ligne budgétaire — mais
-// ils doivent rester identifiables partout. On les tient donc à part de
-// rawData, pour ne fausser aucun total, et on les ajoute à la liste des travaux
-// à la demande.
-let relevesPlanches = [];
-const LIB_PLANCHE = { pergolas: 'Pergola', vegetalisation: 'Aménagement paysager' };
-const ETAT_PLANCHE = { realise: 'realise', encours: 'cours', programme: 'planifie' };
-
 async function chargerReferentielEcoles() {
   try {
     const es = await Source.ecoles();
     ecolesParId = {};
     es.forEach(e => { ecolesParId[e.id] = e; });
-    relevesPlanches = [];
-    es.forEach(e => {
-      Object.entries(e.planches || {}).forEach(([k, v]) => {
-        // « 2024-2025 » : on retient la dernière année pour le filtre, en
-        // gardant l'intitulé complet pour l'affichage.
-        const annees = String(v.a || '').match(/\d{4}/g) || [];
-        relevesPlanches.push({
-          ecole: e.court || e.nom, ecole_id: e.id, secteur: e.q || '',
-          type: LIB_PLANCHE[k] || k, programme: 'Relevé planches (hors PPI)',
-          annee: annees.length ? parseInt(annees[annees.length - 1]) : '',
-          anneeLabel: String(v.a || ''), montant: 0,
-          etat: ETAT_PLANCHE[v.s] || 'planifie', notes: '', releve: true
-        });
-      });
-    });
-  } catch (e) { ecolesParId = {}; relevesPlanches = []; }
+  } catch (e) { ecolesParId = {}; }
 }
 
 // L'école concernée par une alerte : celle de l'opération si elle est

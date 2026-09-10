@@ -890,10 +890,10 @@
    "lon": 55.425165
   },
   {
-   "id": "ecole-elementaire-raymond-mondon",
-   "nom": "Ecole élémentaire Raymond Mondon",
+   "id": "ecole-primaire-raymond-mondon",
+   "nom": "Ecole primaire Raymond Mondon",
    "court": "Raymond Mondon",
-   "niveau": "Élémentaire",
+   "niveau": "Primaire",
    "q": "LA SOURCE",
    "lat": -20.887209,
    "lon": 55.453897,
