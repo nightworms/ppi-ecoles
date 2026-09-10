@@ -379,3 +379,13 @@ body.jour .carte-zone.clair #carte-svg .c-traits path{stroke:#cec4b0}
 .carte-zone.photo .carte-zoom button { color: #ffffff; }
 .carte-zone.photo .carte-zoom button + button { border-top-color: rgba(255,255,255,.2); }
 .c-ortho { pointer-events: none; }
+
+/* Sur la photographie, les marqueurs se perdaient dans un fond chargé : un
+   liseré sombre les en détache. Le filtre porte sur le calque entier, pas sur
+   chacun des 77 marqueurs — un filtre par marqueur ferait saccader les
+   déplacements. */
+.carte-zone.photo #carte-svg .c-marques {
+  filter: drop-shadow(0 0 1.1px rgba(0,0,0,.95))
+          drop-shadow(0 0 2.6px rgba(0,0,0,.6));
+}
+.carte-zone.photo #carte-svg .c-vide { stroke-width: 1.8px; }
