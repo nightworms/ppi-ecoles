@@ -352,7 +352,15 @@
   .badge-reporte { background: rgba(232,130,12,0.12); color: #e8820c; border: 1px solid rgba(232,130,12,0.25); }
 
   /* TABLE WRAPPER */
-  .table-wrap { overflow-x: auto; max-height: 520px; overflow-y: auto; border-radius: 8px; }
+  /* La hauteur du tableau suit celle de la fenêtre. Elle était figée à 520px :
+     sur une tablette cela remplissait l'écran, mais sur un grand moniteur le
+     tableau s'arrêtait à mi-hauteur en laissant le bas de la page vide. Les
+     260px retranchés couvrent l'en-tête du site, le titre et la barre de
+     filtres. « max() » garde un tableau utilisable sur un écran bas : la page
+     défile alors, comme avant. C'est un maximum, donc un tableau de trois
+     lignes reste haut de trois lignes. */
+  .table-wrap { overflow-x: auto; overflow-y: auto; border-radius: 8px;
+    max-height: max(320px, calc(100vh - 260px)); }
   .table-wrap::-webkit-scrollbar { width: 4px; height: 4px; }
   .table-wrap::-webkit-scrollbar-track { background: transparent; }
   .table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -629,7 +637,9 @@
     .data-table th { background: #f0f0f0 !important; color: #111 !important; }
     .data-table td, .data-table th { border-color: #ddd !important; color: #111 !important; }
     .data-table tr:nth-child(even) td { background: #f9f9f9 !important; }
-    .table-wrap { overflow: visible !important; }
+    /* On libère aussi la hauteur : sans cela le tableau resterait borné à la
+       hauteur de l'écran, et l'impression s'arrêterait où s'arrêtait l'affichage. */
+    .table-wrap { overflow: visible !important; max-height: none !important; }
 
     /* Gantt */
     .gantt-wrap, #gantt-body { overflow: visible !important; }
@@ -872,7 +882,7 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=63">
+  <link rel="stylesheet" href="carte.css?v=66">
 </head>
 <body>
 <script>
@@ -1328,11 +1338,6 @@
         <option value="">Toutes les années</option>
         <option>2025</option><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option><option>2031</option><option>2032</option><option>2028</option>
       </select>
-      <select class="filter-select" id="alert-filter-lien" onchange="renderAlertes()">
-        <option value="">Rattachées ou non</option>
-        <option value="oui">Liées à une opération</option>
-        <option value="non">Sans opération</option>
-      </select>
       <select class="filter-select" id="alert-filter-niveau" onchange="renderAlertes()">
         <option value="">Tous les niveaux</option>
         <option value="urgence">🚨 Urgence</option>
@@ -1496,10 +1501,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=63"></script>
-<script src="donnees/source.js?v=63"></script>
-<script src="carte.js?v=63"></script>
-<script src="compte.js?v=63"></script>
+<script src="donnees/config.js?v=66"></script>
+<script src="donnees/source.js?v=66"></script>
+<script src="carte.js?v=66"></script>
+<script src="compte.js?v=66"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
@@ -2242,12 +2247,9 @@ function renderAlertes() {
   const filtreAnnee  = document.getElementById('alert-filter-annee').value;
   const filtreNiveau = document.getElementById('alert-filter-niveau').value;
 
-  const filtreLien = (document.getElementById('alert-filter-lien')||{}).value || '';
-
   const filtered = alertes.filter(a =>
     (!filtreAnnee  || a.annee === filtreAnnee) &&
-    (!filtreNiveau || a.niveau === filtreNiveau) &&
-    (!filtreLien   || (filtreLien === 'oui') === (a.operation_id != null))
+    (!filtreNiveau || a.niveau === filtreNiveau)
   );
 
   // KPI badges
