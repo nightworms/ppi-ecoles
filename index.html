@@ -882,7 +882,7 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=66">
+  <link rel="stylesheet" href="carte.css?v=68">
 </head>
 <body>
 <script>
@@ -999,7 +999,7 @@
 <div id="loading-overlay" style="display:flex;position:fixed;inset:0;background:rgba(13,17,23,0.92);z-index:9000;flex-direction:column;align-items:center;justify-content:center;gap:20px">
   <div style="width:48px;height:48px;border:4px solid #2a3441;border-top-color:#f0a500;border-radius:50%;animation:spin 0.8s linear infinite"></div>
   <div id="loading-msg" style="font-family:'Syne',sans-serif;font-size:15px;color:#e2e8f0">Chargement...</div>
-  <div style="font-size:12px;color:#7a8fa6">Connexion au Google Sheet en cours</div>
+  <div id="loading-source" style="font-size:12px;color:#7a8fa6">Connexion à la base de données</div>
 </div>
 
 <!-- ERROR OVERLAY -->
@@ -1501,10 +1501,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=66"></script>
-<script src="donnees/source.js?v=66"></script>
-<script src="carte.js?v=66"></script>
-<script src="compte.js?v=66"></script>
+<script src="donnees/config.js?v=68"></script>
+<script src="donnees/source.js?v=68"></script>
+<script src="carte.js?v=68"></script>
+<script src="compte.js?v=68"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
@@ -2564,6 +2564,18 @@ function toAlertes(data) {
 function showLoading(msg) {
   document.getElementById('loading-overlay').style.display='flex';
   document.getElementById('loading-msg').textContent=msg;
+  // La deuxième ligne annonçait « Connexion au Google Sheet en cours », écrit
+  // en dur avant la bascule. Depuis, aucune requête ne part vers la feuille :
+  // dire le contraire à chaque chargement inquiétait pour rien. On nomme la
+  // source réellement lue.
+  var sl = document.getElementById('loading-source');
+  if (sl) {
+    sl.textContent = (window.Source && Source.mode === 'gsheet')
+      ? 'Connexion à la feuille Google en cours'
+      : (window.Source && Source.mode === 'instantane')
+        ? 'Lecture de l\u2019instantané local'
+        : 'Connexion à la base Supabase en cours';
+  }
 }
 function hideLoading() { document.getElementById('loading-overlay').style.display='none'; }
 /* Sur le site publié, un visiteur non connecté ne voit rien : les règles
@@ -2714,13 +2726,16 @@ let donneesPerimees = false;
 window.signalerEcriture = function () { donneesPerimees = true; };
 
 async function loadFromGSheets(silencieux) {
-  if(!SHEET_ID||SHEET_ID==='VOTRE_SHEET_ID_ICI'){
-    showError('Configuration requise : ouvrez ce fichier dans un éditeur de texte et remplacez VOTRE_SHEET_ID_ICI par l ID de votre Google Sheet (visible dans l URL du Sheet).');
-    return;
-  }
   // Toutes les vues lisent la même source que la carte : sans quoi le tableau de
   // bord et la carte afficheraient deux totaux différents dès la bascule.
   const viaSupabase = window.Source && Source.mode === 'supabase';
+  // Le contrôle du SHEET_ID s'exécutait avant celui-ci : sur une installation
+  // Supabase sans identifiant de feuille, il aurait réclamé de configurer une
+  // feuille que l'application ne lit plus.
+  if (!viaSupabase && (!SHEET_ID || SHEET_ID === 'VOTRE_SHEET_ID_ICI')) {
+    showError('Configuration requise : ouvrez ce fichier dans un éditeur de texte et remplacez VOTRE_SHEET_ID_ICI par l ID de votre Google Sheet (visible dans l URL du Sheet).');
+    return;
+  }
   if (!silencieux) {
     showLoading(viaSupabase ? 'Connexion à la base…' : 'Connexion au Google Sheet...');
   }
