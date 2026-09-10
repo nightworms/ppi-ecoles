@@ -380,12 +380,29 @@ body.jour .carte-zone.clair #carte-svg .c-traits path{stroke:#cec4b0}
 .carte-zone.photo .carte-zoom button + button { border-top-color: rgba(255,255,255,.2); }
 .c-ortho { pointer-events: none; }
 
-/* Sur la photographie, les marqueurs se perdaient dans un fond chargé : un
-   liseré sombre les en détache. Le filtre porte sur le calque entier, pas sur
-   chacun des 77 marqueurs — un filtre par marqueur ferait saccader les
-   déplacements. */
-.carte-zone.photo #carte-svg .c-marques {
+/* Un liseré détache les marqueurs du fond, quel qu'il soit. Le filtre porte
+   sur le calque entier et non sur chacun des 77 marqueurs — un filtre par
+   marqueur ferait saccader les déplacements ; ainsi posé il coûte environ
+   deux millisecondes par redessin. */
+#carte-svg .c-marques {
   filter: drop-shadow(0 0 1.1px rgba(0,0,0,.95))
           drop-shadow(0 0 2.6px rgba(0,0,0,.6));
+}
+/* « Fond sombre » doit être sombre quel que soit le thème de la page. Les
+   couleurs du plan viennent des jetons ; en mode jour, les terres viraient au
+   crème tandis que la mer, figée en dur, restait nuit. On rétablit ici les
+   valeurs de nuit pour la seule zone de carte. */
+#page-carte .carte-zone:not(.clair):not(.photo) {
+  --bg: #0d1117; --surface: #161b22; --surface2: #1c2230;
+  --border: #2a3441; --text: #e2e8f0; --text-muted: #7a8fa6;
+  --text-dim: #4a5568;
+  background: #161b22; border-color: #2a3441;
+}
+
+/* Sur le fond sombre, un liseré noir ne se verrait pas : on l'éclaircit pour
+   que le geste garde son sens. */
+.carte-zone:not(.clair):not(.photo) #carte-svg .c-marques {
+  filter: drop-shadow(0 0 1.1px rgba(255,255,255,.85))
+          drop-shadow(0 0 3px rgba(0,0,0,.75));
 }
 .carte-zone.photo #carte-svg .c-vide { stroke-width: 1.8px; }
