@@ -18,6 +18,32 @@
     --text: #e2e8f0;
     --text-muted: #7a8fa6;
     --text-dim: #4a5568;
+    --ombre: rgba(0,0,0,.45);
+    color-scheme: dark;
+  }
+
+  /* ====================================================================
+     Mode jour — ivoire
+     --------------------------------------------------------------------
+     Toute la palette découle de ces jetons. Les teintes d'accent sont
+     assombries : le même ambre #f0a500 qui éclaire un fond nuit devient
+     illisible sur de l'ivoire — il y tombe à 1,7 de rapport de contraste,
+     contre 4,9 pour la version foncée.
+     ==================================================================== */
+  body.jour {
+    --bg: #f6f2e8;          /* ivoire, le fond de page         */
+    --surface: #fffdf7;     /* cartes et panneaux, plus clairs */
+    --surface2: #efe9db;    /* champs, zones en creux          */
+    --border: #ddd4c2;
+    --accent:  #a86a04;     /* ambre foncé, lisible sur ivoire */
+    --accent2: #0c757e;     /* sarcelle foncée                 */
+    --accent3: #b93a3a;
+    --accent4: #4a7d2c;
+    --text: #221f19;
+    --text-muted: #6a6155;
+    --text-dim: #8f8577;
+    --ombre: rgba(90,74,42,.16);
+    color-scheme: light;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -57,6 +83,14 @@
   .nav-btn:hover { color: var(--text); background: var(--surface2); }
   .nav-btn.active { color: var(--accent); background: rgba(240,165,0,0.1); font-weight: 500; }
   .header-right { display: flex; align-items: center; gap: 10px; }
+  .btn-theme {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px;
+    cursor: pointer; font-size: 15px; line-height: 1; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: color .15s, border-color .15s;
+  }
+  .btn-theme:hover { color: var(--accent); border-color: var(--accent); }
   .tag-year {
     background: rgba(240,165,0,0.15); color: var(--accent);
     font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
@@ -349,7 +383,7 @@
   .modal-box {
     background:var(--surface); border:1px solid var(--border); border-radius:16px;
     width:100%; max-width:720px; max-height:85vh; overflow-y:auto;
-    box-shadow:0 24px 64px rgba(0,0,0,0.5);
+    box-shadow:0 24px 64px var(--ombre);
   }
   .modal-header {
     display:flex; align-items:flex-start; justify-content:space-between;
@@ -558,13 +592,13 @@
     margin-bottom: 12px;
   }
   .alert-card {
-    background: var(--card); border: 1px solid var(--border);
+    background: var(--surface); border: 1px solid var(--border);
     border-radius: 12px; padding: 16px;
     margin-bottom: 12px; position: relative;
     transition: box-shadow 0.2s;
     animation: fadeIn 0.2s ease;
   }
-  .alert-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+  .alert-card:hover { box-shadow: 0 4px 20px var(--ombre); }
   .alert-card.urgence  { border-left: 4px solid var(--accent3); }
   .alert-card.vigilance{ border-left: 4px solid var(--accent); }
   .alert-card.decision { border-left: 4px solid var(--accent2); }
@@ -622,7 +656,7 @@
   .alert-tag.resolu      { background:rgba(106,176,76,0.15); color:#6ab04c; }
 
   .alert-kpi-badge {
-    background: var(--card); border: 1px solid var(--border);
+    background: var(--surface); border: 1px solid var(--border);
     border-radius: 10px; padding: 10px 18px;
     display:flex; align-items:center; gap:10px;
     font-family:'Syne',sans-serif;
@@ -644,7 +678,7 @@
   .btn-alert-del:hover { background:rgba(224,92,92,0.22); }
 
   .form-textarea {
-    width:100%; background:var(--input-bg); border:1px solid var(--border);
+    width:100%; background:var(--surface2); border:1px solid var(--border);
     border-radius:8px; color:var(--text); font-family:'DM Sans',sans-serif;
     font-size:13px; padding:10px 12px; resize:vertical; box-sizing:border-box;
     transition:border-color 0.15s;
@@ -687,9 +721,18 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=39">
+  <link rel="stylesheet" href="carte.css?v=40">
 </head>
 <body>
+<script>
+  /* Le thème doit être posé avant le premier rendu : appliqué plus tard, on
+     verrait la page apparaître en nuit puis virer à l'ivoire. */
+  (function () {
+    var t;
+    try { t = localStorage.getItem('ppi:theme'); } catch (e) {}
+    if (t === 'jour') document.body.classList.add('jour');
+  })();
+</script>
 
 <header>
   <div class="logo">
@@ -723,6 +766,9 @@
     <button class="nav-btn" onclick="showPage('controle')">🔎 Contrôle</button>
   </nav>
   <div class="header-right">
+    <button id="btn-theme" class="btn-theme" onclick="basculerTheme()"
+            title="Basculer entre le mode jour et le mode nuit"
+            aria-label="Basculer le thème"></button>
     <div class="tag-year">2025 – 2032</div>
     <span id="sync-badge" style="font-size:11px;color:#6ab04c;opacity:0;transition:opacity 0.5s;white-space:nowrap"></span>
     <span id="next-sync-badge" style="font-size:10px;color:var(--text-muted);white-space:nowrap"></span>
@@ -1154,7 +1200,7 @@
   <div class="prog-header">
     <div class="prog-title">Carte des opérations</div>
     <div style="display:flex;gap:8px;align-items:center">
-      <select class="filter-select" onchange="Carte.theme(this.value)">
+      <select class="filter-select" id="carte-f-theme" onchange="Carte.theme(this.value)">
         <option value="clair">Fond clair</option>
         <option value="sombre">Fond sombre</option>
       </select>
@@ -1276,28 +1322,64 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=39"></script>
-<script src="donnees/source.js?v=39"></script>
-<script src="carte.js?v=39"></script>
-<script src="compte.js?v=39"></script>
+<script src="donnees/config.js?v=40"></script>
+<script src="donnees/source.js?v=40"></script>
+<script src="carte.js?v=40"></script>
+<script src="compte.js?v=40"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
 
-const typeColors = {
-  "Étanchéité / sur-toiture":"#e05c5c",
-  "Menuiserie":"#3ecfcf",
-  "Ravalement":"#f0a500",
-  "Restauration":"#5b8dee",
-  "Sanitaire":"#6ab04c",
-  "Sol souple":"#fd79a8",
-  "Sol synthétique":"#a29bfe",
-  "Brasseur d'air":"#00cec9",
-  "Aménagement paysagé":"#55efc4",
-  "Réfection des coursives":"#e05c5c",
-  "Création salle de classe":"#fab1a0",
-  "Isolation préau":"#dfe6e9",
+/* ====================================================================
+   Palettes des séries
+   --------------------------------------------------------------------
+   Les teintes du mode nuit sont calibrées pour un fond #0d1117. Posées
+   sur de l'ivoire, elles tombent sous le seuil de lisibilité — l'ambre
+   #f0a500 n'y offre que 1,7 de contraste. On tient donc une version
+   foncée de chaque teinte, et une fonction unique y puise.
+   ==================================================================== */
+const SERIES = {
+  nuit: { realise:'#6ab04c', cours:'#5b8dee', consult:'#f0a500',
+          planifie:'#7a8fa6', urgent:'#e05c5c', reporte:'#e8820c' },
+  jour: { realise:'#3f6f26', cours:'#2856b0', consult:'#955e03',
+          planifie:'#6a6155', urgent:'#a83232', reporte:'#9c4f05' }
 };
+const ANNEE_TEINTES = {
+  nuit: { 2024:'#f0a500', 2025:'#3ecfcf', 2026:'#5b8dee', 2027:'#a29bfe',
+          2028:'#fd79a8', 2029:'#55efc4', 2030:'#fab1a0', 2031:'#dfe6e9', 2032:'#7a8fa6' },
+  jour: { 2024:'#955e03', 2025:'#0a6570', 2026:'#2856b0', 2027:'#5b41ad',
+          2028:'#b03668', 2029:'#146b52', 2030:'#a3542f', 2031:'#6a6155', 2032:'#6a6155' }
+};
+const TYPE_TEINTES = {
+  nuit: { rouge:'#e05c5c', sarcelle:'#3ecfcf', ambre:'#f0a500', bleu:'#5b8dee',
+          vert:'#6ab04c', rose:'#fd79a8', violet:'#a29bfe', cyan:'#00cec9',
+          menthe:'#55efc4', saumon:'#fab1a0', gris:'#dfe6e9', ardoise:'#7a8fa6' },
+  jour: { rouge:'#a83232', sarcelle:'#0a6570', ambre:'#955e03', bleu:'#2856b0',
+          vert:'#3f6f26', rose:'#b03668', violet:'#5b41ad', cyan:'#0a6570',
+          menthe:'#146b52', saumon:'#a3542f', gris:'#6a6155', ardoise:'#6a6155' }
+};
+function couleurEtat(e) {
+  const p = SERIES[themeActuel()]; return p[e] || p.planifie;
+}
+function couleurAnnee(y) {
+  return ANNEE_TEINTES[themeActuel()][y] || SERIES[themeActuel()].planifie;
+}
+function couleurType(t) {
+  const nom = TYPE_NOMS[t] || 'ardoise';
+  return TYPE_TEINTES[themeActuel()][nom];
+}
+/* Chaque type de travaux est désigné par un nom de teinte, pas par un code :
+   c'est ce qui permet d'en donner deux versions sans dupliquer la table. */
+const TYPE_NOMS = {
+  "Étanchéité / sur-toiture":"rouge", "Menuiserie":"sarcelle",
+  "Ravalement":"ambre", "Restauration":"bleu", "Sanitaire":"vert",
+  "Sol souple":"rose", "Sol synthétique":"violet", "Brasseur d'air":"cyan",
+  "Aménagement paysager":"menthe", "Aménagement paysagé":"menthe",
+  "Pergola":"menthe", "Réfection des coursives":"rouge",
+  "Création salle de classe":"saumon", "Création de salle de classe":"saumon",
+  "Isolation préau":"gris"
+};
+
 
 // ===== ECOLES PAR SECTEUR =====
 const ecolesBySecteur = {
@@ -1398,7 +1480,7 @@ function renderChartTypes(elId, data) {
   data.forEach(d => { if(d.montant) types[d.type] = (types[d.type]||0) + d.montant; });
   const sorted = Object.entries(types).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const max = sorted[0]?.[1]||1;
-  document.getElementById(elId).innerHTML = sorted.map(([t,v])=>barRow(t,v,max,typeColors[t]||'#7a8fa6')).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
+  document.getElementById(elId).innerHTML = sorted.map(([t,v])=>barRow(t,v,max,couleurType(t))).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
 }
 
 function renderChartDonut(elId, data) {
@@ -1420,7 +1502,7 @@ function renderChartDonut(elId, data) {
 function renderChartEtat(elId, data) {
   const etats = {realise:0,cours:0,consult:0,planifie:0,urgent:0};
   data.forEach(d => { etats[d.etat] = (etats[d.etat]||0) + d.montant; });
-  const etatColors = {realise:'#6ab04c',cours:'#5b8dee',consult:'#f0a500',planifie:'#7a8fa6',urgent:'#e05c5c',reporte:'#e8820c'};
+  const etatColors = SERIES[themeActuel()];
   // « reporte » manquait : la barre correspondante s'affichait « undefined ».
   const etatLabels = {realise:'Réalisé',cours:'En cours',consult:'Consultation',planifie:'Planifié',urgent:'Urgent',reporte:'Reporté'};
   const filtered = Object.entries(etats).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
@@ -1452,7 +1534,7 @@ function renderChartTopOps(elId, data) {
   const sorted = [...data].filter(d=>d.montant>0).sort((a,b)=>b.montant-a.montant).slice(0,10);
   const max = sorted[0]?.montant||1;
   document.getElementById(elId).innerHTML = sorted.map(d=>
-    barRow(`${d.ecole} — ${d.type}`, d.montant, max, typeColors[d.type]||'#7a8fa6')
+    barRow(`${d.ecole} — ${d.type}`, d.montant, max, couleurType(d.type))
   ).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
 }
 
@@ -1490,7 +1572,7 @@ function renderSecteursChart() {}
 function renderGantt() {
   const groupBy = document.getElementById('gantt-group')?.value || 'type';
   const annees = [2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
-  const etatColor = {realise:'#6ab04c', cours:'#5b8dee', consult:'#f0a500', planifie:'#7a8fa6', urgent:'#e05c5c', reporte:'#e8820c'};
+  const etatColor = SERIES[themeActuel()];
   const etatOrder = {realise:0, cours:1, consult:2, planifie:3, urgent:4, reporte:5};
 
   // Grouper les opérations
@@ -1518,11 +1600,11 @@ function renderGantt() {
 
   // Couleur dominante d'un groupe = état le plus fréquent
   function dominantColor(ops) {
-    if (!ops || ops.length === 0) return '#2a3347';
+    if (!ops || ops.length === 0) return 'var(--border)';
     const counts = {};
     ops.forEach(o => counts[o.etat] = (counts[o.etat]||0) + 1);
     const dom = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
-    return etatColor[dom] || '#7a8fa6';
+    return etatColor[dom] || etatColor.planifie;
   }
 
   // Barre de progression état (mini-segments colorés)
@@ -1532,7 +1614,7 @@ function renderGantt() {
     ops.forEach(d => byEtat[d.etat] = (byEtat[d.etat]||0) + d.montant);
     const segs = Object.entries(byEtat).sort((a,b)=>(etatOrder[a[0]]||9)-(etatOrder[b[0]]||9));
     return `<div style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:5px;gap:1px">` +
-      segs.map(([e,v])=>`<div style="flex:${v};background:${etatColor[e]||'#7a8fa6'};min-width:4px" title="${e}: ${fmt(v)}"></div>`).join('') +
+      segs.map(([e,v])=>`<div style="flex:${v};background:${etatColor[e]||etatColor.planifie};min-width:4px" title="${e}: ${fmt(v)}"></div>`).join('') +
     `</div>`;
   }
 
@@ -1541,7 +1623,7 @@ function renderGantt() {
   // En-tête
   html += `<div style="display:grid;grid-template-columns:${labelW}px repeat(${annees.length},${colW}px);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px">`;
   html += `<div style="font-size:11px;font-weight:600;color:var(--text-muted);padding:0 8px">${groupBy === 'type' ? 'Type de travaux' : groupBy === 'programme' ? 'Programme' : 'Secteur'}</div>`;
-  const anneeAccents = {2024:'#f0a500',2025:'#3ecfcf',2026:'#5b8dee',2027:'#a29bfe'};
+  const anneeAccents = ANNEE_TEINTES[themeActuel()];
   annees.forEach(y => {
     const total = rawData.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
     html += `<div style="text-align:center;padding:0 8px">
@@ -1554,7 +1636,7 @@ function renderGantt() {
   // Lignes
   sortedGroups.forEach(([key, byYear]) => {
     const rowTotal = Object.values(byYear).flat().reduce((s,d)=>s+d.montant,0);
-    const baseColor = groupBy === 'type' ? (typeColors[key]||'#7a8fa6') : dominantColor(Object.values(byYear).flat());
+    const baseColor = groupBy === 'type' ? couleurType(key) : dominantColor(Object.values(byYear).flat());
 
     html += `<div style="display:grid;grid-template-columns:${labelW}px repeat(${annees.length},${colW}px);border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;padding:6px 0;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">`;
 
@@ -1754,6 +1836,31 @@ window.addEventListener('beforeprint', () => {
 window.addEventListener('afterprint', () => {
   if (window.Carte && Carte.finImpression) Carte.finImpression();
 });
+
+// ===== THÈME =====
+function themeActuel() { return document.body.classList.contains('jour') ? 'jour' : 'nuit'; }
+
+function appliquerTheme(t, memoriser) {
+  document.body.classList.toggle('jour', t === 'jour');
+  const b = document.getElementById('btn-theme');
+  if (b) {
+    b.textContent = t === 'jour' ? '☾' : '☀';
+    b.title = t === 'jour' ? 'Passer en mode nuit' : 'Passer en mode jour';
+  }
+  // Le fond de carte suit la page : une carte sombre sur une page ivoire
+  // jurerait. Le sélecteur de la vue Carte reste libre de le redéfinir.
+  const sel = document.getElementById('carte-f-theme');
+  if (sel) sel.value = t === 'jour' ? 'clair' : 'sombre';
+  if (window.Carte && Carte.theme) Carte.theme(t === 'jour' ? 'clair' : 'sombre');
+  if (memoriser) { try { localStorage.setItem('ppi:theme', t); } catch (e) {} }
+  // Les graphiques portent leurs couleurs en dur dans le HTML produit : sans
+  // nouveau rendu, ils garderaient la palette de l'autre thème.
+  if (memoriser && Array.isArray(rawData) && rawData.length) initApp();
+}
+
+function basculerTheme() {
+  appliquerTheme(themeActuel() === 'jour' ? 'nuit' : 'jour', true);
+}
 
 // ===== EXPORT CSV =====
 function exportCSV() {
@@ -2313,6 +2420,7 @@ async function loadFromGSheets(silencieux) {
   } catch(e){ showError(e.reseau ? e.message : 'Erreur de connexion : ' + e.message); }
 }
 // ===== INIT =====
+appliquerTheme(themeActuel(), false);   // pose l'icône du bouton
 if (window.Compte) Compte.init();
 loadFromGSheets();
 

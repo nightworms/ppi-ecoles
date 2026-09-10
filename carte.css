@@ -35,7 +35,7 @@
 /* infobulle */
 #carte-bulle{position:absolute;pointer-events:none;background:var(--surface);
   border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;
-  color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.45);
+  color:var(--text);box-shadow:0 8px 24px var(--ombre);
   transform:translate(-50%,calc(-100% - 14px));opacity:0;transition:opacity .1s;
   z-index:6;max-width:330px}
 #carte-bulle.on{opacity:1}
@@ -106,7 +106,7 @@
   #page-carte .carte-panneau{position:absolute;top:0;right:0;bottom:0;
     width:min(360px,54%);border-radius:0 12px 12px 0;
     border-width:0 0 0 1px;z-index:5;
-    box-shadow:-14px 0 34px rgba(0,0,0,.32)}
+    box-shadow:-14px 0 34px var(--ombre)}
   #page-carte .carte-panneau.vide{display:none}
 
   #page-carte .carte-outils{gap:7px;margin-bottom:10px}
@@ -117,10 +117,6 @@
   #carte-compteurs b{font-size:14px}
 }
 
-/* Le panneau flottant doit se détacher du fond clair comme du fond sombre. */
-@media (max-width:1280px) and (min-width:901px){
-  .carte-zone.clair .carte-panneau{box-shadow:-14px 0 34px rgba(20,32,28,.18)}
-}
 
 @media (max-width:900px){
   #page-carte .carte-wrap{grid-template-columns:1fr;height:auto}
@@ -134,6 +130,12 @@
    reste sombre autour ; seule la surface cartographique s'éclaircit.
    ------------------------------------------------------------------ */
 #page-carte .carte-zone.clair{background:#e8ede9;border-color:#cfd9d3}
+/* En mode jour, le pourtour de la carte se réchauffe pour s'accorder à
+   l'ivoire : le gris-vert d'origine y paraissait froid. Le fond sombre de
+   page garde, lui, la version neutre. */
+body.jour #page-carte .carte-zone.clair{background:#ece5d6;border-color:var(--border)}
+body.jour .carte-zone.clair #carte-svg .c-voisins path{fill:#ece5d6;stroke:#d8cfbd}
+body.jour .carte-zone.clair #carte-svg .c-traits path{stroke:#cec4b0}
 .carte-zone.clair #carte-svg .c-mer{fill:#dbeafe}
 .carte-zone.clair #carte-svg .c-quartiers path{fill:#ffffff}
 .carte-zone.clair #carte-svg .c-voisins path{fill:#e8ede9;stroke:#cfd9d3}
