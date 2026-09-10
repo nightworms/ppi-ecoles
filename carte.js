@@ -438,8 +438,9 @@ window.Carte = (function () {
     });
     var d = document.getElementById('carte-compteurs');
     if (d) d.innerHTML =
-      '<span><b>' + liste.length + '</b> écoles</span>' +
-      '<span><b>' + ops + '</b> opérations</span>' +
+      // Un filtre qui ne laisse qu'une école affichait « 1 écoles ».
+      '<span><b>' + liste.length + '</b> école' + (liste.length > 1 ? 's' : '') + '</span>' +
+      '<span><b>' + ops + '</b> opération' + (ops > 1 ? 's' : '') + '</span>' +
       '<span><b>' + (montant / 1e6).toFixed(2).replace('.', ',') + '</b> M€</span>';
   }
 
