@@ -32,7 +32,7 @@ window.Carte = (function () {
   var TEINTES_C = ['#a8620d', '#0b6f86', '#3d7a1e', '#6a3d92', '#a13328',
                    '#2c4f9c', '#97316b', '#4a6570', '#8a4b1f', '#2f6d35', '#7a6a12'];
   var couleursType = {}, couleursTypeC = {};   // remplis à la lecture des opérations
-  var theme = 'clair';                          // fond de carte : 'clair' | 'sombre'
+  var theme = 'clair';                          // fond de carte : 'clair' | 'photo'
   var calques = { bati: true, voirie: true, rues: true, planches: true };
 
   // Relevé des planches ArcMap : deux dispositifs que le PPI ne suit pas. Ils sont
@@ -1098,7 +1098,7 @@ window.Carte = (function () {
       z.classList.toggle('photo', theme === 'photo');
     }
     var b = document.getElementById('carte-bulle');
-    if (b) b.classList.toggle('clair', theme !== 'sombre');
+    if (b) b.classList.add('clair');
     majOrtho(true);
     legende(); marques(); panneau();
   }
@@ -1229,7 +1229,7 @@ window.Carte = (function () {
   return {
     demarrer: demarrer,
     controle: rendreControle,
-    theme: function (v) { theme = v; appliquerTheme(); },
+    theme: function (v) { theme = (v === 'photo') ? 'photo' : 'clair'; appliquerTheme(); },
     editer: function (id) { saisie = { id: id }; panneau(); },
     nouvelleObs: function () { obsEnCours = selection; panneau(); },
     // Appelée par l'onglet Alertes après une modification ou une suppression :
