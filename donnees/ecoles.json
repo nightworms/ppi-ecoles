@@ -1,1 +1,1043 @@
-{"ecoles":[{"id":"ecole-maternelle-aurore","nom":"Ecole maternelle Aurore","court":"Aurore","niveau":"Maternelle","q":"BRETAGNE","lat":-20.918257,"lon":55.49401},{"id":"ecole-maternelle-bancouliers","nom":"Ecole maternelle Bancouliers","court":"Bancouliers","niveau":"Maternelle","q":"MOUFIA","lat":-20.908684,"lon":55.481769},{"id":"ecole-maternelle-bois-de-nefles","nom":"Ecole maternelle Bois de Nèfles","court":"Bois de Nèfles","niveau":"Maternelle","q":"BOIS DE NEFLES","lat":-20.916103,"lon":55.477842,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-maternelle-bouvet","nom":"Ecole maternelle Bouvet","court":"Bouvet","niveau":"Maternelle","q":"VAUBAN","lat":-20.888241,"lon":55.462731},{"id":"ecole-maternelle-centrale","nom":"Ecole maternelle Centrale","court":"Centrale","niveau":"Maternelle","q":"CENTRE-VILLE","lat":-20.880758,"lon":55.453864},{"id":"ecole-maternelle-champ-fleuri","nom":"Ecole maternelle Champ Fleuri","court":"Champ Fleuri","niveau":"Maternelle","q":"MARCADET","lat":-20.887214,"lon":55.468753,"planches":{"vegetalisation":{"a":"2026","s":"programme"}}},{"id":"ecole-maternelle-claude-debussy","nom":"Ecole maternelle Claude Debussy","court":"Claude Debussy","niveau":"Maternelle","q":"BUTOR STE-CLOTILDE","lat":-20.887986,"lon":55.480404,"planches":{"pergolas":{"a":"2024-2025","s":"realise"}}},{"id":"ecole-maternelle-damase-legros","nom":"Ecole maternelle Damase Legros","court":"Damase Legros","niveau":"Maternelle","q":"CHAUDRON","lat":-20.89022,"lon":55.485854,"planches":{"vegetalisation":{"a":"2025","s":"realise"}},"pos":"registre"},{"id":"ecole-maternelle-domenjod","nom":"Ecole maternelle Domenjod","court":"Domenjod","niveau":"Maternelle","q":"DOMENJOD","lat":-20.912072,"lon":55.506894},{"id":"ecole-maternelle-eudoxie-nonge","nom":"Ecole maternelle Eudoxie Nonge","court":"Eudoxie Nonge","niveau":"Maternelle","q":"CHAUDRON","lat":-20.89845,"lon":55.49435,"verif":true},{"id":"ecole-maternelle-francoise-mollard","nom":"Ecole maternelle Françoise Mollard","court":"Françoise Mollard","niveau":"Maternelle","q":"CAMELIAS PROVIDENCE","lat":-20.89543,"lon":55.461124,"verif":true},{"id":"ecole-maternelle-gisele-calmy","nom":"Ecole maternelle Gisèle Calmy","court":"Gisèle Calmy","niveau":"Maternelle","q":"CENTRE-VILLE","lat":-20.882048,"lon":55.45705,"planches":{"pergolas":{"a":"2024-2025","s":"realise"}}},{"id":"ecole-maternelle-herbiniere-lebert","nom":"Ecole maternelle Herbinière Lebert","court":"Herbinière Lebert","niveau":"Maternelle","q":"CHAUDRON","lat":-20.896559,"lon":55.485834,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-maternelle-la-riviere-2","nom":"Ecole maternelle La Rivière 2","court":"La Rivière 2","niveau":"Maternelle","q":"PETITE ILE BAS DE LA RIVIERE","lat":-20.882201,"lon":55.446024,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-maternelle-la-source","nom":"Ecole maternelle La Source","court":"La Source","niveau":"Maternelle","q":"BELLEPIERRE","lat":-20.89264,"lon":55.452337},{"id":"ecole-maternelle-les-badamiers","nom":"Ecole maternelle Les Badamiers","court":"Les Badamiers","niveau":"Maternelle","q":"MOUFIA 2","lat":-20.899592,"lon":55.491406},{"id":"ecole-maternelle-les-bringelliers","nom":"Ecole maternelle Les Bringelliers","court":"Les Bringelliers","niveau":"Maternelle","q":"BOIS DE NEFLES","lat":-20.905503,"lon":55.475339},{"id":"ecole-maternelle-les-cocotiers","nom":"Ecole maternelle Les Cocotiers","court":"Les Cocotiers","niveau":"Maternelle","q":"DOMENJOD","lat":-20.910043,"lon":55.504056,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-maternelle-les-flamboyants","nom":"Ecole maternelle Les Flamboyants","court":"Les Flamboyants","niveau":"Maternelle","q":"CENTRE-VILLE","lat":-20.883337,"lon":55.454924,"planches":{"pergolas":{"a":"2024-2025","s":"realise"},"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-maternelle-les-jacarandas","nom":"Ecole maternelle Les Jacarandas","court":"Les Jacarandas","niveau":"Maternelle","q":"BUTOR STE-CLOTILDE","lat":-20.891161,"lon":55.478919},{"id":"ecole-maternelle-les-rubis","nom":"Ecole maternelle Les Rubis","court":"Les Rubis","niveau":"Maternelle","q":"BELLEPIERRE","lat":-20.899651,"lon":55.444878,"planches":{"pergolas":{"a":"2024-2025","s":"realise"}}},{"id":"ecole-maternelle-les-tamarins","nom":"Ecole maternelle Les Tamarins","court":"Les Tamarins","niveau":"Maternelle","q":"BUTOR STE-CLOTILDE","lat":-20.898417,"lon":55.482054,"planches":{"pergolas":{"a":"2024-2025","s":"realise"},"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-maternelle-les-tulipiers","nom":"Ecole maternelle Les Tulipiers","court":"Les Tulipiers","niveau":"Maternelle","q":"MOUFIA","lat":-20.91636,"lon":55.485958,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-maternelle-michel-debre","nom":"Ecole maternelle Michel Debré","court":"Michel Debré","niveau":"Maternelle","q":"CHAUDRON","lat":-20.891975,"lon":55.48527},{"id":"ecole-maternelle-montgaillard","nom":"Ecole maternelle Montgaillard","court":"Montgaillard","niveau":"Maternelle","q":"MONTGAILLARD COLLINE DES CAMELIAS","lat":-20.89997,"lon":55.469952,"planches":{"pergolas":{"a":"2024-2025","s":"realise"}}},{"id":"ecole-maternelle-petite-ile","nom":"Ecole maternelle Petite-Ile","court":"Petite-Ile","niveau":"Maternelle","q":"PETITE ILE BAS DE LA RIVIERE","lat":-20.882962,"lon":55.445991,"planches":{"vegetalisation":{"a":"2025","s":"realise"}},"pos":"registre"},{"id":"ecole-maternelle-philippe-vinson","nom":"Ecole maternelle Philippe Vinson","court":"Philippe Vinson","niveau":"Maternelle","q":"MONTAGNE 8ème","lat":-20.889082,"lon":55.422426,"verif":true},{"id":"ecole-maternelle-providence","nom":"Ecole maternelle Providence","court":"Providence","niveau":"Maternelle","q":"CAMELIAS PROVIDENCE","lat":-20.893445,"lon":55.457603,"planches":{"pergolas":{"a":"2024-2025","s":"realise"}}},{"id":"ecole-maternelle-ruisseau-blanc","nom":"Ecole maternelle Ruisseau Blanc","court":"Ruisseau Blanc","niveau":"Maternelle","q":"MONTAGNE 8ème","lat":-20.90064,"lon":55.409399,"verif":true},{"id":"ecole-maternelle-saint-francois","nom":"Ecole maternelle Saint François","court":"Saint François","niveau":"Maternelle","q":"SAINT-FRANCOIS","lat":-20.917482,"lon":55.459627},{"id":"ecole-maternelle-saint-bernard","nom":"Ecole maternelle Saint-Bernard","court":"Saint-Bernard","niveau":"Maternelle","q":"MONTAGNE 15ème","lat":-20.910618,"lon":55.400706},{"id":"ecole-maternelle-vauban","nom":"Ecole maternelle Vauban","court":"Vauban","niveau":"Maternelle","q":"VAUBAN","lat":-20.886622,"lon":55.464533},{"id":"ecole-maternelle-ylang-ylang","nom":"Ecole maternelle Ylang-Ylang","court":"Ylang-Ylang","niveau":"Maternelle","q":"PETITE ILE BAS DE LA RIVIERE","lat":-20.885447,"lon":55.444696,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-primaire-ancien-theatre","nom":"Ecole primaire Ancien Théâtre","court":"Ancien Théâtre","niveau":"Primaire","q":"CENTRE-VILLE","lat":-20.875707,"lon":55.45355},{"id":"ecole-primaire-application-bellepierre","nom":"Ecole primaire Application Bellepierre","court":"Application Bellepierre","niveau":"Primaire","q":"BELLEPIERRE","lat":-20.894759,"lon":55.446919,"planches":{"pergolas":{"a":"2026-2027","s":"encours"},"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-primaire-grand-canal","nom":"Ecole primaire Grand Canal","court":"Grand Canal","niveau":"Primaire","q":"BRETAGNE","lat":-20.90968,"lon":55.496649,"verif":true},{"id":"ecole-primaire-jean-baptiste-bossard","nom":"Ecole primaire Jean-Baptiste Bossard","court":"Jean-Baptiste Bossard","niveau":"Primaire","q":"BUTOR STE-CLOTILDE","lat":-20.894267,"lon":55.483587},{"id":"ecole-primaire-la-chaumiere","nom":"Ecole primaire La Chaumière","court":"La Chaumière","niveau":"Primaire","q":"MONTGAILLARD COLLINE DES CAMELIAS","lat":-20.898317,"lon":55.462192},{"id":"ecole-primaire-le-brule","nom":"Ecole primaire Le Brûlé","court":"Le Brûlé","niveau":"Primaire","q":"BRULE","lat":-20.923923,"lon":55.434687,"verif":true},{"id":"ecole-primaire-les-baies-roses","nom":"Ecole primaire Les Baies Roses","court":"Les Baies Roses","niveau":"Primaire","q":"MOUFIA","lat":-20.905181,"lon":55.480336,"planches":{"pergolas":{"a":"2024-2025","s":"realise"}}},{"id":"ecole-primaire-les-eglantines","nom":"Ecole primaire Les Eglantines","court":"Les Eglantines","niveau":"Primaire","q":"MOUFIA","lat":-20.918197,"lon":55.486944,"planches":{"pergolas":{"a":"2024-2025","s":"realise"},"vegetalisation":{"a":"2025","s":"realise"}},"pos":"registre"},{"id":"ecole-primaire-maxime-laope","nom":"Ecole primaire Maxime Laope","court":"Maxime Laope","niveau":"Primaire","q":"BRETAGNE","lat":-20.938677,"lon":55.485932},{"id":"ecole-primaire-philibert-commerson","nom":"Ecole primaire Philibert Commerson","court":"Philibert Commerson","niveau":"Primaire","q":"BRETAGNE","lat":-20.925681,"lon":55.49383},{"id":"ecole-primaire-piton-bois-de-nefles","nom":"Ecole primaire Piton Bois de Nèfles","court":"Piton Bois de Nèfles","niveau":"Primaire","q":"BOIS DE NEFLES","lat":-20.933317,"lon":55.470705,"pos":"registre"},{"id":"ecole-primaire-prima","nom":"Ecole primaire Prima","court":"Prima","niveau":"Primaire","q":"PRIMA","lat":-20.898765,"lon":55.501389},{"id":"ecole-elementaire-affouches","nom":"Ecole élémentaire Affouches","court":"Affouches","niveau":"Élémentaire","q":"MONTAGNE 15ème","lat":-20.919723,"lon":55.404359},{"id":"ecole-elementaire-alain-lorraine","nom":"Ecole élémentaire Alain Lorraine","court":"Alain Lorraine","niveau":"Élémentaire","q":"MOUFIA","lat":-20.916949,"lon":55.486367,"planches":{"pergolas":{"a":"2024-2025","s":"realise"},"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-elementaire-bancouliers","nom":"Ecole élémentaire Bancouliers","court":"Bancouliers","niveau":"Élémentaire","q":"MOUFIA","lat":-20.909138,"lon":55.481925},{"id":"ecole-elementaire-bois-de-nefles","nom":"Ecole élémentaire Bois de Nèfles","court":"Bois de Nèfles","niveau":"Élémentaire","q":"BOIS DE NEFLES","lat":-20.916712,"lon":55.476153},{"id":"ecole-elementaire-bory-de-saint-vincent","nom":"Ecole élémentaire Bory de Saint-Vincent","court":"Bory de Saint-Vincent","niveau":"Élémentaire","q":"BRETAGNE","lat":-20.919415,"lon":55.49349,"verif":true},{"id":"ecole-elementaire-bouvet","nom":"Ecole élémentaire Bouvet","court":"Bouvet","niveau":"Élémentaire","q":"VAUBAN","lat":-20.888241,"lon":55.462731},{"id":"ecole-elementaire-candide-azema-a","nom":"Ecole élémentaire Candide Azéma A","court":"Candide Azéma A","niveau":"Élémentaire","q":"CAMELIAS PROVIDENCE","lat":-20.893468,"lon":55.465123},{"id":"ecole-elementaire-candide-azema-b","nom":"Ecole élémentaire Candide Azéma B","court":"Candide Azéma B","niveau":"Élémentaire","q":"CAMELIAS PROVIDENCE","lat":-20.893181,"lon":55.465163},{"id":"ecole-elementaire-centrale","nom":"Ecole élémentaire Centrale","court":"Centrale","niveau":"Élémentaire","q":"CENTRE-VILLE","lat":-20.880366,"lon":55.453722},{"id":"ecole-elementaire-champ-fleuri","nom":"Ecole élémentaire Champ Fleuri","court":"Champ Fleuri","niveau":"Élémentaire","q":"MARCADET","lat":-20.888485,"lon":55.46725,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-elementaire-damase-legros","nom":"Ecole élémentaire Damase Legros","court":"Damase Legros","niveau":"Élémentaire","q":"CHAUDRON","lat":-20.895476,"lon":55.491632,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-elementaire-domenjod","nom":"Ecole élémentaire Domenjod","court":"Domenjod","niveau":"Élémentaire","q":"DOMENJOD","lat":-20.912072,"lon":55.506894},{"id":"ecole-elementaire-eudoxie-nonge","nom":"Ecole élémentaire Eudoxie Nonge","court":"Eudoxie Nonge","niveau":"Élémentaire","q":"CHAUDRON","lat":-20.89845,"lon":55.49435,"verif":true},{"id":"ecole-elementaire-gabriel-mace","nom":"Ecole élémentaire Gabriel Macé","court":"Gabriel Macé","niveau":"Élémentaire","q":"LA SOURCE","lat":-20.889604,"lon":55.448999,"planches":{"pergolas":{"a":"2026","s":"realise"}}},{"id":"ecole-elementaire-henri-dunant","nom":"Ecole élémentaire Henri Dunant","court":"Henri Dunant","niveau":"Élémentaire","q":"MONTGAILLARD COLLINE DES CAMELIAS","lat":-20.896381,"lon":55.467547,"planches":{"pergolas":{"a":"2024-2025","s":"realise"}}},{"id":"ecole-elementaire-herbiniere-lebert","nom":"Ecole élémentaire Herbinière Lebert","court":"Herbinière Lebert","niveau":"Élémentaire","q":"CHAUDRON","lat":-20.897155,"lon":55.485864},{"id":"ecole-elementaire-joinville","nom":"Ecole élémentaire Joinville","court":"Joinville","niveau":"Élémentaire","q":"CENTRE-VILLE","lat":-20.884273,"lon":55.454341,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-elementaire-jules-reydellet-a","nom":"Ecole élémentaire Jules Reydellet A","court":"Jules Reydellet A","niveau":"Élémentaire","q":"PETITE ILE BAS DE LA RIVIERE","lat":-20.882592,"lon":55.446142,"planches":{"pergolas":{"a":"2026-2027","s":"encours"},"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-elementaire-jules-reydellet-b","nom":"Ecole élémentaire Jules Reydellet B","court":"Jules Reydellet B","niveau":"Élémentaire","q":"PETITE ILE BAS DE LA RIVIERE","lat":-20.881808,"lon":55.446968,"planches":{"pergolas":{"a":"2024-2025","s":"realise"},"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-elementaire-les-badamiers","nom":"Ecole élémentaire Les Badamiers","court":"Les Badamiers","niveau":"Élémentaire","q":"MOUFIA 2","lat":-20.899494,"lon":55.490723,"planches":{"pergolas":{"a":"2024-2025","s":"realise"},"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-elementaire-les-bringelliers","nom":"Ecole élémentaire Les Bringelliers","court":"Les Bringelliers","niveau":"Élémentaire","q":"BOIS DE NEFLES","lat":-20.905784,"lon":55.475848},{"id":"ecole-elementaire-les-camelias","nom":"Ecole élémentaire Les Camélias","court":"Les Camélias","niveau":"Élémentaire","q":"LA SOURCE","lat":-20.889711,"lon":55.454419},{"id":"ecole-elementaire-les-lilas-bois-noirs","nom":"Ecole élémentaire Les Lilas - Bois Noirs","court":"Les Lilas - Bois Noirs","niveau":"Élémentaire","q":"BUTOR STE-CLOTILDE","lat":-20.891399,"lon":55.47855,"planches":{"pergolas":{"a":"2026","s":"realise"}}},{"id":"ecole-elementaire-les-tamarins","nom":"Ecole élémentaire Les Tamarins","court":"Les Tamarins","niveau":"Élémentaire","q":"BUTOR STE-CLOTILDE","lat":-20.897345,"lon":55.480728,"planches":{"pergolas":{"a":"2024-2025","s":"realise"},"vegetalisation":{"a":"2025","s":"realise"}},"pos":"registre"},{"id":"ecole-elementaire-les-topazes","nom":"Ecole élémentaire Les Topazes","court":"Les Topazes","niveau":"Élémentaire","q":"BELLEPIERRE","lat":-20.898789,"lon":55.444077,"pos":"registre"},{"id":"ecole-elementaire-leon-dierx","nom":"Ecole élémentaire Léon Dierx","court":"Léon Dierx","niveau":"Élémentaire","q":"CENTRE-VILLE","lat":-20.883967,"lon":55.45106,"planches":{"pergolas":{"a":"2026","s":"realise"}}},{"id":"ecole-elementaire-michel-debre","nom":"Ecole élémentaire Michel Debré","court":"Michel Debré","niveau":"Élémentaire","q":"CHAUDRON","lat":-20.892413,"lon":55.485437,"planches":{"vegetalisation":{"a":"2025","s":"realise"}}},{"id":"ecole-elementaire-philippe-vinson","nom":"Ecole élémentaire Philippe Vinson","court":"Philippe Vinson","niveau":"Élémentaire","q":"MONTAGNE 8ème","lat":-20.889211,"lon":55.425165},{"id":"ecole-elementaire-raymond-mondon","nom":"Ecole élémentaire Raymond Mondon","court":"Raymond Mondon","niveau":"Élémentaire","q":"LA SOURCE","lat":-20.887209,"lon":55.453897,"planches":{"pergolas":{"a":"2026-2027","s":"encours"},"vegetalisation":{"a":"2026","s":"programme"}},"pos":"registre"},{"id":"ecole-elementaire-ruisseau-blanc","nom":"Ecole élémentaire Ruisseau Blanc","court":"Ruisseau Blanc","niveau":"Élémentaire","q":"MONTAGNE 8ème","lat":-20.89508,"lon":55.410625},{"id":"ecole-elementaire-saint-francois","nom":"Ecole élémentaire Saint François","court":"Saint François","niveau":"Élémentaire","q":"SAINT-FRANCOIS","lat":-20.919165,"lon":55.45966,"verif":true},{"id":"ecole-elementaire-saint-bernard","nom":"Ecole élémentaire Saint-Bernard","court":"Saint-Bernard","niveau":"Élémentaire","q":"MONTAGNE 15ème","lat":-20.909484,"lon":55.399564}],"quartiers_labels":[{"n":"PETITE ILE BAS DE LA RIVIERE","lat":-20.88356,"lon":55.4422},{"n":"CENTRE-VILLE","lat":-20.88497,"lon":55.45344},{"n":"BUTOR STE-CLOTILDE","lat":-20.88735,"lon":55.47648},{"n":"CHAUDRON","lat":-20.88861,"lon":55.493},{"n":"LA SOURCE","lat":-20.88886,"lon":55.4499},{"n":"VAUBAN","lat":-20.88914,"lon":55.46186},{"n":"MARCADET","lat":-20.88924,"lon":55.46664},{"n":"MONTAGNE 8ème","lat":-20.8912,"lon":55.42221},{"n":"PRIMA","lat":-20.89439,"lon":55.50226},{"n":"MOUFIA 2","lat":-20.89859,"lon":55.48898},{"n":"MONTGAILLARD COLLINE DES CAMELIAS","lat":-20.90155,"lon":55.4637},{"n":"BELLEPIERRE","lat":-20.90162,"lon":55.44287},{"n":"MOUFIA","lat":-20.90819,"lon":55.48292},{"n":"CAMELIAS PROVIDENCE","lat":-20.91076,"lon":55.44758},{"n":"MONTAGNE 15ème","lat":-20.91151,"lon":55.39688},{"n":"DOMENJOD","lat":-20.91608,"lon":55.5064},{"n":"BRULE","lat":-20.92226,"lon":55.43105},{"n":"SAINT-FRANCOIS","lat":-20.92413,"lon":55.45567},{"n":"BOIS DE NEFLES","lat":-20.92518,"lon":55.47628},{"n":"BRETAGNE","lat":-20.92961,"lon":55.49242}]}
+{
+ "ecoles": [
+  {
+   "id": "ecole-maternelle-aurore",
+   "nom": "Ecole maternelle Aurore",
+   "court": "Aurore",
+   "niveau": "Maternelle",
+   "q": "BRETAGNE",
+   "lat": -20.918257,
+   "lon": 55.49401
+  },
+  {
+   "id": "ecole-maternelle-bancouliers",
+   "nom": "Ecole maternelle Bancouliers",
+   "court": "Bancouliers",
+   "niveau": "Maternelle",
+   "q": "MOUFIA",
+   "lat": -20.908684,
+   "lon": 55.481769
+  },
+  {
+   "id": "ecole-maternelle-bois-de-nefles",
+   "nom": "Ecole maternelle Bois de Nèfles",
+   "court": "Bois de Nèfles",
+   "niveau": "Maternelle",
+   "q": "BOIS DE NEFLES",
+   "lat": -20.916103,
+   "lon": 55.477842,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-bouvet",
+   "nom": "Ecole maternelle Bouvet",
+   "court": "Bouvet",
+   "niveau": "Maternelle",
+   "q": "VAUBAN",
+   "lat": -20.888241,
+   "lon": 55.462731
+  },
+  {
+   "id": "ecole-maternelle-centrale",
+   "nom": "Ecole maternelle Centrale",
+   "court": "Centrale",
+   "niveau": "Maternelle",
+   "q": "CENTRE-VILLE",
+   "lat": -20.880758,
+   "lon": 55.453864
+  },
+  {
+   "id": "ecole-maternelle-champ-fleuri",
+   "nom": "Ecole maternelle Champ Fleuri",
+   "court": "Champ Fleuri",
+   "niveau": "Maternelle",
+   "q": "MARCADET",
+   "lat": -20.887214,
+   "lon": 55.468753,
+   "planches": {
+    "vegetalisation": {
+     "a": "2026",
+     "s": "programme"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-claude-debussy",
+   "nom": "Ecole maternelle Claude Debussy",
+   "court": "Claude Debussy",
+   "niveau": "Maternelle",
+   "q": "BUTOR STE-CLOTILDE",
+   "lat": -20.887986,
+   "lon": 55.480404,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-damase-legros",
+   "nom": "Ecole maternelle Damase Legros",
+   "court": "Damase Legros",
+   "niveau": "Maternelle",
+   "q": "CHAUDRON",
+   "lat": -20.89022,
+   "lon": 55.485854,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   },
+   "pos": "registre"
+  },
+  {
+   "id": "ecole-maternelle-domenjod",
+   "nom": "Ecole maternelle Domenjod",
+   "court": "Domenjod",
+   "niveau": "Maternelle",
+   "q": "DOMENJOD",
+   "lat": -20.912072,
+   "lon": 55.506894
+  },
+  {
+   "id": "ecole-maternelle-francoise-mollard",
+   "nom": "Ecole maternelle Françoise Mollard",
+   "court": "Françoise Mollard",
+   "niveau": "Maternelle",
+   "q": "CAMELIAS PROVIDENCE",
+   "lat": -20.89543,
+   "lon": 55.461124,
+   "verif": true
+  },
+  {
+   "id": "ecole-maternelle-gisele-calmy",
+   "nom": "Ecole maternelle Gisèle Calmy",
+   "court": "Gisèle Calmy",
+   "niveau": "Maternelle",
+   "q": "CENTRE-VILLE",
+   "lat": -20.882048,
+   "lon": 55.45705,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-herbiniere-lebert",
+   "nom": "Ecole maternelle Herbinière Lebert",
+   "court": "Herbinière Lebert",
+   "niveau": "Maternelle",
+   "q": "CHAUDRON",
+   "lat": -20.896559,
+   "lon": 55.485834,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-la-riviere-2",
+   "nom": "Ecole maternelle La Rivière 2",
+   "court": "La Rivière 2",
+   "niveau": "Maternelle",
+   "q": "PETITE ILE BAS DE LA RIVIERE",
+   "lat": -20.882201,
+   "lon": 55.446024,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-la-source",
+   "nom": "Ecole maternelle La Source",
+   "court": "La Source",
+   "niveau": "Maternelle",
+   "q": "BELLEPIERRE",
+   "lat": -20.89264,
+   "lon": 55.452337
+  },
+  {
+   "id": "ecole-maternelle-les-badamiers",
+   "nom": "Ecole maternelle Les Badamiers",
+   "court": "Les Badamiers",
+   "niveau": "Maternelle",
+   "q": "MOUFIA 2",
+   "lat": -20.899592,
+   "lon": 55.491406
+  },
+  {
+   "id": "ecole-maternelle-les-bringelliers",
+   "nom": "Ecole maternelle Les Bringelliers",
+   "court": "Les Bringelliers",
+   "niveau": "Maternelle",
+   "q": "BOIS DE NEFLES",
+   "lat": -20.905503,
+   "lon": 55.475339
+  },
+  {
+   "id": "ecole-maternelle-les-cocotiers",
+   "nom": "Ecole maternelle Les Cocotiers",
+   "court": "Les Cocotiers",
+   "niveau": "Maternelle",
+   "q": "DOMENJOD",
+   "lat": -20.910043,
+   "lon": 55.504056,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-les-flamboyants",
+   "nom": "Ecole maternelle Les Flamboyants",
+   "court": "Les Flamboyants",
+   "niveau": "Maternelle",
+   "q": "CENTRE-VILLE",
+   "lat": -20.883337,
+   "lon": 55.454924,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    },
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-les-jacarandas",
+   "nom": "Ecole maternelle Les Jacarandas",
+   "court": "Les Jacarandas",
+   "niveau": "Maternelle",
+   "q": "BUTOR STE-CLOTILDE",
+   "lat": -20.891161,
+   "lon": 55.478919
+  },
+  {
+   "id": "ecole-maternelle-les-rubis",
+   "nom": "Ecole maternelle Les Rubis",
+   "court": "Les Rubis",
+   "niveau": "Maternelle",
+   "q": "BELLEPIERRE",
+   "lat": -20.899651,
+   "lon": 55.444878,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-les-tamarins",
+   "nom": "Ecole maternelle Les Tamarins",
+   "court": "Les Tamarins",
+   "niveau": "Maternelle",
+   "q": "BUTOR STE-CLOTILDE",
+   "lat": -20.898417,
+   "lon": 55.482054,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    },
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-les-tulipiers",
+   "nom": "Ecole maternelle Les Tulipiers",
+   "court": "Les Tulipiers",
+   "niveau": "Maternelle",
+   "q": "MOUFIA",
+   "lat": -20.91636,
+   "lon": 55.485958,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-michel-debre",
+   "nom": "Ecole maternelle Michel Debré",
+   "court": "Michel Debré",
+   "niveau": "Maternelle",
+   "q": "CHAUDRON",
+   "lat": -20.891975,
+   "lon": 55.48527
+  },
+  {
+   "id": "ecole-maternelle-montgaillard",
+   "nom": "Ecole maternelle Montgaillard",
+   "court": "Montgaillard",
+   "niveau": "Maternelle",
+   "q": "MONTGAILLARD COLLINE DES CAMELIAS",
+   "lat": -20.89997,
+   "lon": 55.469952,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-petite-ile",
+   "nom": "Ecole maternelle Petite-Ile",
+   "court": "Petite-Ile",
+   "niveau": "Maternelle",
+   "q": "PETITE ILE BAS DE LA RIVIERE",
+   "lat": -20.882962,
+   "lon": 55.445991,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   },
+   "pos": "registre"
+  },
+  {
+   "id": "ecole-maternelle-philippe-vinson",
+   "nom": "Ecole maternelle Philippe Vinson",
+   "court": "Philippe Vinson",
+   "niveau": "Maternelle",
+   "q": "MONTAGNE 8ème",
+   "lat": -20.889082,
+   "lon": 55.422426,
+   "verif": true
+  },
+  {
+   "id": "ecole-maternelle-providence",
+   "nom": "Ecole maternelle Providence",
+   "court": "Providence",
+   "niveau": "Maternelle",
+   "q": "CAMELIAS PROVIDENCE",
+   "lat": -20.893445,
+   "lon": 55.457603,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-maternelle-ruisseau-blanc",
+   "nom": "Ecole maternelle Ruisseau Blanc",
+   "court": "Ruisseau Blanc",
+   "niveau": "Maternelle",
+   "q": "MONTAGNE 8ème",
+   "lat": -20.90064,
+   "lon": 55.409399,
+   "verif": true
+  },
+  {
+   "id": "ecole-maternelle-saint-francois",
+   "nom": "Ecole maternelle Saint François",
+   "court": "Saint François",
+   "niveau": "Maternelle",
+   "q": "SAINT-FRANCOIS",
+   "lat": -20.917482,
+   "lon": 55.459627
+  },
+  {
+   "id": "ecole-maternelle-saint-bernard",
+   "nom": "Ecole maternelle Saint-Bernard",
+   "court": "Saint-Bernard",
+   "niveau": "Maternelle",
+   "q": "MONTAGNE 15ème",
+   "lat": -20.910618,
+   "lon": 55.400706
+  },
+  {
+   "id": "ecole-maternelle-vauban",
+   "nom": "Ecole maternelle Vauban",
+   "court": "Vauban",
+   "niveau": "Maternelle",
+   "q": "VAUBAN",
+   "lat": -20.886622,
+   "lon": 55.464533
+  },
+  {
+   "id": "ecole-maternelle-ylang-ylang",
+   "nom": "Ecole maternelle Ylang-Ylang",
+   "court": "Ylang-Ylang",
+   "niveau": "Maternelle",
+   "q": "PETITE ILE BAS DE LA RIVIERE",
+   "lat": -20.885447,
+   "lon": 55.444696,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-primaire-ancien-theatre",
+   "nom": "Ecole primaire Ancien Théâtre",
+   "court": "Ancien Théâtre",
+   "niveau": "Primaire",
+   "q": "CENTRE-VILLE",
+   "lat": -20.875707,
+   "lon": 55.45355
+  },
+  {
+   "id": "ecole-primaire-application-bellepierre",
+   "nom": "Ecole primaire Application Bellepierre",
+   "court": "Application Bellepierre",
+   "niveau": "Primaire",
+   "q": "BELLEPIERRE",
+   "lat": -20.894759,
+   "lon": 55.446919,
+   "planches": {
+    "pergolas": {
+     "a": "2026-2027",
+     "s": "encours"
+    },
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-primaire-grand-canal",
+   "nom": "Ecole primaire Grand Canal",
+   "court": "Grand Canal",
+   "niveau": "Primaire",
+   "q": "BRETAGNE",
+   "lat": -20.90968,
+   "lon": 55.496649,
+   "verif": true
+  },
+  {
+   "id": "ecole-primaire-jean-baptiste-bossard",
+   "nom": "Ecole primaire Jean-Baptiste Bossard",
+   "court": "Jean-Baptiste Bossard",
+   "niveau": "Primaire",
+   "q": "BUTOR STE-CLOTILDE",
+   "lat": -20.894267,
+   "lon": 55.483587
+  },
+  {
+   "id": "ecole-primaire-la-chaumiere",
+   "nom": "Ecole primaire La Chaumière",
+   "court": "La Chaumière",
+   "niveau": "Primaire",
+   "q": "MONTGAILLARD COLLINE DES CAMELIAS",
+   "lat": -20.898317,
+   "lon": 55.462192
+  },
+  {
+   "id": "ecole-primaire-le-brule",
+   "nom": "Ecole primaire Le Brûlé",
+   "court": "Le Brûlé",
+   "niveau": "Primaire",
+   "q": "BRULE",
+   "lat": -20.923923,
+   "lon": 55.434687,
+   "verif": true
+  },
+  {
+   "id": "ecole-primaire-les-baies-roses",
+   "nom": "Ecole primaire Les Baies Roses",
+   "court": "Les Baies Roses",
+   "niveau": "Primaire",
+   "q": "MOUFIA",
+   "lat": -20.905181,
+   "lon": 55.480336,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-primaire-les-eglantines",
+   "nom": "Ecole primaire Les Eglantines",
+   "court": "Les Eglantines",
+   "niveau": "Primaire",
+   "q": "MOUFIA",
+   "lat": -20.918197,
+   "lon": 55.486944,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    },
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   },
+   "pos": "registre"
+  },
+  {
+   "id": "ecole-primaire-maxime-laope",
+   "nom": "Ecole primaire Maxime Laope",
+   "court": "Maxime Laope",
+   "niveau": "Primaire",
+   "q": "BRETAGNE",
+   "lat": -20.938677,
+   "lon": 55.485932
+  },
+  {
+   "id": "ecole-primaire-philibert-commerson",
+   "nom": "Ecole primaire Philibert Commerson",
+   "court": "Philibert Commerson",
+   "niveau": "Primaire",
+   "q": "BRETAGNE",
+   "lat": -20.925681,
+   "lon": 55.49383
+  },
+  {
+   "id": "ecole-primaire-piton-bois-de-nefles",
+   "nom": "Ecole primaire Piton Bois de Nèfles",
+   "court": "Piton Bois de Nèfles",
+   "niveau": "Primaire",
+   "q": "BOIS DE NEFLES",
+   "lat": -20.933317,
+   "lon": 55.470705,
+   "pos": "registre"
+  },
+  {
+   "id": "ecole-primaire-prima",
+   "nom": "Ecole primaire Prima",
+   "court": "Prima",
+   "niveau": "Primaire",
+   "q": "PRIMA",
+   "lat": -20.898765,
+   "lon": 55.501389
+  },
+  {
+   "id": "ecole-elementaire-affouches",
+   "nom": "Ecole élémentaire Affouches",
+   "court": "Affouches",
+   "niveau": "Élémentaire",
+   "q": "MONTAGNE 15ème",
+   "lat": -20.919723,
+   "lon": 55.404359
+  },
+  {
+   "id": "ecole-elementaire-alain-lorraine",
+   "nom": "Ecole élémentaire Alain Lorraine",
+   "court": "Alain Lorraine",
+   "niveau": "Élémentaire",
+   "q": "MOUFIA",
+   "lat": -20.916949,
+   "lon": 55.486367,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    },
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-bancouliers",
+   "nom": "Ecole élémentaire Bancouliers",
+   "court": "Bancouliers",
+   "niveau": "Élémentaire",
+   "q": "MOUFIA",
+   "lat": -20.909138,
+   "lon": 55.481925
+  },
+  {
+   "id": "ecole-elementaire-bois-de-nefles",
+   "nom": "Ecole élémentaire Bois de Nèfles",
+   "court": "Bois de Nèfles",
+   "niveau": "Élémentaire",
+   "q": "BOIS DE NEFLES",
+   "lat": -20.916712,
+   "lon": 55.476153
+  },
+  {
+   "id": "ecole-elementaire-bory-de-saint-vincent",
+   "nom": "Ecole élémentaire Bory de Saint-Vincent",
+   "court": "Bory de Saint-Vincent",
+   "niveau": "Élémentaire",
+   "q": "BRETAGNE",
+   "lat": -20.919415,
+   "lon": 55.49349,
+   "verif": true
+  },
+  {
+   "id": "ecole-elementaire-bouvet",
+   "nom": "Ecole élémentaire Bouvet",
+   "court": "Bouvet",
+   "niveau": "Élémentaire",
+   "q": "VAUBAN",
+   "lat": -20.888241,
+   "lon": 55.462731
+  },
+  {
+   "id": "ecole-elementaire-candide-azema-a",
+   "nom": "Ecole élémentaire Candide Azéma A",
+   "court": "Candide Azéma A",
+   "niveau": "Élémentaire",
+   "q": "CAMELIAS PROVIDENCE",
+   "lat": -20.893468,
+   "lon": 55.465123
+  },
+  {
+   "id": "ecole-elementaire-candide-azema-b",
+   "nom": "Ecole élémentaire Candide Azéma B",
+   "court": "Candide Azéma B",
+   "niveau": "Élémentaire",
+   "q": "CAMELIAS PROVIDENCE",
+   "lat": -20.893181,
+   "lon": 55.465163
+  },
+  {
+   "id": "ecole-elementaire-centrale",
+   "nom": "Ecole élémentaire Centrale",
+   "court": "Centrale",
+   "niveau": "Élémentaire",
+   "q": "CENTRE-VILLE",
+   "lat": -20.880366,
+   "lon": 55.453722
+  },
+  {
+   "id": "ecole-elementaire-champ-fleuri",
+   "nom": "Ecole élémentaire Champ Fleuri",
+   "court": "Champ Fleuri",
+   "niveau": "Élémentaire",
+   "q": "MARCADET",
+   "lat": -20.888485,
+   "lon": 55.46725,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-damase-legros",
+   "nom": "Ecole élémentaire Damase Legros",
+   "court": "Damase Legros",
+   "niveau": "Élémentaire",
+   "q": "CHAUDRON",
+   "lat": -20.895476,
+   "lon": 55.491632,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-domenjod",
+   "nom": "Ecole élémentaire Domenjod",
+   "court": "Domenjod",
+   "niveau": "Élémentaire",
+   "q": "DOMENJOD",
+   "lat": -20.912072,
+   "lon": 55.506894
+  },
+  {
+   "id": "ecole-primaire-eudoxie-nonge",
+   "nom": "Ecole primaire Eudoxie Nonge",
+   "court": "Eudoxie Nonge",
+   "niveau": "Primaire",
+   "q": "CHAUDRON",
+   "lat": -20.89845,
+   "lon": 55.49435,
+   "verif": true
+  },
+  {
+   "id": "ecole-elementaire-gabriel-mace",
+   "nom": "Ecole élémentaire Gabriel Macé",
+   "court": "Gabriel Macé",
+   "niveau": "Élémentaire",
+   "q": "LA SOURCE",
+   "lat": -20.889604,
+   "lon": 55.448999,
+   "planches": {
+    "pergolas": {
+     "a": "2026",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-henri-dunant",
+   "nom": "Ecole élémentaire Henri Dunant",
+   "court": "Henri Dunant",
+   "niveau": "Élémentaire",
+   "q": "MONTGAILLARD COLLINE DES CAMELIAS",
+   "lat": -20.896381,
+   "lon": 55.467547,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-herbiniere-lebert",
+   "nom": "Ecole élémentaire Herbinière Lebert",
+   "court": "Herbinière Lebert",
+   "niveau": "Élémentaire",
+   "q": "CHAUDRON",
+   "lat": -20.897155,
+   "lon": 55.485864
+  },
+  {
+   "id": "ecole-elementaire-joinville",
+   "nom": "Ecole élémentaire Joinville",
+   "court": "Joinville",
+   "niveau": "Élémentaire",
+   "q": "CENTRE-VILLE",
+   "lat": -20.884273,
+   "lon": 55.454341,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-jules-reydellet-a",
+   "nom": "Ecole élémentaire Jules Reydellet A",
+   "court": "Jules Reydellet A",
+   "niveau": "Élémentaire",
+   "q": "PETITE ILE BAS DE LA RIVIERE",
+   "lat": -20.882592,
+   "lon": 55.446142,
+   "planches": {
+    "pergolas": {
+     "a": "2026-2027",
+     "s": "encours"
+    },
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-jules-reydellet-b",
+   "nom": "Ecole élémentaire Jules Reydellet B",
+   "court": "Jules Reydellet B",
+   "niveau": "Élémentaire",
+   "q": "PETITE ILE BAS DE LA RIVIERE",
+   "lat": -20.881808,
+   "lon": 55.446968,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    },
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-les-badamiers",
+   "nom": "Ecole élémentaire Les Badamiers",
+   "court": "Les Badamiers",
+   "niveau": "Élémentaire",
+   "q": "MOUFIA 2",
+   "lat": -20.899494,
+   "lon": 55.490723,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    },
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-les-bringelliers",
+   "nom": "Ecole élémentaire Les Bringelliers",
+   "court": "Les Bringelliers",
+   "niveau": "Élémentaire",
+   "q": "BOIS DE NEFLES",
+   "lat": -20.905784,
+   "lon": 55.475848
+  },
+  {
+   "id": "ecole-elementaire-les-camelias",
+   "nom": "Ecole élémentaire Les Camélias",
+   "court": "Les Camélias",
+   "niveau": "Élémentaire",
+   "q": "LA SOURCE",
+   "lat": -20.889711,
+   "lon": 55.454419
+  },
+  {
+   "id": "ecole-elementaire-les-lilas-bois-noirs",
+   "nom": "Ecole élémentaire Les Lilas - Bois Noirs",
+   "court": "Les Lilas - Bois Noirs",
+   "niveau": "Élémentaire",
+   "q": "BUTOR STE-CLOTILDE",
+   "lat": -20.891399,
+   "lon": 55.47855,
+   "planches": {
+    "pergolas": {
+     "a": "2026",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-les-tamarins",
+   "nom": "Ecole élémentaire Les Tamarins",
+   "court": "Les Tamarins",
+   "niveau": "Élémentaire",
+   "q": "BUTOR STE-CLOTILDE",
+   "lat": -20.897345,
+   "lon": 55.480728,
+   "planches": {
+    "pergolas": {
+     "a": "2024-2025",
+     "s": "realise"
+    },
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   },
+   "pos": "registre"
+  },
+  {
+   "id": "ecole-elementaire-les-topazes",
+   "nom": "Ecole élémentaire Les Topazes",
+   "court": "Les Topazes",
+   "niveau": "Élémentaire",
+   "q": "BELLEPIERRE",
+   "lat": -20.898789,
+   "lon": 55.444077,
+   "pos": "registre"
+  },
+  {
+   "id": "ecole-elementaire-leon-dierx",
+   "nom": "Ecole élémentaire Léon Dierx",
+   "court": "Léon Dierx",
+   "niveau": "Élémentaire",
+   "q": "CENTRE-VILLE",
+   "lat": -20.883967,
+   "lon": 55.45106,
+   "planches": {
+    "pergolas": {
+     "a": "2026",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-michel-debre",
+   "nom": "Ecole élémentaire Michel Debré",
+   "court": "Michel Debré",
+   "niveau": "Élémentaire",
+   "q": "CHAUDRON",
+   "lat": -20.892413,
+   "lon": 55.485437,
+   "planches": {
+    "vegetalisation": {
+     "a": "2025",
+     "s": "realise"
+    }
+   }
+  },
+  {
+   "id": "ecole-elementaire-philippe-vinson",
+   "nom": "Ecole élémentaire Philippe Vinson",
+   "court": "Philippe Vinson",
+   "niveau": "Élémentaire",
+   "q": "MONTAGNE 8ème",
+   "lat": -20.889211,
+   "lon": 55.425165
+  },
+  {
+   "id": "ecole-elementaire-raymond-mondon",
+   "nom": "Ecole élémentaire Raymond Mondon",
+   "court": "Raymond Mondon",
+   "niveau": "Élémentaire",
+   "q": "LA SOURCE",
+   "lat": -20.887209,
+   "lon": 55.453897,
+   "planches": {
+    "pergolas": {
+     "a": "2026-2027",
+     "s": "encours"
+    },
+    "vegetalisation": {
+     "a": "2026",
+     "s": "programme"
+    }
+   },
+   "pos": "registre"
+  },
+  {
+   "id": "ecole-elementaire-ruisseau-blanc",
+   "nom": "Ecole élémentaire Ruisseau Blanc",
+   "court": "Ruisseau Blanc",
+   "niveau": "Élémentaire",
+   "q": "MONTAGNE 8ème",
+   "lat": -20.89508,
+   "lon": 55.410625
+  },
+  {
+   "id": "ecole-elementaire-saint-francois",
+   "nom": "Ecole élémentaire Saint François",
+   "court": "Saint François",
+   "niveau": "Élémentaire",
+   "q": "SAINT-FRANCOIS",
+   "lat": -20.919165,
+   "lon": 55.45966,
+   "verif": true
+  },
+  {
+   "id": "ecole-elementaire-saint-bernard",
+   "nom": "Ecole élémentaire Saint-Bernard",
+   "court": "Saint-Bernard",
+   "niveau": "Élémentaire",
+   "q": "MONTAGNE 15ème",
+   "lat": -20.909484,
+   "lon": 55.399564
+  }
+ ],
+ "quartiers_labels": [
+  {
+   "n": "PETITE ILE BAS DE LA RIVIERE",
+   "lat": -20.88356,
+   "lon": 55.4422
+  },
+  {
+   "n": "CENTRE-VILLE",
+   "lat": -20.88497,
+   "lon": 55.45344
+  },
+  {
+   "n": "BUTOR STE-CLOTILDE",
+   "lat": -20.88735,
+   "lon": 55.47648
+  },
+  {
+   "n": "CHAUDRON",
+   "lat": -20.88861,
+   "lon": 55.493
+  },
+  {
+   "n": "LA SOURCE",
+   "lat": -20.88886,
+   "lon": 55.4499
+  },
+  {
+   "n": "VAUBAN",
+   "lat": -20.88914,
+   "lon": 55.46186
+  },
+  {
+   "n": "MARCADET",
+   "lat": -20.88924,
+   "lon": 55.46664
+  },
+  {
+   "n": "MONTAGNE 8ème",
+   "lat": -20.8912,
+   "lon": 55.42221
+  },
+  {
+   "n": "PRIMA",
+   "lat": -20.89439,
+   "lon": 55.50226
+  },
+  {
+   "n": "MOUFIA 2",
+   "lat": -20.89859,
+   "lon": 55.48898
+  },
+  {
+   "n": "MONTGAILLARD COLLINE DES CAMELIAS",
+   "lat": -20.90155,
+   "lon": 55.4637
+  },
+  {
+   "n": "BELLEPIERRE",
+   "lat": -20.90162,
+   "lon": 55.44287
+  },
+  {
+   "n": "MOUFIA",
+   "lat": -20.90819,
+   "lon": 55.48292
+  },
+  {
+   "n": "CAMELIAS PROVIDENCE",
+   "lat": -20.91076,
+   "lon": 55.44758
+  },
+  {
+   "n": "MONTAGNE 15ème",
+   "lat": -20.91151,
+   "lon": 55.39688
+  },
+  {
+   "n": "DOMENJOD",
+   "lat": -20.91608,
+   "lon": 55.5064
+  },
+  {
+   "n": "BRULE",
+   "lat": -20.92226,
+   "lon": 55.43105
+  },
+  {
+   "n": "SAINT-FRANCOIS",
+   "lat": -20.92413,
+   "lon": 55.45567
+  },
+  {
+   "n": "BOIS DE NEFLES",
+   "lat": -20.92518,
+   "lon": 55.47628
+  },
+  {
+   "n": "BRETAGNE",
+   "lat": -20.92961,
+   "lon": 55.49242
+  }
+ ]
+}

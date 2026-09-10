@@ -1,5 +1,5 @@
 /* =====================================================================
-   Vue Carte — les opérations PPI situées sur les 77 écoles de la commune
+   Vue Carte — les opérations PPI situées sur les 76 écoles de la commune
    ---------------------------------------------------------------------
    Les opérations viennent du module Source ; le fond de plan et le
    référentiel géographique sont des fichiers du dépôt. Rien n'est écrit :
