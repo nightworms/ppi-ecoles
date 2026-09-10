@@ -97,6 +97,52 @@
     padding: 4px 12px; border-radius: 20px; letter-spacing: 0.05em;
   }
 
+  /* ==================================================================
+     Mise en valeur au survol
+     ------------------------------------------------------------------
+     Une surface survolée se soulève d'un ou deux pixels, prend la teinte
+     d'accent sur son contour et une ombre douce. Assez pour guider l'œil,
+     pas assez pour clignoter : ces pages en comptent des dizaines.
+     Le mouvement est supprimé pour qui demande moins d'animation.
+     ================================================================== */
+  .card, .matrix-quadrant, .alert-kpi-badge, .alert-card, .kpi-card,
+  .gantt-bloc {
+    transition: transform .16s ease, box-shadow .16s ease,
+                border-color .16s ease, background-color .16s ease;
+  }
+  .card:hover, .matrix-quadrant:hover, .alert-kpi-badge:hover {
+    border-color: var(--accent);
+    box-shadow: 0 6px 22px var(--ombre);
+    transform: translateY(-2px);
+  }
+  .alert-card:hover, .kpi-card:hover {
+    box-shadow: 0 6px 22px var(--ombre);
+  }
+
+  /* Cellules du planning : la teinte de la cellule est celle de son état
+     dominant, et le survol l'affirme au lieu d'imposer l'ambre général. */
+  .gantt-bloc {
+    background: color-mix(in srgb, var(--c) 9%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c) 26%, transparent);
+    border-radius: 8px; padding: 6px 10px;
+  }
+  .gantt-bloc:hover {
+    background: color-mix(in srgb, var(--c) 18%, transparent);
+    border-color: var(--c);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px var(--ombre);
+  }
+  .gantt-bloc-m { font-family:'Syne',sans-serif; font-weight:700;
+                  font-size:12px; color: var(--c); }
+  .gantt-bloc-n { font-size:10px; color: var(--text-muted); margin-top:2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .matrix-quadrant, .alert-kpi-badge, .alert-card, .kpi-card,
+    .gantt-bloc { transition: none; }
+    .card:hover, .matrix-quadrant:hover, .alert-kpi-badge:hover,
+    .kpi-card:hover, .alert-card:hover, .gantt-bloc:hover { transform: none; }
+  }
+
   /* LAYOUT */
   .main { padding: 28px 32px; max-width: 1600px; margin: 0 auto; }
   .page { display: none; }
@@ -721,7 +767,7 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=41">
+  <link rel="stylesheet" href="carte.css?v=42">
 </head>
 <body>
 <script>
@@ -1324,10 +1370,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=41"></script>
-<script src="donnees/source.js?v=41"></script>
-<script src="carte.js?v=41"></script>
-<script src="compte.js?v=41"></script>
+<script src="donnees/config.js?v=42"></script>
+<script src="donnees/source.js?v=42"></script>
+<script src="carte.js?v=42"></script>
+<script src="compte.js?v=42"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
@@ -1657,10 +1703,13 @@ function renderGantt() {
         const total = ops.reduce((s,d)=>s+d.montant,0);
         const nb = ops.length;
         const domColor = dominantColor(ops);
+        // La teinte passe par une propriété personnalisée plutôt que par des
+        // styles en ligne : le survol peut alors la reprendre en CSS, ce qu'un
+        // style en ligne interdirait.
         html += `<div style="padding:4px 8px">
-          <div style="background:${domColor}18;border:1px solid ${domColor}35;border-radius:8px;padding:6px 10px">
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:${domColor}">${fmt(total)}</div>
-            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${nb} opération${nb>1?'s':''}</div>
+          <div class="gantt-bloc" style="--c:${domColor}">
+            <div class="gantt-bloc-m">${fmt(total)}</div>
+            <div class="gantt-bloc-n">${nb} opération${nb>1?'s':''}</div>
             ${etatBar(ops)}
           </div>
         </div>`;
