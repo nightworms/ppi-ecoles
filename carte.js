@@ -1,5 +1,5 @@
 /* =====================================================================
-   Vue Carte — les opérations PPI situées sur les 76 écoles de la commune
+   Vue Carte — les opérations PPI situées sur les 75 écoles de la commune
    ---------------------------------------------------------------------
    Les opérations viennent du module Source ; le fond de plan et le
    référentiel géographique sont des fichiers du dépôt. Rien n'est écrit :
@@ -33,6 +33,9 @@ window.Carte = (function () {
                    '#2c4f9c', '#97316b', '#4a6570', '#8a4b1f', '#2f6d35', '#7a6a12'];
   var couleursType = {}, couleursTypeC = {};   // remplis à la lecture des opérations
   var theme = 'clair';                          // fond de carte : 'clair' | 'photo'
+  // Bâti, voirie et noms de rues sont toujours affichés : leurs interrupteurs
+  // ont été retirés de la barre d'outils, qui gagne en lisibilité. La densité
+  // reste pilotée par le zoom, plus bas.
   var calques = { bati: true, voirie: true, rues: true };
 
   // --- rapprochement des noms -----------------------------------------
@@ -202,7 +205,10 @@ window.Carte = (function () {
             orphelines: [], approx: [] };
   var filtre = { annee: '', programme: '', type: '', etat: '', secteur: '',
                  niveau: '', q: '' };
-  var colorerPar = 'etat';
+  // La coloration se fait par type de travaux, sans alternative : le
+  // sélecteur « état / type » a été retiré de la barre d'outils. L'état
+  // reste lisible sur le marqueur — aplat pour réalisé, contour sinon.
+  var colorerPar = 'type';
   var selection = null, pret = false;
 
   function opsVisibles(e) {
@@ -225,10 +231,6 @@ window.Carte = (function () {
   }
   function couleurOp(o) {
     var clair = theme === 'clair';
-    if (colorerPar === 'etat') {
-      var e = ETATS[o.etat] || ETATS.planifie;
-      return clair ? e.cc : e.c;
-    }
     return (clair ? couleursTypeC : couleursType)[o.type] || (clair ? '#4a6570' : '#7a8fa6');
   }
 
@@ -418,6 +420,14 @@ window.Carte = (function () {
      la portion de plan que vous regardez, à la résolution du papier, sans
      dépendre de la taille que le navigateur donne à la page imprimée. */
   var avantImpression = null;
+  /* La feuille est bien plus large que haute — un A4 paysage laisse environ
+     273 mm sur 128 une fois les bandeaux et la légende posés. Le cadrage de
+     l'écran, lui, est presque carré. Sans correction, « meet » centrerait la
+     carte en la bordant de vide sur un tiers de la largeur. On étire donc la
+     fenêtre à la proportion de la feuille : on montre un peu plus de terrain
+     qu'à l'écran, jamais moins, et la carte occupe toute la page. */
+  var RATIO_FEUILLE = 273 / 128;
+
   function preparerImpression() {
     if (!pret || avantImpression) return false;
     var r = svg.getBoundingClientRect();
@@ -425,10 +435,15 @@ window.Carte = (function () {
     avantImpression = { vb: svg.getAttribute('viewBox'),
                         tr: gRoot.getAttribute('transform'),
                         par: svg.getAttribute('preserveAspectRatio') };
-    svg.setAttribute('viewBox', [(-vue.x / vue.k).toFixed(2),
-                                 (-vue.y / vue.k).toFixed(2),
-                                 (r.width / vue.k).toFixed(2),
-                                 (r.height / vue.k).toFixed(2)].join(' '));
+    var x = -vue.x / vue.k, y = -vue.y / vue.k;
+    var w = r.width / vue.k, h = r.height / vue.k;
+    var w2 = w, h2 = h;
+    if (w / h < RATIO_FEUILLE) w2 = h * RATIO_FEUILLE;
+    else h2 = w / RATIO_FEUILLE;
+    x -= (w2 - w) / 2;          // on garde le même centre
+    y -= (h2 - h) / 2;
+    svg.setAttribute('viewBox', [x.toFixed(2), y.toFixed(2),
+                                 w2.toFixed(2), h2.toFixed(2)].join(' '));
     svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     gRoot.setAttribute('transform', '');
     return true;
@@ -460,7 +475,7 @@ window.Carte = (function () {
       filtres: parts.length ? parts.join(' · ') : 'Aucun filtre — vue complète',
       chiffres: liste.length + ' écoles · ' + ops + ' opérations · ' +
                 (montant / 1e6).toFixed(2).replace('.', ',') + ' M€',
-      colorePar: colorerPar === 'etat' ? 'état' : 'type de travaux'
+      colorePar: 'type de travaux'
     };
   }
 
@@ -940,11 +955,11 @@ window.Carte = (function () {
   function legende() {
     var d = document.getElementById('carte-legende');
     var clair = theme === 'clair';
-    var items = colorerPar === 'etat'
-      ? Object.keys(ETATS).map(function (k) {
-          return { n: ETATS[k].nom, c: clair ? ETATS[k].cc : ETATS[k].c }; })
-      : Object.keys(couleursType).map(function (t) {
-          return { n: t, c: (clair ? couleursTypeC : couleursType)[t] }; });
+    var items = Object.keys(couleursType).sort(function (a, b) {
+      return a.localeCompare(b, 'fr');
+    }).map(function (t) {
+      return { n: t, c: (clair ? couleursTypeC : couleursType)[t] };
+    });
     var h = items.map(function (i) {
       return '<span class="c-lg"><i style="background:' + i.c + '"></i>' + esc(i.n) + '</span>';
     }).join('');
@@ -1039,34 +1054,6 @@ window.Carte = (function () {
     if (b) b.classList.add('clair');
     majOrtho(true);
     legende(); marques(); panneau();
-  }
-
-  /* Exporte ce que la carte montre, filtres compris. */
-  function exporter() {
-    var lignes = [['ecole', 'niveau', 'quartier', 'latitude', 'longitude',
-                   'programme', 'type', 'annee', 'montant', 'etat']];
-    ecolesVisibles().forEach(function (e) {
-      var ops = opsVisibles(e);
-      if (!ops.length) {
-        lignes.push([e.nom, e.niveau, e.q, e.lat, e.lon, '', '', '', '', '']);
-        return;
-      }
-      ops.forEach(function (o) {
-        lignes.push([e.nom, e.niveau, e.q, e.lat, e.lon, o.programme, o.type,
-                     o.annee, o.montant, (ETATS[o.etat] || {}).nom || o.etat]);
-      });
-    });
-    var csv = '\ufeff' + lignes.map(function (r) {
-      return r.map(function (v) {
-        v = v == null ? '' : String(v);
-        return /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-      }).join(';');
-    }).join('\r\n');
-    var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    var a = document.createElement('a');
-    a.href = url; a.download = 'carte-operations-ppi.csv';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
   }
 
   /* ------------------------------------------------------------------
@@ -1257,8 +1244,6 @@ window.Carte = (function () {
     enregistrer: enregistrer,
     supprimer: supprimer,
     rafraichirDroits: function () { if (pret) { marques(); panneau(); } },
-    calque: function (nom, actif) { calques[nom] = actif; legende(); marques(); },
-    exporter: exporter,
     redimensionner: function () { if (pret) cadrer(); },
     preparerImpression: preparerImpression,
     finImpression: finImpression,
@@ -1277,7 +1262,6 @@ window.Carte = (function () {
       filtre[champ] = valeur; selection = null; marques(); panneau();
     },
     chercher: function (v) { filtre.q = v; marques(); },
-    colorer: function (mode) { colorerPar = mode; legende(); marques(); panneau(); },
     zoom: function (f) {
       var r = svg.getBoundingClientRect(); zoomer(f, r.width / 2, r.height / 2);
     },

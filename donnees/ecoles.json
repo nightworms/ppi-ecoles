@@ -34,15 +34,6 @@
    }
   },
   {
-   "id": "ecole-maternelle-bouvet",
-   "nom": "Ecole maternelle Bouvet",
-   "court": "Bouvet",
-   "niveau": "Maternelle",
-   "q": "VAUBAN",
-   "lat": -20.888241,
-   "lon": 55.462731
-  },
-  {
    "id": "ecole-maternelle-centrale",
    "nom": "Ecole maternelle Centrale",
    "court": "Centrale",
@@ -592,10 +583,10 @@
    "pos": "geocodage"
   },
   {
-   "id": "ecole-elementaire-bouvet",
-   "nom": "Ecole élémentaire Bouvet",
+   "id": "ecole-primaire-bouvet",
+   "nom": "Ecole primaire Bouvet",
    "court": "Bouvet",
-   "niveau": "Élémentaire",
+   "niveau": "Primaire",
    "q": "VAUBAN",
    "lat": -20.888241,
    "lon": 55.462731

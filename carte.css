@@ -140,7 +140,6 @@
   #page-carte .carte-outils{gap:7px;margin-bottom:10px}
   #page-carte .carte-outils .filter-select,
   #page-carte .carte-outils .filter-input{font-size:12px;padding:6px 9px}
-  .carte-calques button{padding:5px 9px;font-size:11px}
   #carte-compteurs{gap:12px;font-size:11px}
   #carte-compteurs b{font-size:14px}
 }
@@ -193,15 +192,9 @@ body.jour .carte-zone.clair #carte-svg .c-traits path{stroke:#cec4b0}
 #carte-bulle.clair .c-rien{color:#8a9a92}
 
 /* interrupteurs de calque */
-.carte-calques{display:flex;gap:6px;align-items:center}
-.carte-calques button{background:var(--surface2);border:1px solid var(--border);
-  color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:12px;
-  padding:7px 12px;border-radius:8px;cursor:pointer;transition:all .15s}
-.carte-calques button[aria-pressed="true"]{background:rgba(240,165,0,.12);
-  border-color:rgba(240,165,0,.4);color:var(--accent)}
-.carte-calques button:hover{color:var(--text)}
 
 .c-lg-sep{width:1px;height:12px;background:var(--border);display:inline-block}
+.carte-cle{margin-top:10px;font-size:11px;color:var(--text-dim);line-height:1.6}
 .c-lg-note{color:var(--text-dim);font-style:italic}
 
 /* Contrôle de cohérence */
@@ -335,19 +328,56 @@ body.jour .carte-zone.clair #carte-svg .c-traits path{stroke:#cec4b0}
    que dégager la place et rendre le fond imprimable.
    ===================================================================== */
 @media print {
-  /* Le bandeau de connexion n'a rien à faire sur un document imprimé. */
+  /* Le bandeau de connexion n'a rien à faire sur un document imprimé. La clé
+     de lecture et la ligne d'avis non plus : elles s'adressent à l'écran, et
+     chaque millimètre compte pour tenir sur une seule feuille. */
   .cpt,
   #page-carte .carte-outils,
   #page-carte .carte-panneau,
   #page-carte .carte-zoom,
+  #page-carte .carte-cle,
+  #page-carte #carte-etat,
   #page-carte #carte-bulle          { display: none !important; }
+
+  /* ---------------------------------------------------------------
+     Tenir sur une seule feuille.
+     La hauteur utile d'un A4 paysage vaut 210mm moins les marges, soit
+     180mm. On l'impose à la page et on la répartit : les bandeaux
+     prennent ce qu'il leur faut, la carte occupe tout le reste. Une
+     hauteur fixe — 165mm auparavant — ignorait la place déjà prise par
+     le titre, le rappel des filtres et la légende, et débordait donc
+     sur une seconde page.
+     --------------------------------------------------------------- */
+  #page-carte.page.active           { display: flex !important;
+    /* 174mm et non 180 : la page démarre 2mm plus bas que le haut de la zone
+       imprimable — décalage hérité de l'en-tête masqué, et qui varie d'un
+       navigateur à l'autre. On réserve la différence au lieu de viser la
+       limite exacte, faute de quoi les derniers millimètres basculeraient sur
+       une seconde feuille. */
+    flex-direction: column; height: 174mm; overflow: hidden;
+    /* 4mm de jeu en bas : la légende s'arrêtait pile sur la limite, et le
+       moindre écart de police à l'impression — ou un type de travaux de plus —
+       l'aurait rognée. La carte, seul élément élastique, absorbe la
+       différence. */
+    padding-bottom: 4mm; box-sizing: border-box;
+    page-break-inside: avoid; page-break-after: avoid; }
+  #page-carte .prog-header          { flex: 0 0 auto; margin: 0 0 3mm !important; }
+  #page-carte .prog-title           { font-size: 15px !important; }
+  #page-carte .print-header-band,
+  #page-carte #carte-print-resume,
+  #page-carte #carte-legende        { flex: 0 0 auto; }
 
   #carte-print-resume               { display: block !important;
     margin: 0 0 8px; font-size: 10.5px; color: #333; line-height: 1.6; }
   #carte-print-resume .cpr-l b      { color: #000; }
 
-  #page-carte .carte-wrap           { display: block !important; }
-  #page-carte .carte-zone           { width: 100% !important; height: 165mm !important;
+  /* « min-height: 0 » sans quoi un élément flexible refuse de se réduire
+     au-dessous de son contenu, et la carte repousserait la légende hors
+     de la feuille. */
+  #page-carte .carte-wrap           { display: block !important;
+    flex: 1 1 auto; min-height: 0; }
+  #page-carte .carte-zone           { width: 100% !important; height: 100% !important;
+    min-height: 70mm;
     background: #fff !important; border: 1px solid #bbb !important;
     border-radius: 0 !important; page-break-inside: avoid; }
   #page-carte #carte-svg            { width: 100% !important; height: 100% !important; }

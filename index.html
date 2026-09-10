@@ -872,7 +872,7 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=55">
+  <link rel="stylesheet" href="carte.css?v=59">
 </head>
 <body>
 <script>
@@ -1396,11 +1396,6 @@
           <span>🛰 Vue aérienne</span>
         </label>
       </div>
-      <select class="filter-select" onchange="Carte.colorer(this.value)">
-        <option value="etat">Colorer par état</option>
-        <option value="type">Colorer par type de travaux</option>
-      </select>
-      <button class="export-btn" onclick="Carte.exporter()">⬇ Exporter la vue</button>
       <button class="print-btn" onclick="printPage('carte')"
         title="Imprimer la vue affichée — choisissez « Enregistrer au format PDF » dans la fenêtre d’impression">🖨 Imprimer / PDF</button>
     </div>
@@ -1427,11 +1422,6 @@
       <option value="Élémentaire">Élémentaire</option>
       <option value="Primaire">Primaire</option>
     </select>
-    <div class="carte-calques">
-      <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('bati',a)">Bâti</button>
-      <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('voirie',a)">Voirie</button>
-      <button type="button" aria-pressed="true" onclick="var a=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',a);Carte.calque('rues',a)">Noms de rues</button>
-    </div>
     <div id="carte-compteurs"></div>
   </div>
 
@@ -1450,11 +1440,9 @@
 
   <div id="carte-legende"></div>
   <div id="carte-etat"></div>
-  <div style="margin-top:10px;font-size:11px;color:var(--text-dim);line-height:1.6">
-    La taille du point suit le montant cumulé des opérations retenues ; chaque secteur est
-    une opération, disque plein pour les travaux réalisés. Les noms de rues apparaissent à
-    l'échelle du quartier. Les opérations se modifient dans la feuille Google ; la saisie
-    depuis l'application viendra avec Supabase.
+  <div class="carte-cle">
+    La taille du point suit le montant cumulé des opérations retenues ; chaque secteur du
+    disque est une opération, en aplat lorsque les travaux sont réalisés.
   </div>
 </div>
 
@@ -1508,10 +1496,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=55"></script>
-<script src="donnees/source.js?v=55"></script>
-<script src="carte.js?v=55"></script>
-<script src="compte.js?v=55"></script>
+<script src="donnees/config.js?v=59"></script>
+<script src="donnees/source.js?v=59"></script>
+<script src="carte.js?v=59"></script>
+<script src="compte.js?v=59"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
