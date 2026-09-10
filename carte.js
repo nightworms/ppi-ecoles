@@ -1098,7 +1098,11 @@ window.Carte = (function () {
     if (!pret) { await demarrer(); }
     if (!pret) { d.innerHTML = '<div class="ctl-rien">Données indisponibles.</div>'; return; }
 
-    var nomsPPI = {}; D.ops.forEach(function (o) { nomsPPI[o.ecole] = 1; });
+    // On comptait ici les libellés d'école distincts vus au PPI. Depuis que le
+    // relevé des planches est versé aux opérations, ces lignes portent le nom
+    // complet du référentiel quand la feuille emploie ses abréviations : la même
+    // école comptait deux fois, et le total dépassait le nombre d'écoles. On
+    // affiche donc le nombre d'opérations, qui se vérifie d'un coup d'œil.
     var sansOp = D.ecoles.filter(function (e) { return !(D.parEcole[e.id] || []).length; });
     var aVerifier = D.ecoles.filter(function (e) { return e.verif; });
     var recalees  = D.ecoles.filter(function (e) { return e.pos === 'registre'; });
@@ -1112,8 +1116,8 @@ window.Carte = (function () {
       'Recalculé à chaque affichage.</p>' +
 
       '<div class="ctl-cartes">' +
-        carte(Object.keys(nomsPPI).length, 'écoles nommées au PPI') +
-        carte(Object.keys(D.parEcole).length, 'rattachées à un point de la carte') +
+        carte(D.ops.length, 'opérations au PPI') +
+        carte(Object.keys(D.parEcole).length, 'écoles portant au moins une opération') +
         carte(perdues.length, 'opérations non situées', perdues.length > 0) +
         carte(sansOp.length, 'écoles sans aucune opération au PPI') +
       '</div>' +
