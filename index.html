@@ -135,6 +135,10 @@
   .gantt-bloc-m { font-family:'Syne',sans-serif; font-weight:700;
                   font-size:12px; color: var(--c); }
   .gantt-bloc-n { font-size:10px; color: var(--text-muted); margin-top:2px; }
+  /* La ligne du planning se marque au survol : le repère horizontal manque
+     vite sur huit exercices. rgba(255,255,255,…) ne convenait qu'au fond nuit. */
+  .gantt-ligne { border-bottom: 1px solid var(--border); transition: background-color .15s; }
+  .gantt-ligne:hover { background: var(--surface2); }
 
   @media (prefers-reduced-motion: reduce) {
     .card, .matrix-quadrant, .alert-kpi-badge, .alert-card, .kpi-card,
@@ -143,6 +147,55 @@
     .kpi-card:hover, .alert-card:hover, .gantt-bloc:hover { transform: none; }
   }
 
+  /* ==================================================================
+     Panneau de détail d'une cellule du planning
+     ================================================================== */
+  .detail-voile {
+    display: none; position: fixed; inset: 0; z-index: 1100;
+    background: rgba(0,0,0,0.45);
+  }
+  .detail-voile.ouvert { display: block; }
+  .detail-panneau {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: min(520px, 92vw); background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: -18px 0 48px var(--ombre);
+    display: flex; flex-direction: column;
+    animation: detailEntre .18s ease-out;
+  }
+  @keyframes detailEntre { from { transform: translateX(24px); opacity: .4 } }
+  @media (prefers-reduced-motion: reduce) { .detail-panneau { animation: none } }
+  .detail-tete {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 12px; padding: 20px 22px 14px; border-bottom: 1px solid var(--border);
+  }
+  .detail-surtitre { font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--text-muted); font-weight: 600; }
+  .detail-titre { font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 18px; color: var(--text); margin-top: 3px; line-height: 1.3; }
+  .detail-chiffres { display: flex; gap: 28px; padding: 14px 22px;
+    border-bottom: 1px solid var(--border); }
+  .detail-chiffres b { font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 19px; color: var(--accent); display: block; }
+  .detail-chiffres span { font-size: 11px; color: var(--text-muted); }
+  .detail-liste { overflow-y: auto; padding: 8px 14px 20px; flex: 1; }
+  .detail-op { border: 1px solid transparent; border-radius: 10px;
+    padding: 11px 12px; cursor: pointer; transition: background-color .14s,
+    border-color .14s; }
+  .detail-op:hover { background: var(--surface2); border-color: var(--border); }
+  .detail-op-h { display: flex; justify-content: space-between;
+    align-items: baseline; gap: 10px; }
+  .detail-op-e { font-weight: 600; font-size: 13px; color: var(--accent2); }
+  .detail-op-m { font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 13px; color: var(--text); white-space: nowrap; }
+  .detail-op-b { display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; margin-top: 5px; font-size: 11.5px;
+    color: var(--text-muted); }
+  .detail-op-s { color: var(--text-dim); font-size: 10.5px;
+    text-transform: uppercase; letter-spacing: .04em; }
+  .detail-op-n { margin-top: 6px; font-size: 11.5px; color: var(--text-muted);
+    line-height: 1.5; border-left: 2px solid var(--border); padding-left: 8px; }
+
   /* LAYOUT */
   .main { padding: 28px 32px; max-width: 1600px; margin: 0 auto; }
   .page { display: none; }
@@ -150,6 +203,14 @@
 
   /* KPI ROW */
   .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 28px; }
+  /* La vue globale en compte six depuis l'ajout des points de vigilance. */
+  #page-dashboard-global .kpi-row { grid-template-columns: repeat(6, 1fr); }
+  .kpi-value.orange { color: var(--accent); }
+  .kpi-card.orange::before { background: var(--accent); }
+  .kpi-cliquable { cursor: pointer; }
+  @media (max-width: 1400px) {
+    #page-dashboard-global .kpi-row { grid-template-columns: repeat(3, 1fr); }
+  }
   .kpi-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -767,7 +828,7 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=42">
+  <link rel="stylesheet" href="carte.css?v=43">
 </head>
 <body>
 <script>
@@ -823,6 +884,24 @@
     <button id="btn-sync" class="btn-secondary" onclick="reloadData()" title="Recharger les données">↻ Sync</button>
   </div>
 </header>
+
+<!-- PANNEAU DE DÉTAIL D'UNE CELLULE DU PLANNING -->
+<div id="detail-cellule" class="detail-voile" onclick="if(event.target===this)fermerDetailCellule()">
+  <aside class="detail-panneau" role="dialog" aria-label="Détail des opérations">
+    <div class="detail-tete">
+      <div>
+        <div class="detail-surtitre" id="detail-surtitre">—</div>
+        <div class="detail-titre" id="detail-titre">—</div>
+      </div>
+      <button class="modal-close" onclick="fermerDetailCellule()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="detail-chiffres">
+      <div><b id="detail-montant">—</b><span>budget</span></div>
+      <div><b id="detail-nb">—</b><span>opérations</span></div>
+    </div>
+    <div class="detail-liste" id="detail-liste"></div>
+  </aside>
+</div>
 
 <!-- MODALE FICHE ÉCOLE -->
 <div id="modal-ecole" class="modal-overlay" onclick="if(event.target===this)closeModal()">
@@ -935,6 +1014,14 @@
       <div class="kpi-label">Planifié / Consultation</div>
       <div class="kpi-value red" id="g-kpi-planifie">—</div>
       <div class="kpi-sub" id="g-kpi-planifie-sub">—</div>
+    </div>
+    <!-- Les alertes vivaient dans leur seul onglet : ce compteur les remonte
+         là où l'on regarde en premier, et y conduit d'un clic. -->
+    <div class="kpi-card orange kpi-cliquable" onclick="showPage('alertes')"
+         title="Voir les alertes">
+      <div class="kpi-label">Points de vigilance</div>
+      <div class="kpi-value orange" id="g-kpi-vigilance">—</div>
+      <div class="kpi-sub" id="g-kpi-vigilance-sub">—</div>
     </div>
   </div>
 
@@ -1090,6 +1177,7 @@
         <option value="type">Type de travaux</option>
         <option value="programme">Programme</option>
         <option value="secteur">Secteur</option>
+        <option value="ecole">École</option>
       </select>
       <button class="print-btn" onclick="printPage('programmation')" title="Imprimer cette page">🖨 Imprimer</button>
     </div>
@@ -1370,10 +1458,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=42"></script>
-<script src="donnees/source.js?v=42"></script>
-<script src="carte.js?v=42"></script>
-<script src="compte.js?v=42"></script>
+<script src="donnees/config.js?v=43"></script>
+<script src="donnees/source.js?v=43"></script>
+<script src="carte.js?v=43"></script>
+<script src="compte.js?v=43"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
@@ -1521,6 +1609,20 @@ function renderKpis(prefix, data) {
   document.getElementById(`${prefix}-kpi-cours-sub`).textContent  = nbCours + ' opération(s)';
   document.getElementById(`${prefix}-kpi-planifie`).textContent   = fmt(totalPlanifie);
   document.getElementById(`${prefix}-kpi-planifie-sub`).textContent= nbPlanifie + ' opération(s)';
+
+  // Points de vigilance : les alertes encore ouvertes, urgences en tête.
+  // Elles ne suivent pas le périmètre affiché — une alerte vaut pour tout le
+  // programme, et la masquer au premier filtre serait la perdre de vue.
+  const elVig = document.getElementById(`${prefix}-kpi-vigilance`);
+  if (elVig) {
+    const ouvertes = (alertes || []).filter(a => a.statut !== 'resolu');
+    const urgences = ouvertes.filter(a => a.niveau === 'urgence').length;
+    elVig.textContent = ouvertes.length;
+    document.getElementById(`${prefix}-kpi-vigilance-sub`).textContent =
+      ouvertes.length === 0 ? 'aucune en cours'
+      : urgences ? urgences + ' urgence' + (urgences > 1 ? 's' : '')
+      : 'à suivre';
+  }
 }
 
 function renderChartTypes(elId, data) {
@@ -1628,6 +1730,7 @@ function renderGantt() {
   rawData.forEach(d => {
     const key = groupBy === 'type' ? d.type :
                 groupBy === 'programme' ? (d.programme || 'Non défini') :
+                groupBy === 'ecole' ? (d.ecole || 'Non défini').trim() :
                 d.secteur.trim();
     if (!groups[key]) groups[key] = {};
     const yr = d.annee;
@@ -1643,8 +1746,10 @@ function renderGantt() {
   });
 
   const colW = 130;
-  const labelW = groupBy === 'secteur' ? 140 : 170;
-  const totalW = labelW + annees.length * colW;
+  // Les noms d'école sont longs : la colonne de gauche s'élargit pour eux.
+  const labelW = groupBy === 'ecole' ? 210 : groupBy === 'secteur' ? 140 : 170;
+  const totalCol = 110;                     // colonne des totaux de ligne
+  const totalW = labelW + annees.length * colW + totalCol;
 
   // Couleur dominante d'un groupe = état le plus fréquent
   function dominantColor(ops) {
@@ -1669,8 +1774,11 @@ function renderGantt() {
   let html = `<div style="min-width:${totalW}px">`;
 
   // En-tête
-  html += `<div style="display:grid;grid-template-columns:${labelW}px repeat(${annees.length},${colW}px);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px">`;
-  html += `<div style="font-size:11px;font-weight:600;color:var(--text-muted);padding:0 8px">${groupBy === 'type' ? 'Type de travaux' : groupBy === 'programme' ? 'Programme' : 'Secteur'}</div>`;
+  const LIB_GROUPE = { type:'Type de travaux', programme:'Programme',
+                       ecole:'École', secteur:'Secteur' };
+  const grille = `${labelW}px repeat(${annees.length},${colW}px) ${totalCol}px`;
+  html += `<div style="display:grid;grid-template-columns:${grille};border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px">`;
+  html += `<div style="font-size:11px;font-weight:600;color:var(--text-muted);padding:0 8px">${LIB_GROUPE[groupBy] || 'Secteur'}</div>`;
   const anneeAccents = ANNEE_TEINTES[themeActuel()];
   annees.forEach(y => {
     const total = rawData.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
@@ -1679,6 +1787,11 @@ function renderGantt() {
       <div style="font-size:10px;color:var(--text-muted);margin-top:1px">${fmt(total)}</div>
     </div>`;
   });
+  // Colonne des totaux : ce que pèse chaque ligne, tous exercices confondus.
+  html += `<div style="text-align:right;padding:0 10px">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--text-muted)">Total</div>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:1px">tous exercices</div>
+  </div>`;
   html += `</div>`;
 
   // Lignes
@@ -1686,7 +1799,7 @@ function renderGantt() {
     const rowTotal = Object.values(byYear).flat().reduce((s,d)=>s+d.montant,0);
     const baseColor = groupBy === 'type' ? couleurType(key) : dominantColor(Object.values(byYear).flat());
 
-    html += `<div style="display:grid;grid-template-columns:${labelW}px repeat(${annees.length},${colW}px);border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;padding:6px 0;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">`;
+    html += `<div class="gantt-ligne" style="display:grid;grid-template-columns:${grille};align-items:center;padding:6px 0">`;
 
     // Label
     html += `<div style="padding:0 8px;display:flex;align-items:center;gap:8px">
@@ -1707,7 +1820,11 @@ function renderGantt() {
         // styles en ligne : le survol peut alors la reprendre en CSS, ce qu'un
         // style en ligne interdirait.
         html += `<div style="padding:4px 8px">
-          <div class="gantt-bloc" style="--c:${domColor}">
+          <div class="gantt-bloc" style="--c:${domColor}" tabindex="0" role="button"
+               title="Voir le détail des ${nb} opération${nb>1?'s':''}"
+               data-g="${esc(key)}" data-a="${y}"
+               onclick="ouvrirDetailCellule(this)"
+               onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
             <div class="gantt-bloc-m">${fmt(total)}</div>
             <div class="gantt-bloc-n">${nb} opération${nb>1?'s':''}</div>
             ${etatBar(ops)}
@@ -1716,12 +1833,17 @@ function renderGantt() {
       }
     });
 
+    // Total de la ligne, tous exercices confondus
+    html += `<div style="text-align:right;padding:0 10px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:12.5px;color:var(--text)">${fmt(rowTotal)}</div>
+    </div>`;
+
     html += `</div>`;
   });
 
   // Ligne total
-  html += `<div style="display:grid;grid-template-columns:${labelW}px repeat(${annees.length},${colW}px);border-top:2px solid var(--border);margin-top:4px;padding-top:8px;align-items:center">`;
-  html += `<div style="padding:0 8px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text-muted)">TOTAL</div>`;
+  html += `<div style="display:grid;grid-template-columns:${grille};border-top:2px solid var(--border);margin-top:4px;padding-top:8px;align-items:center">`;
+  html += `<div style="padding:0 8px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text-muted)">TOTAL EXERCICE</div>`;
   annees.forEach(y => {
     const total = rawData.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
     const nb = rawData.filter(d=>d.annee===y).length;
@@ -1730,11 +1852,69 @@ function renderGantt() {
       <div style="font-size:10px;color:var(--text-dim)">${nb} op.</div>
     </div>`;
   });
+  // Total général, à l'intersection des deux totaux
+  const totalGeneral = rawData.reduce((s,d)=>s+d.montant,0);
+  html += `<div style="text-align:right;padding:0 10px">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13.5px;color:var(--accent)">${fmt(totalGeneral)}</div>
+    <div style="font-size:10px;color:var(--text-dim)">${rawData.length} op.</div>
+  </div>`;
   html += `</div>`;
 
   html += `</div>`;
   document.getElementById('gantt-body').innerHTML = html;
 }
+
+/* ====================================================================
+   Détail d'une cellule du planning
+   --------------------------------------------------------------------
+   Une cellule dit un montant et un nombre ; elle ne disait pas lesquels.
+   Le panneau répond à la question sans quitter la vue.
+   ==================================================================== */
+function ouvrirDetailCellule(el) {
+  // Le groupe et l'année voyagent en attributs de données : les glisser dans
+  // un onclick sous forme de JSON cassait l'attribut dès qu'une valeur
+  // contenait un guillemet.
+  const c = { g: el.dataset.g, a: parseInt(el.dataset.a) };
+  const groupBy = document.getElementById('gantt-group')?.value || 'type';
+  const cle = d => groupBy === 'type' ? d.type
+              : groupBy === 'programme' ? (d.programme || 'Non défini')
+              : groupBy === 'ecole' ? (d.ecole || 'Non défini').trim()
+              : d.secteur.trim();
+  const ops = rawData.filter(d => d.annee === c.a && cle(d) === c.g)
+                     .sort((a, b) => b.montant - a.montant);
+  if (!ops.length) return;
+
+  const LIB = { type:'Nature des travaux', programme:'Programme',
+                ecole:'École', secteur:'Secteur' };
+  document.getElementById('detail-surtitre').textContent =
+    (LIB[groupBy] || 'Secteur') + ' · exercice ' + c.a;
+  document.getElementById('detail-titre').textContent = c.g;
+  document.getElementById('detail-montant').textContent =
+    fmt(ops.reduce((s, d) => s + d.montant, 0));
+  document.getElementById('detail-nb').textContent = ops.length;
+
+  document.getElementById('detail-liste').innerHTML = ops.map(o => `
+    <div class="detail-op" onclick="fermerDetailCellule();openModalEcole('${String(o.ecole).replace(/'/g,"\\'")}')">
+      <div class="detail-op-h">
+        <span class="detail-op-e">${esc(o.ecole)}</span>
+        <span class="detail-op-m">${o.montant ? fmt(o.montant) : '—'}</span>
+      </div>
+      <div class="detail-op-b">
+        <span>${esc(o.type)}</span>
+        ${etatBadge(o.etat)}
+        <span class="detail-op-s">${esc(o.secteur)}</span>
+      </div>
+      ${o.notes ? `<div class="detail-op-n">${esc(o.notes)}</div>` : ''}
+    </div>`).join('');
+
+  document.getElementById('detail-cellule').classList.add('ouvert');
+}
+function fermerDetailCellule() {
+  document.getElementById('detail-cellule').classList.remove('ouvert');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') fermerDetailCellule();
+});
 
 function renderTable() {
   filterTable();
