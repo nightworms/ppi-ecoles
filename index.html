@@ -196,6 +196,49 @@
   .detail-op-n { margin-top: 6px; font-size: 11.5px; color: var(--text-muted);
     line-height: 1.5; border-left: 2px solid var(--border); padding-left: 8px; }
 
+  /* ==================================================================
+     Barre des filtres croisés
+     ================================================================== */
+  .barre-filtres {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 10px 14px; margin-bottom: 18px; border-radius: 10px;
+    border: 1px dashed var(--border); background: transparent;
+    min-height: 44px; transition: background-color .16s, border-color .16s;
+  }
+  .barre-filtres.bf-active {
+    border-style: solid; border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+  .bf-vide { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+  .bf-etiq {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 10px 5px 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: border-color .14s;
+  }
+  .bf-etiq:hover { border-color: var(--accent3); }
+  .bf-champ { font-size: 9.5px; text-transform: uppercase; letter-spacing: .07em;
+              color: var(--text-muted); font-weight: 600; }
+  .bf-valeur { font-size: 12px; color: var(--text); font-weight: 500; }
+  .bf-x { color: var(--text-dim); font-size: 14px; line-height: 1; }
+  .bf-etiq:hover .bf-x { color: var(--accent3); }
+  .bf-tout { background: none; border: none; color: var(--text-muted);
+    font-size: 11.5px; cursor: pointer; text-decoration: underline;
+    text-underline-offset: 2px; font-family: 'DM Sans', sans-serif; }
+  .bf-tout:hover { color: var(--accent); }
+  .bf-compte { margin-left: auto; font-size: 11.5px; color: var(--text-muted);
+    font-variant-numeric: tabular-nums; }
+
+  /* Barres de graphique et en-têtes d'année, devenus des commandes */
+  .bar-cliquable { cursor: pointer; border-radius: 6px;
+    transition: background-color .14s; }
+  .bar-cliquable:hover { background: var(--surface2); }
+  .bar-active { background: color-mix(in srgb, var(--accent) 13%, transparent); }
+  .bar-active .bar-label { color: var(--text); font-weight: 600; }
+  .gantt-annee { transition: background-color .14s; }
+  .gantt-annee:hover { background: var(--surface2); }
+  .gantt-annee-active { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+
   /* LAYOUT */
   .main { padding: 28px 32px; max-width: 1600px; margin: 0 auto; }
   .page { display: none; }
@@ -828,7 +871,7 @@
     .header-right { gap: 7px; }
   }
 </style>
-  <link rel="stylesheet" href="carte.css?v=43">
+  <link rel="stylesheet" href="carte.css?v=44">
 </head>
 <body>
 <script>
@@ -988,6 +1031,8 @@
       <button class="print-btn" onclick="printPage('dashboard-global')" title="Imprimer cette page">🖨 Imprimer</button>
     </div>
   </div>
+
+  <div class="barre-filtres" id="filtres-global"></div>
 
   <div class="kpi-row">
     <div class="kpi-card yellow">
@@ -1192,6 +1237,7 @@
     <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)"><div style="width:12px;height:12px;border-radius:3px;background:#e05c5c"></div>Urgent</div>
   </div>
 
+  <div class="barre-filtres" id="filtres-prog"></div>
   <div id="gantt-body" style="overflow-x:auto;width:100%"></div>
 </div>
 
@@ -1458,10 +1504,10 @@ if (location.protocol === 'file:') {
   });
 }
 </script>
-<script src="donnees/config.js?v=43"></script>
-<script src="donnees/source.js?v=43"></script>
-<script src="carte.js?v=43"></script>
-<script src="compte.js?v=43"></script>
+<script src="donnees/config.js?v=44"></script>
+<script src="donnees/source.js?v=44"></script>
+<script src="carte.js?v=44"></script>
+<script src="compte.js?v=44"></script>
 <script>
 // ===== DATA =====
 let rawData = [];
@@ -1581,9 +1627,77 @@ function fmt(n) {
   return n.toLocaleString('fr-FR') + ' €';
 }
 
-function barRow(label, val, max, color, extra='') {
+/* ====================================================================
+   Filtrage croisé
+   --------------------------------------------------------------------
+   Un seul jeu de filtres, partagé par la vue globale et la programmation.
+   Cliquer une barre, une année ou un secteur restreint les deux vues à la
+   fois ; les filtres actifs s'affichent en étiquettes qu'on retire une à
+   une. Les onglets Travaux, Alertes et Carte gardent leurs propres
+   filtres : deux systèmes sur une même page se contrediraient.
+   ==================================================================== */
+let filtresCroises = {};
+const LIB_FILTRE = { annee:'Année', type:'Nature', programme:'Programme',
+                     secteur:'Secteur', etat:'État', ecole:'École' };
+const LIB_ETAT = { realise:'Réalisé', cours:'En cours', consult:'Consultation',
+                   planifie:'Planifié', urgent:'Urgent', reporte:'Reporté' };
+
+function donneesFiltrees() {
+  const f = filtresCroises;
+  return (rawData || []).filter(d =>
+    (f.annee     === undefined || d.annee === f.annee) &&
+    (f.type      === undefined || d.type === f.type) &&
+    (f.programme === undefined || (d.programme || 'Non défini') === f.programme) &&
+    (f.secteur   === undefined || String(d.secteur).trim() === f.secteur) &&
+    (f.etat      === undefined || d.etat === f.etat) &&
+    (f.ecole     === undefined || String(d.ecole).trim() === f.ecole));
+}
+
+/* Cliquer deux fois la même valeur la retire : le geste est réversible
+   sans aller chercher l'étiquette. */
+function basculerFiltre(champ, valeur) {
+  if (filtresCroises[champ] === valeur) delete filtresCroises[champ];
+  else filtresCroises[champ] = valeur;
+  appliquerFiltresCroises();
+}
+function retirerFiltre(champ) { delete filtresCroises[champ]; appliquerFiltresCroises(); }
+function effacerFiltres() { filtresCroises = {}; appliquerFiltresCroises(); }
+
+function appliquerFiltresCroises() {
+  rendreBarreFiltres();
+  refreshDashboard();
+  renderGantt();
+  renderProgressBar(donneesFiltrees());
+}
+
+function rendreBarreFiltres() {
+  const champs = Object.keys(filtresCroises);
+  const n = donneesFiltrees().length;
+  const html = champs.length === 0
+    ? `<span class="bf-vide">Aucun filtre — cliquez une barre, une année ou une
+       cellule pour restreindre la vue globale et la programmation.</span>`
+    : champs.map(c => {
+        const v = filtresCroises[c];
+        const libelle = c === 'etat' ? (LIB_ETAT[v] || v) : v;
+        return `<button class="bf-etiq" onclick="retirerFiltre('${c}')"
+                  title="Retirer ce filtre">
+                  <span class="bf-champ">${LIB_FILTRE[c] || c}</span>
+                  <span class="bf-valeur">${esc(libelle)}</span>
+                  <span class="bf-x">×</span></button>`;
+      }).join('') +
+      `<button class="bf-tout" onclick="effacerFiltres()">tout effacer</button>
+       <span class="bf-compte">${n} opération${n > 1 ? 's' : ''}</span>`;
+  document.querySelectorAll('.barre-filtres').forEach(el => {
+    el.innerHTML = html;
+    el.classList.toggle('bf-active', champs.length > 0);
+  });
+}
+
+function barRow(label, val, max, color, extra='', classes='') {
   const pct = max > 0 ? Math.round(val/max*100) : 0;
-  return `<div class="bar-row" ${extra}>
+  // Les classes sont fusionnées : un second attribut « class » dans « extra »
+  // serait purement et simplement ignoré par l'analyseur HTML.
+  return `<div class="bar-row${classes ? ' ' + classes : ''}" ${extra}>
     <div class="bar-label" style="font-size:11px">${label}</div>
     <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
     <div class="bar-amount">${fmt(val)}</div>
@@ -1630,7 +1744,8 @@ function renderChartTypes(elId, data) {
   data.forEach(d => { if(d.montant) types[d.type] = (types[d.type]||0) + d.montant; });
   const sorted = Object.entries(types).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const max = sorted[0]?.[1]||1;
-  document.getElementById(elId).innerHTML = sorted.map(([t,v])=>barRow(t,v,max,couleurType(t))).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
+  document.getElementById(elId).innerHTML = sorted.map(([t,v])=>barRow(t,v,max,couleurType(t),
+    `onclick="basculerFiltre('type', ${JSON.stringify(t).replace(/"/g,'&quot;')})" title="Filtrer sur ${esc(t)}"`, `bar-cliquable${filtresCroises.type===t?' bar-active':''}`)).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
 }
 
 function renderChartDonut(elId, data) {
@@ -1657,7 +1772,8 @@ function renderChartEtat(elId, data) {
   const etatLabels = {realise:'Réalisé',cours:'En cours',consult:'Consultation',planifie:'Planifié',urgent:'Urgent',reporte:'Reporté'};
   const filtered = Object.entries(etats).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
   const max = filtered[0]?.[1]||1;
-  document.getElementById(elId).innerHTML = filtered.map(([e,v])=>barRow(etatLabels[e],v,max,etatColors[e])).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
+  document.getElementById(elId).innerHTML = filtered.map(([e,v])=>barRow(etatLabels[e],v,max,etatColors[e],
+    `onclick="basculerFiltre('etat','${e}')" title="Filtrer sur ${etatLabels[e]}"`, `bar-cliquable${filtresCroises.etat===e?' bar-active':''}`)).join('') || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
 }
 
 function renderChartSecteurs(elId, data) {
@@ -1667,7 +1783,8 @@ function renderChartSecteurs(elId, data) {
   const max = sorted[0]?.[1]||1;
   document.getElementById(elId).innerHTML =
     `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px 24px">` +
-    sorted.map(([s,v])=>barRow(s,v,max,'linear-gradient(90deg,#3ecfcf,#5b8dee)')).join('') +
+    sorted.map(([s,v])=>barRow(s,v,max,'linear-gradient(90deg,#3ecfcf,#5b8dee)',
+      `onclick="basculerFiltre('secteur', ${JSON.stringify(s).replace(/"/g,'&quot;')})" title="Filtrer sur ${esc(s)}"`, `bar-cliquable${filtresCroises.secteur===s?' bar-active':''}`)).join('') +
     `</div>` || '<div style="color:var(--text-dim);font-size:12px;padding:8px">Aucune donnée</div>';
 }
 
@@ -1677,7 +1794,8 @@ function renderChartAnnees(elId, data) {
   const sorted = Object.entries(annees).sort((a,b)=>a[0]-b[0]);
   const max = Math.max(...sorted.map(([,v])=>v))||1;
   const anneeColors = {2025:'#f0a500',2026:'#3ecfcf',2027:'#5b8dee',2028:'#a29bfe',2029:'#fd79a8',2030:'#55efc4',2031:'#e17055',2032:'#74b9ff'};
-  document.getElementById(elId).innerHTML = sorted.map(([y,v])=>barRow(y,v,max,anneeColors[y]||'#7a8fa6')).join('');
+  document.getElementById(elId).innerHTML = sorted.map(([y,v])=>barRow(y,v,max,anneeColors[y]||'#7a8fa6',
+    `onclick="basculerFiltre('annee',${parseInt(y)})" title="Filtrer sur ${y}"`, `bar-cliquable${filtresCroises.annee===parseInt(y)?' bar-active':''}`)).join('');
 }
 
 function renderChartTopOps(elId, data) {
@@ -1690,7 +1808,7 @@ function renderChartTopOps(elId, data) {
 
 // ===== GLOBAL DASHBOARD =====
 function refreshDashboard() {
-  const data = rawData;
+  const data = donneesFiltrees();
   renderKpis('g', data);
   renderChartTypes('g-chart-types', data);
   renderChartDonut('g-chart-donut', data);
@@ -1720,6 +1838,7 @@ function renderSecteursChart() {}
 
 
 function renderGantt() {
+  const donnees = donneesFiltrees();
   const groupBy = document.getElementById('gantt-group')?.value || 'type';
   const annees = [2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
   const etatColor = SERIES[themeActuel()];
@@ -1727,7 +1846,7 @@ function renderGantt() {
 
   // Grouper les opérations
   const groups = {};
-  rawData.forEach(d => {
+  donnees.forEach(d => {
     const key = groupBy === 'type' ? d.type :
                 groupBy === 'programme' ? (d.programme || 'Non défini') :
                 groupBy === 'ecole' ? (d.ecole || 'Non défini').trim() :
@@ -1781,8 +1900,10 @@ function renderGantt() {
   html += `<div style="font-size:11px;font-weight:600;color:var(--text-muted);padding:0 8px">${LIB_GROUPE[groupBy] || 'Secteur'}</div>`;
   const anneeAccents = ANNEE_TEINTES[themeActuel()];
   annees.forEach(y => {
-    const total = rawData.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
-    html += `<div style="text-align:center;padding:0 8px">
+    const total = donnees.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
+    html += `<div class="gantt-annee${filtresCroises.annee===y?' gantt-annee-active':''}"
+      style="text-align:center;padding:2px 8px;cursor:pointer;border-radius:6px"
+      onclick="basculerFiltre('annee',${y})" title="Filtrer sur l’exercice ${y}">
       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:${anneeAccents[y]}">${y}</div>
       <div style="font-size:10px;color:var(--text-muted);margin-top:1px">${fmt(total)}</div>
     </div>`;
@@ -1845,18 +1966,18 @@ function renderGantt() {
   html += `<div style="display:grid;grid-template-columns:${grille};border-top:2px solid var(--border);margin-top:4px;padding-top:8px;align-items:center">`;
   html += `<div style="padding:0 8px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text-muted)">TOTAL EXERCICE</div>`;
   annees.forEach(y => {
-    const total = rawData.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
-    const nb = rawData.filter(d=>d.annee===y).length;
+    const total = donnees.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
+    const nb = donnees.filter(d=>d.annee===y).length;
     html += `<div style="padding:4px 8px;text-align:center">
       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:${anneeAccents[y]}">${fmt(total)}</div>
       <div style="font-size:10px;color:var(--text-dim)">${nb} op.</div>
     </div>`;
   });
   // Total général, à l'intersection des deux totaux
-  const totalGeneral = rawData.reduce((s,d)=>s+d.montant,0);
+  const totalGeneral = donnees.reduce((s,d)=>s+d.montant,0);
   html += `<div style="text-align:right;padding:0 10px">
     <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13.5px;color:var(--accent)">${fmt(totalGeneral)}</div>
-    <div style="font-size:10px;color:var(--text-dim)">${rawData.length} op.</div>
+    <div style="font-size:10px;color:var(--text-dim)">${donnees.length} op.</div>
   </div>`;
   html += `</div>`;
 
@@ -1880,7 +2001,7 @@ function ouvrirDetailCellule(el) {
               : groupBy === 'programme' ? (d.programme || 'Non défini')
               : groupBy === 'ecole' ? (d.ecole || 'Non défini').trim()
               : d.secteur.trim();
-  const ops = rawData.filter(d => d.annee === c.a && cle(d) === c.g)
+  const ops = donneesFiltrees().filter(d => d.annee === c.a && cle(d) === c.g)
                      .sort((a, b) => b.montant - a.montant);
   if (!ops.length) return;
 
@@ -2607,9 +2728,10 @@ function initApp() {
   const currentYear = new Date().getFullYear();
   const validYears = [2025,2026,2027,2028,2029,2030,2031,2032];
   anneeSelect.value = validYears.includes(currentYear) ? currentYear : 2026;
+  rendreBarreFiltres();
   refreshDashboard(); refreshAnnualDashboard();
   renderGantt(); renderTable(); renderAlertes();
-  renderProgressBar(rawData);
+  renderProgressBar(donneesFiltrees());
   startAutoRefresh();
 }
 async function reloadData() { await loadFromGSheets(); }
