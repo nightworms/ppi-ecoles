@@ -89,15 +89,6 @@
    "pos": "registre"
   },
   {
-   "id": "ecole-maternelle-domenjod",
-   "nom": "Ecole maternelle Domenjod",
-   "court": "Domenjod",
-   "niveau": "Maternelle",
-   "q": "DOMENJOD",
-   "lat": -20.912072,
-   "lon": 55.506894
-  },
-  {
    "id": "ecole-maternelle-francoise-mollard",
    "nom": "Ecole maternelle Françoise Mollard",
    "court": "Françoise Mollard",
