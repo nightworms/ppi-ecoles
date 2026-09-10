@@ -32,9 +32,10 @@ window.Source = (function () {
      déjà enregistrées — un type jamais employé ne pouvait donc jamais l'être,
      et Pergola comme Aménagement paysager restaient inaccessibles. */
   var TYPES_TRAVAUX = [
-    // A'DAP : agenda d'accessibilité programmée. Remplace le fourre-tout
-    // « Autre », qui ne désignait en réalité que ces travaux.
-    "A'DAP",
+    // Ad'AP : agenda d'accessibilité programmée — c'est l'orthographe
+    // officielle. Remplace le fourre-tout « Autre », qui ne désignait en
+    // réalité que ces travaux.
+    "Ad'AP",
     'Aménagement paysager',
     'Brasseur d\'air',        // apostrophe droite : c'est celle des données
     'Création de salle de classe',
