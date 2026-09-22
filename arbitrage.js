@@ -65,7 +65,12 @@
       }
       throw new Error('Base de données : ' + r.status + ' ' + t.slice(0, 140));
     }
-    return r.status === 204 ? null : r.json();
+    // « Prefer: return=minimal » renvoie un corps vide : le lire comme du JSON
+    // échouerait alors que l'écriture a bien eu lieu.
+    if (r.status === 204) return null;
+    var corps = await r.text();
+    if (!corps) return null;
+    try { return JSON.parse(corps); } catch (e) { return null; }
   }
 
   /* ------------------------------------------------------- chargements */

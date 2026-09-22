@@ -222,9 +222,11 @@ function appliquerTheme(t, memoriser){
 }
 function basculerTheme(){ appliquerTheme(themeActuel() === 'jour' ? 'nuit' : 'jour', true); }
 (function(){
-  var t = null;
+  var t;
   try { t = localStorage.getItem('ppi:theme'); } catch (e) {}
-  appliquerTheme(t === 'jour' ? 'jour' : 'nuit', false);
+  // Même règle que le tableau de bord : l'ivoire est le mode par défaut,
+  // seul un choix explicite de « nuit » passe la page en sombre.
+  appliquerTheme(t !== 'nuit' ? 'jour' : 'nuit', false);
 })();
 </script>
 <script src="donnees/config.js"></script>
