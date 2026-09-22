@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var ANNEES = [2027, 2028, 2029, 2030, 2031];
+  var ANNEES = [2027, 2028, 2029, 2030, 2031, 2032];   // aligné sur l'horizon du tableau de bord
   var PROGS = ['Confort thermique', 'Gros entretien', 'Mise en sécurité',
                "Accessibilité Ad'AP", 'Maintenance'];
 
