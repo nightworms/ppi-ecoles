@@ -14,6 +14,12 @@
   --text:#e2e8f0; --text-muted:#7a8fa6; --text-dim:#4a5568;
   --ombre:rgba(0,0,0,.45); color-scheme:dark;
 }
+body.jour{
+  --bg:#f6f2e8; --surface:#fffdf7; --surface2:#efe9db; --border:#ddd4c2;
+  --accent:#a86a04; --accent2:#0c757e; --accent3:#b93a3a; --accent4:#4a7d2c;
+  --text:#221f19; --text-muted:#6a6155; --text-dim:#8f8577;
+  --ombre:rgba(90,74,42,.16); color-scheme:light;
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);
   font-family:'DM Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;
@@ -73,9 +79,15 @@ main{padding-block:18px 70px}
 .ctx .src{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);margin-right:6px}
 .ctx button{background:none;border:0;color:var(--accent2);cursor:pointer;font:inherit;font-size:.74rem;padding:0}
 .dec{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-.dgrp{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
-.dgrp button{font-size:.7rem;font-weight:700;padding:6px 10px;border:0;background:transparent;
-  color:var(--text-muted);cursor:pointer;border-right:1px solid var(--border);font-family:inherit}
+.dgrp{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden;
+  box-shadow:0 1px 0 var(--ombre)}
+.dgrp button{font-size:.72rem;font-weight:700;padding:7px 13px;border:0;background:var(--surface2);
+  color:var(--text);cursor:pointer;border-right:1px solid var(--border);font-family:inherit;
+  transition:background .12s,color .12s}
+.dgrp button:hover{background:var(--accent);color:#141414}
+.dgrp button.d2:hover{background:var(--accent2);color:#08201f}
+.dgrp button.d3:hover{background:var(--text-dim);color:var(--surface)}
+.dgrp button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .dgrp button:last-child{border-right:0}
 .dgrp button[aria-pressed="true"]{background:var(--accent);color:#141414}
 .dgrp button.d2[aria-pressed="true"]{background:var(--accent2);color:#08201f}
@@ -86,6 +98,9 @@ main{padding-block:18px 70px}
   font-size:.8rem;color:var(--text-muted);line-height:1.45;display:flex;flex-direction:column;gap:8px}
 .detail b{color:var(--text);font-weight:500}
 .detail .tag{font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);display:block}
+.consigne{margin:0 0 14px;padding:11px 15px;background:var(--surface);border:1px solid var(--border);
+  border-left:3px solid var(--accent);border-radius:7px;font-size:.83rem;color:var(--text-muted);max-width:none}
+.consigne b{color:var(--text)}
 .hidden{display:none!important}
 .vide{text-align:center;padding:48px 20px;color:var(--text-dim)}
 
@@ -109,6 +124,16 @@ main{padding-block:18px 70px}
   border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:8px;font-size:.82rem;
   z-index:70;opacity:0;pointer-events:none;transition:opacity .2s;box-shadow:0 6px 24px var(--ombre);max-width:80vw}
 #etat.on{opacity:1}
+body.jour .rg.P3{background:#e4ddcc;color:var(--text-muted)}
+body.jour .rg.P4,body.jour .rg.x{background:#eae4d6;color:var(--text-dim)}
+body.jour .nt.v2{background:#f4e6c4;color:#8a6a10}
+body.jour .nt.v1{background:#dfeccf;color:#3f6b24}
+body.jour .nt.v0{background:#eae4d6;color:var(--text-dim)}
+body.jour .dec .manque{background:#f9edd2}
+body.jour .env .tot{background:#f3ead7}
+.btn-theme{background:none;border:1px solid var(--border);color:var(--text-muted);
+  border-radius:7px;width:32px;height:32px;cursor:pointer;font-size:.95rem;line-height:1}
+.btn-theme:hover{color:var(--accent);border-color:var(--accent)}
 @media (max-width:1150px){
   .ligne{grid-template-columns:42px 1fr 34px;row-gap:9px}
   .ligne .po{grid-column:2/4} .ligne .ctx{grid-column:1/-1} .dec{grid-column:1/-1;justify-content:flex-start}
@@ -123,6 +148,7 @@ main{padding-block:18px 70px}
     <div><div class="fil"><a href="./" style="color:var(--text-dim);text-decoration:none">← Tableau de bord PPI</a>
            · Direction de l'Éducation · Saint-Denis de La Réunion</div>
          <h1>Arbitrage de la programmation</h1></div>
+    <button id="btn-theme" class="btn-theme" onclick="basculerTheme()" title="Changer de thème">☾</button>
     <div class="qui" id="qui"></div>
     <div class="avance"><b id="pfait">0</b><span>arbitrées sur <span id="ptot">—</span></span></div>
   </div>
@@ -159,6 +185,10 @@ main{padding-block:18px 70px}
   </div>
 
   <div id="appli">
+    <p class="consigne">Pour chaque intervention, choisissez sa destination à droite de la ligne :
+       <b>PPI</b> pour l'inscrire au plan — l'année, le type et le montant s'ouvrent alors —,
+       <b>Entretien</b> pour la confier à la Direction des travaux du territoire,
+       <b>Écarter</b> pour la laisser sans suite. Tout est enregistré aussitôt.</p>
     <div id="liste"></div>
     <div class="vide hidden" id="vide">Aucune intervention ne correspond à ces filtres.</div>
 
@@ -179,6 +209,24 @@ main{padding-block:18px 70px}
 </div></main>
 <div id="etat" role="status" aria-live="polite"></div>
 
+<script>
+/* Même mécanisme que le tableau de bord : classe « jour » sur le corps,
+   préférence conservée sous la clé ppi:theme. Le choix suit d'une page à l'autre. */
+function themeActuel(){ return document.body.classList.contains('jour') ? 'jour' : 'nuit'; }
+function appliquerTheme(t, memoriser){
+  document.body.classList.toggle('jour', t === 'jour');
+  var b = document.getElementById('btn-theme');
+  if (b) { b.textContent = t === 'jour' ? '☾' : '☀';
+           b.title = t === 'jour' ? 'Passer en mode nuit' : 'Passer en mode jour'; }
+  if (memoriser) { try { localStorage.setItem('ppi:theme', t); } catch (e) {} }
+}
+function basculerTheme(){ appliquerTheme(themeActuel() === 'jour' ? 'nuit' : 'jour', true); }
+(function(){
+  var t = null;
+  try { t = localStorage.getItem('ppi:theme'); } catch (e) {}
+  appliquerTheme(t === 'jour' ? 'jour' : 'nuit', false);
+})();
+</script>
 <script src="donnees/config.js"></script>
 <script src="donnees/source.js"></script>
 <script src="arbitrage.js"></script>

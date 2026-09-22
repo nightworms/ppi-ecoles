@@ -50,7 +50,14 @@
     if (!r.ok) {
       var t = await r.text();
       if (r.status === 401 || r.status === 403) {
-        throw new Error('Accès refusé. Votre compte est peut-être en lecture seule.');
+        var d = {}; try { d = JSON.parse(t); } catch (e) {}
+        if (d.code === '42501' || /row-level security/i.test(t)) {
+          throw new Error('La base refuse l’écriture : la règle d’accès de la table ' +
+            '« arbitrages » ne reconnaît pas votre compte. Vérifiez que votre ligne de ' +
+            'la table « membres » porte bien user_id = votre identifiant et role ' +
+            '« admin » ou « redacteur ». (' + (d.message || '42501') + ')');
+        }
+        throw new Error('Accès refusé par la base : ' + (d.message || t.slice(0, 120)));
       }
       if (/relation .*arbitrages.* does not exist/i.test(t)) {
         throw new Error('La table « arbitrages » n’existe pas encore. ' +
