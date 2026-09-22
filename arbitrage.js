@@ -75,7 +75,7 @@
 
   /* ------------------------------------------------------- chargements */
   async function charger() {
-    var r = await fetch('donnees/arbitrage-interventions.json?v=3');
+    var r = await fetch('donnees/arbitrage-interventions.json?v=4');
     if (!r.ok) throw new Error('Référentiel des interventions introuvable.');
     DATA = await r.json();
     DATA.forEach(function (x) { IDX[x.id] = x; });
@@ -281,6 +281,8 @@
     if (L.length > lim.length) h += '<div class="vide">' + (L.length - lim.length) +
       ' autres interventions correspondent — affinez les filtres pour les atteindre.</div>';
     $('#liste').innerHTML = h;
+    var bv = $('#expVue');
+    if (bv) bv.textContent = 'Exporter la liste affichée (' + L.length + ')';
     enveloppes();
   }
 
@@ -399,6 +401,40 @@
     a.download = nom; document.body.appendChild(a); a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   }
+  /* Export de la vue : ce que les filtres désignent, arbitré ou non. */
+  function nomDuFichier() {
+    var m = ['Arbitrage'];
+    if (filtres.rang) m.push(filtres.rang === '\u2014' ? 'non classees' : filtres.rang);
+    if (filtres.dec) m.push({'0':'a arbitrer','ppi':'retenues PPI','entretien':'petit entretien',
+                             'ecarte':'ecartees','verse':'versees'}[filtres.dec] || filtres.dec);
+    if (filtres.sect) m.push(filtres.sect);
+    if (filtres.poste) m.push(filtres.poste);
+    if (filtres.q) m.push('recherche ' + filtres.q);
+    return m.join(' - ').replace(/[\\\/:*?"<>|]/g, ' ').slice(0, 120) + '.csv';
+  }
+  $('#expVue').addEventListener('click', function () {
+    var L = retenues();
+    if (!L.length) { etat('La liste affichée est vide.'); return; }
+    var l = [['Ecole', 'Secteur', 'Poste', 'Type de travaux', 'Note diagnostic', 'Priorite', 'Score',
+              'Situation au plan', 'Demande du conseil d ecole', 'Anciennete',
+              'Ligne existante', 'Destination arbitree', 'Annee retenue', 'Thematique',
+              'Montant retenu', 'Versee au plan']];
+    var DEST = {ppi: 'PPI', entretien: 'Petit entretien', ecarte: 'Écartée'};
+    L.forEach(function (x) {
+      var d = A[x.id] || {};
+      var dem = (x.dem && x.dem.length)
+        ? x.dem.map(function (q) { return (q.u ? '[' + q.u + '] ' : '') + q.d; }).join(' / ') : '';
+      var lig = x.ligne ? (x.ligne.annee + ' · ' + Math.round(x.ligne.montant) + ' € · ' + x.ligne.etat) : '';
+      l.push([x.ecolePPI, x.secteur, x.poste, (d.type || x.type), (x.note || ''), x.rang, x.score,
+              x.statut, dem, (x.anc || ''), lig,
+              (DEST[d.dest] || ''), (d.annee || ''), (d.prog || ''),
+              (d.montant || ''), (d.operation_id ? 'oui' : '')]);
+    });
+    telecharger(nomDuFichier(), csv(l));
+    $('#notepan').textContent = L.length + ' intervention' + (L.length > 1 ? 's' : '') +
+      ' exportée' + (L.length > 1 ? 's' : '') + ', telles que les filtres les désignent.';
+  });
+
   $('#expDTT').addEventListener('click', function () {
     var l = [['Ecole', 'Secteur', 'Poste', 'Note diagnostic', 'Demande ou constat', 'Priorite']], n = 0;
     DATA.forEach(function (x) {

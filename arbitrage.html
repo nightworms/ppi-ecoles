@@ -205,10 +205,13 @@ body.jour .env .tot{background:#f3ead7}
       <p>Les interventions retenues au PPI, pourvues d'une année et d'un montant, deviennent des
          opérations du plan : elles apparaîtront dans le tableau de bord, la carte et les exports,
          au même titre que les lignes existantes. Une intervention déjà versée est marquée et ne
-         peut pas l'être deux fois.</p>
+         peut pas l'être deux fois. Le deuxième bouton reprend <b>exactement la liste que vos
+         filtres désignent</b>, arbitrée ou non — de quoi sortir le tableau d'un secteur, d'un
+         poste ou d'une priorité pour le porter en réunion.</p>
       <div class="bts">
         <button class="bt" id="verser">Verser au plan les interventions prêtes</button>
         <button class="bt sec" id="expDTT">Petit entretien → DTT (.csv)</button>
+        <button class="bt sec" id="expVue">Exporter la liste affichée</button>
         <button class="bt gh" id="expCSV">Export CSV de l'arbitrage</button>
       </div>
       <div class="note" id="notepan"></div>
@@ -239,6 +242,6 @@ function basculerTheme(){ appliquerTheme(themeActuel() === 'jour' ? 'nuit' : 'jo
 </script>
 <script src="donnees/config.js"></script>
 <script src="donnees/source.js"></script>
-<script src="arbitrage.js?v=3"></script>
+<script src="arbitrage.js?v=4"></script>
 </body>
 </html>
