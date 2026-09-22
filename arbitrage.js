@@ -75,7 +75,7 @@
 
   /* ------------------------------------------------------- chargements */
   async function charger() {
-    var r = await fetch('donnees/arbitrage-interventions.json');
+    var r = await fetch('donnees/arbitrage-interventions.json?v=3');
     if (!r.ok) throw new Error('Référentiel des interventions introuvable.');
     DATA = await r.json();
     DATA.forEach(function (x) { IDX[x.id] = x; });
@@ -263,7 +263,7 @@
       if (x.ligne) h += '<div><span class="tag">Ligne existante au plan</span><b>' + x.ligne.annee + '</b> · ' +
                         euro(x.ligne.montant) + ' · ' + esc(x.ligne.etat) + ' · ' + esc(x.ligne.programme) + '</div>';
       h += '<div><span class="tag">Report vers le plan</span>Libellé : <b>' + esc(x.ecolePPI) + '</b>' +
-           (ECOLE_ID[x.ecolePPI] != null ? '' : ' <em>(école non reconnue au référentiel : la ligne sera créée sans rattachement)</em>') +
+           ((x.ecoleId || ECOLE_ID[x.ecolePPI]) ? '' : ' <em>(école non reconnue au référentiel : la ligne sera créée sans rattachement)</em>') +
            ' · Type : <b>' + esc((A[x.id] && A[x.id].type) || x.type) + '</b>' +
            (x.type === 'Autre' && !(A[x.id] && A[x.id].type) ? ' <em>(à choisir : aucun type ne découle du poste)</em>' : '') +
            ' · Statut : ' + esc(x.statut) + ' · Score ' + x.score + '</div>';
@@ -368,7 +368,8 @@
                    etat: 'planifie',
                    notes: 'Arbitrage ' + new Date().toLocaleDateString('fr-FR') + ' — ' + x.poste +
                           ' — priorité ' + x.rang + ' (score ' + x.score + ')' };
-        if (ECOLE_ID[x.ecolePPI] != null) op.ecole_id = ECOLE_ID[x.ecolePPI];
+        var eid = x.ecoleId || ECOLE_ID[x.ecolePPI];
+        if (eid) op.ecole_id = eid;
         var cree = await Source.enregistrerOperation(op);
         var oid = (cree && cree[0] && cree[0].id) || null;
         d.operation_id = oid;
