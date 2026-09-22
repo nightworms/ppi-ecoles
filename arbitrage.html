@@ -94,6 +94,11 @@ main{padding-block:18px 70px}
 .dgrp button.d2[aria-pressed="true"]{background:var(--accent2);color:#08201f}
 .dgrp button.d3[aria-pressed="true"]{background:#3a4657;color:var(--text)}
 .dec input[type=number]{width:100px;text-align:right;font-variant-numeric:tabular-nums}
+.versee{font-size:.7rem;font-weight:700;letter-spacing:.04em;padding:6px 11px;border-radius:7px;
+  background:var(--accent4);color:#fff;white-space:nowrap}
+.bt-reprendre{font-family:inherit;font-size:.72rem;font-weight:700;padding:6px 12px;border-radius:7px;
+  border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer}
+.bt-reprendre:hover{border-color:var(--accent3);color:var(--accent3)}
 .dec .manque{border-color:var(--accent);background:#2a2415}
 .detail{grid-column:1/-1;border-top:1px solid var(--border);margin-top:9px;padding-top:10px;
   font-size:.8rem;color:var(--text-muted);line-height:1.45;display:flex;flex-direction:column;gap:8px}
@@ -189,7 +194,9 @@ body.jour .env .tot{background:#f3ead7}
     <p class="consigne">Pour chaque intervention, choisissez sa destination à droite de la ligne :
        <b>PPI</b> pour l'inscrire au plan — l'année, le type et le montant s'ouvrent alors —,
        <b>Entretien</b> pour la confier à la Direction des travaux du territoire,
-       <b>Écarter</b> pour la laisser sans suite. Tout est enregistré aussitôt.</p>
+       <b>Écarter</b> pour la laisser sans suite. Tout est enregistré aussitôt.
+       Une intervention déjà versée au plan se reprend par le bouton <b>Reprendre</b> :
+       son opération est alors retirée du plan et la décision se rouvre.</p>
     <div id="liste"></div>
     <div class="vide hidden" id="vide">Aucune intervention ne correspond à ces filtres.</div>
 

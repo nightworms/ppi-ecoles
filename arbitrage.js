@@ -106,6 +106,31 @@
     A = n;
   }
 
+  /* Une opération supprimée depuis le tableau de bord laisserait l'arbitrage
+     marqué « versé » à tort : on rétablit la vérité au chargement. */
+  async function reconcilier() {
+    var vus = {};
+    try { (await Source.travaux()).forEach(function (t) { if (t.id != null) vus[t.id] = 1; }); }
+    catch (e) { return; }
+    var perdus = Object.keys(A).filter(function (id) {
+      return A[id].operation_id && !vus[A[id].operation_id]; });
+    if (!perdus.length) return;
+    for (var i = 0; i < perdus.length; i++) {
+      var id = perdus[i]; A[id].operation_id = null;
+      try {
+        await sb('/arbitrages', { method: 'POST',
+          corps: { id: id, destination: A[id].dest,
+                   annee: A[id].annee ? parseInt(A[id].annee, 10) : null,
+                   programme: A[id].prog || null, montant: A[id].montant || 0,
+                   type_travaux: A[id].type || null, note: A[id].note || null, operation_id: null },
+          entetes: { Prefer: 'resolution=merge-duplicates,return=minimal' } });
+      } catch (e) { /* on réessaiera au prochain chargement */ }
+    }
+    etat(perdus.length + ' arbitrage' + (perdus.length > 1 ? 's' : '') +
+         ' rouvert' + (perdus.length > 1 ? 's' : '') +
+         ' : l’opération correspondante a été retirée du plan.', 5200);
+  }
+
   /* ---------------------------------------------------------- écriture */
   function enregistre(id) {
     var d = A[id];
@@ -196,13 +221,18 @@
     h += '<div class="ctx">' + c + '</div>';
 
     h += '<div class="dec">';
+    if (d.operation_id) {
+      h += '<span class="versee">Versée au plan</span>' +
+           '<button class="bt-reprendre" data-reprendre="' + x.id + '">Reprendre</button>';
+    } else {
     h += '<div class="dgrp">' +
          '<button data-d="ppi" data-id="' + x.id + '" aria-pressed="' + (d.dest === 'ppi') + '">PPI</button>' +
          '<button class="d2" data-d="entretien" data-id="' + x.id + '" aria-pressed="' + (d.dest === 'entretien') + '">Entretien</button>' +
          '<button class="d3" data-d="ecarte" data-id="' + x.id + '" aria-pressed="' + (d.dest === 'ecarte') + '">Écarter</button>' +
          '</div>';
-    if (d.dest === 'ppi') {
-      var fige = d.operation_id ? ' disabled' : '';
+    }
+    if (d.dest === 'ppi' && !d.operation_id) {
+      var fige = '';
       h += '<select data-c="annee" data-id="' + x.id + '"' + fige + (d.annee ? '' : ' class="manque"') + '><option value="">année…</option>';
       ANNEES.forEach(function (a) { h += '<option value="' + a + '"' + (d.annee == a ? ' selected' : '') + '>' + a + '</option>'; });
       h += '</select>';
@@ -264,6 +294,29 @@
       rendu(); return;
     }
     if (b.dataset.plus) { ouverts[b.dataset.plus] = !ouverts[b.dataset.plus]; rendu(); return; }
+    if (b.dataset.reprendre) {
+      var rid = b.dataset.reprendre, rd = A[rid], rx = IDX[rid];
+      if (!rd || !rd.operation_id) return;
+      if (!Source.peutEcrire()) { etat(Source.refusEcriture()); return; }
+      if (!confirm('Reprendre cet arbitrage ?\n\n' + rx.ecolePPI + ' — ' + rx.poste +
+                   '\n\nL’opération correspondante sera retirée du plan d’investissement, ' +
+                   'et l’intervention redeviendra modifiable. Les montants déjà engagés ne ' +
+                   'sont pas concernés : seule la ligne du plan disparaît.')) return;
+      (async function () {
+        try {
+          await Source.supprimerOperation(rd.operation_id);
+          rd.operation_id = null;
+          await sb('/arbitrages', { method: 'POST',
+            corps: { id: rid, destination: rd.dest, annee: rd.annee ? parseInt(rd.annee, 10) : null,
+                     programme: rd.prog || null, montant: rd.montant || 0,
+                     type_travaux: rd.type || null, note: rd.note || null, operation_id: null },
+            entetes: { Prefer: 'resolution=merge-duplicates,return=minimal' } });
+          etat('Opération retirée du plan. L’intervention est de nouveau modifiable.', 4200);
+          rendu();
+        } catch (e) { etat('Reprise impossible : ' + e.message, 5200); }
+      })();
+      return;
+    }
     if (b.dataset.d) {
       var id = b.dataset.id, d = A[id] || {};
       if (d.operation_id) { etat('Cette intervention est déjà versée au plan : modifiez l’opération dans le tableau de bord.'); return; }
@@ -397,7 +450,7 @@
       $('#appli').classList.add('hidden');
       return;
     }
-    try { await lireArbitrages(); }
+    try { await lireArbitrages(); await reconcilier(); }
     catch (e) { etat(e.message, 6000); }
     rendu();
     if (!Source.peutEcrire()) etat('Votre compte est en lecture seule : les arbitrages sont consultables, non modifiables.', 5200);
