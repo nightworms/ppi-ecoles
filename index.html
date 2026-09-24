@@ -136,6 +136,14 @@
   .gantt-bloc-m { font-family:'Syne',sans-serif; font-weight:700;
                   font-size:12px; color: var(--c); }
   .gantt-bloc-n { font-size:10px; color: var(--text-muted); margin-top:2px; }
+  /* Quand les colonnes ne sont plus les exercices, l'année de réalisation ne
+     se lit plus nulle part : la cellule la porte, dans la teinte de son
+     millésime — la même que celle des colonnes d'années.
+     Elle occupe sa propre ligne : la cellule n'offre que 86 px utiles, où le
+     montant en prend déjà 43 et une étendue d'années jusqu'à 69. Les mettre
+     côte à côte faisait passer le montant à la ligne. */
+  .gantt-bloc-a { font-family:'Syne',sans-serif; font-weight:800; font-size:10px;
+                  white-space:nowrap; margin-top:2px; letter-spacing:.02em; }
   /* La ligne du planning se marque au survol : le repère horizontal manque
      vite sur huit exercices. rgba(255,255,255,…) ne convenait qu'au fond nuit. */
   .gantt-ligne { border-bottom: 1px solid var(--border); transition: background-color .15s; }
@@ -1919,6 +1927,22 @@ function donneesHorsChamp(champ) {
     ok('ecole',     () => String(d.ecole).trim() === f.ecole));
 }
 
+/* Dès que les colonnes ne sont plus les exercices, plus rien ne dit quand les
+   travaux se font. La cellule porte donc son millésime, dans la teinte qui lui
+   est déjà attachée ailleurs dans l'application. Une cellule qui en couvre
+   plusieurs affiche l'étendue, et l'infobulle donne le détail exact. */
+function anneesDeCellule(ops) {
+  const ans = [...new Set(ops.map(o => parseInt(o.annee)).filter(a => !isNaN(a)))].sort((a,b) => a-b);
+  if (!ans.length) return null;
+  if (ans.length === 1) {
+    return { texte: String(ans[0]), couleur: couleurAnnee(ans[0]),
+             infobulle: 'Réalisation : ' + ans[0] };
+  }
+  const fin = String(ans[ans.length-1]).slice(-2);
+  return { texte: ans[0] + '–' + fin, couleur: 'var(--text-muted)',
+           infobulle: 'Réalisation : ' + ans.join(', ') };
+}
+
 function couleurAxe(champ, v) {
   if (champ === 'annee') return couleurAnnee(parseInt(v));
   if (champ === 'type')  return couleurType(v);
@@ -2041,13 +2065,16 @@ function renderGantt() {
       } else {
         const total = ops.reduce((s,d)=>s+d.montant,0);
         const nb = ops.length;
+        const an = colBy === 'annee' ? null : anneesDeCellule(ops);
         html += `<div style="padding:4px 8px">
           <div class="gantt-bloc" style="--c:${dominantColor(ops)}" tabindex="0" role="button"
                data-g="${esc(key)}" data-c="${esc(String(v))}"
+               ${an ? `title="${esc(an.infobulle)}"` : ''}
                onclick="ouvrirDetailCellule(this)"
                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
             <div class="gantt-bloc-m">${fmt(total)}</div>
             <div class="gantt-bloc-n">${nb} opération${nb>1?'s':''}</div>
+            ${an ? `<div class="gantt-bloc-a" style="color:${an.couleur}">${an.texte}</div>` : ''}
             ${etatBar(ops)}
           </div>
         </div>`;
