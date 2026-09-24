@@ -170,7 +170,7 @@ body.jour .env .tot{background:#f3ead7}
     <span class="lb" style="margin-left:8px">État</span>
     <select id="fdec">
       <option value="">Tous</option><option value="0">À arbitrer</option>
-      <option value="ppi">Retenues au PPI</option><option value="entretien">Petit entretien</option>
+      <option value="ppi">Retenues au PPI</option><option value="entretien">Maintenance DTT</option>
       <option value="ecarte">Écartées</option><option value="verse">Déjà versées au plan</option>
     </select>
     <select id="fsect"><option value="">Tous les secteurs</option></select>
@@ -193,7 +193,7 @@ body.jour .env .tot{background:#f3ead7}
   <div id="appli">
     <p class="consigne">Pour chaque intervention, choisissez sa destination à droite de la ligne :
        <b>PPI</b> pour l'inscrire au plan — l'année, le type et le montant s'ouvrent alors —,
-       <b>Entretien</b> pour la confier à la Direction des travaux du territoire,
+       <b>Maintenance</b> pour la confier à la Direction des travaux du territoire,
        <b>Écarter</b> pour la laisser sans suite. Tout est enregistré aussitôt.
        Une intervention déjà versée au plan se reprend par le bouton <b>Reprendre</b> :
        son opération est alors retirée du plan et la décision se rouvre.</p>
@@ -210,7 +210,7 @@ body.jour .env .tot{background:#f3ead7}
          poste ou d'une priorité pour le porter en réunion.</p>
       <div class="bts">
         <button class="bt" id="verser">Verser au plan les interventions prêtes</button>
-        <button class="bt sec" id="expDTT">Petit entretien → DTT (.csv)</button>
+        <button class="bt sec" id="expDTT">Maintenance DTT (.csv)</button>
         <button class="bt gh" onclick="location.href='entretien.html'">Suivi d'exécution DTT</button>
         <button class="bt sec" id="expVue">Exporter la liste affichée</button>
         <button class="bt gh" id="expCSV">Export CSV de l'arbitrage</button>
@@ -243,6 +243,6 @@ function basculerTheme(){ appliquerTheme(themeActuel() === 'jour' ? 'nuit' : 'jo
 </script>
 <script src="donnees/config.js"></script>
 <script src="donnees/source.js"></script>
-<script src="arbitrage.js?v=4"></script>
+<script src="arbitrage.js?v=5"></script>
 </body>
 </html>

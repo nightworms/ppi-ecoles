@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Petit entretien — suivi d'exécution — PPI Écoles</title>
+<title>Maintenance DTT — suivi d'exécution — PPI Écoles</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
@@ -157,7 +157,7 @@ body.jour .dgrp button.s4[aria-pressed="true"]{background:#ddd4c2;color:var(--te
   <div class="htop">
     <div><div class="fil"><a href="./" style="color:var(--text-dim);text-decoration:none">← Tableau de bord PPI</a>
            · Direction des travaux du territoire</div>
-         <h1>Petit entretien — suivi d'exécution</h1></div>
+         <h1>Maintenance DTT — suivi d'exécution</h1></div>
     <button id="btn-theme" class="btn-theme" onclick="basculerTheme()" title="Changer de thème">☾</button>
     <div class="qui" id="qui"></div>
   </div>
@@ -215,7 +215,7 @@ body.jour .dgrp button.s4[aria-pressed="true"]{background:#ddd4c2;color:var(--te
       <p>Le tableau reprend l'état d'avancement tel qu'il est à cet instant, filtres compris.</p>
       <div class="bts">
         <button class="bt sec" id="expVue">Exporter la liste affichée</button>
-        <button class="bt gh" id="expTout">Exporter tout le petit entretien</button>
+        <button class="bt gh" id="expTout">Exporter toute la maintenance</button>
       </div>
       <div class="note" id="notepan"></div>
     </section>
@@ -242,6 +242,6 @@ function basculerTheme(){ appliquerTheme(themeActuel() === 'jour' ? 'nuit' : 'jo
 </script>
 <script src="donnees/config.js"></script>
 <script src="donnees/source.js"></script>
-<script src="entretien.js?v=1"></script>
+<script src="entretien.js?v=2"></script>
 </body>
 </html>

@@ -1,8 +1,8 @@
 /* =====================================================================
-   Petit entretien — suivi d'exécution (Direction des travaux du territoire)
+   Maintenance DTT — suivi d'exécution (Direction des travaux du territoire)
    ---------------------------------------------------------------------
    Reprend le référentiel d'interventions, n'affiche que celles que
-   l'arbitrage a orientées vers le petit entretien, et conserve leur
+   l'arbitrage a orientées vers la maintenance DTT, et conserve leur
    avancement dans la table « entretien_suivi ».
 
    Deux tables, deux portées : la DTT écrit son compte rendu, elle ne
@@ -25,7 +25,7 @@
   ];
   var LIB = { a_faire:'À faire', programme:'Programmée', termine:'Terminée', sans_suite:'Sans suite' };
 
-  var DATA = [];                      // interventions confiées au petit entretien
+  var DATA = [];                      // interventions confiées à la maintenance DTT
   var S = Object.create(null);        // id -> suivi
   var filtres = { statut: '', rang: '', sect: '', q: '' };
   var minuteurs = Object.create(null);
@@ -96,7 +96,7 @@
     var idx = {};
     toutes.forEach(function (x) { idx[x.id] = x; });
 
-    // les interventions que l'arbitrage a confiées au petit entretien
+    // les interventions que l'arbitrage a confiées à la maintenance DTT
     var arb = await sb('/arbitrages?select=id,destination&destination=eq.entretien');
     DATA = (arb || []).map(function (a) { return idx[a.id]; }).filter(Boolean);
 
@@ -317,7 +317,7 @@
     return l;
   }
   function nomDuFichier() {
-    var p = ['Petit entretien DTT'];
+    var p = ['Maintenance DTT'];
     if (filtres.statut) p.push(LIB[filtres.statut]);
     if (filtres.rang) p.push(filtres.rang);
     if (filtres.sect) p.push(filtres.sect);
@@ -331,8 +331,8 @@
       ' exportée' + (L.length > 1 ? 's' : '') + ', telles que les filtres les désignent.';
   });
   $('#expTout').addEventListener('click', function () {
-    if (!DATA.length) { etat('Aucune intervention confiée au petit entretien.'); return; }
-    telecharger('Petit entretien DTT - tout.csv', csv(tableau(DATA)));
+    if (!DATA.length) { etat('Aucune intervention confiée à la maintenance DTT.'); return; }
+    telecharger('Maintenance DTT - tout.csv', csv(tableau(DATA)));
     $('#notepan').textContent = DATA.length + ' interventions exportées, filtres ignorés.';
   });
 
@@ -391,7 +391,7 @@
     catch (e) { etat(e.message, 8000); return; }
     rendu();
     if (!DATA.length) {
-      etat('Aucune intervention n’a encore été confiée au petit entretien.', 5200);
+      etat('Aucune intervention n’a encore été confiée à la maintenance DTT.', 5200);
     } else if (!peutEcrire()) {
       etat('Votre compte est en lecture seule : le suivi est consultable, non modifiable.', 5200);
     }

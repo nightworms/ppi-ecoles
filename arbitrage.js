@@ -177,7 +177,7 @@
     h += '<div class="tot"><div class="an">Total PPI</div><div class="mt">' + euro(tot) + '</div>' +
          '<div class="nb">' + ntot + ' retenue' + (ntot > 1 ? 's' : '') +
          (verse ? ' · ' + verse + ' versée' + (verse > 1 ? 's' : '') : '') + '</div></div>';
-    h += '<div class="dtt"><div class="an">Petit entretien</div><div class="mt">' + dtt + '</div>' +
+    h += '<div class="dtt"><div class="an">Maintenance DTT</div><div class="mt">' + dtt + '</div>' +
          '<div class="nb">à transmettre à la DTT</div></div>';
     $('#env').innerHTML = h;
     $('#pfait').textContent = Object.keys(A).length;
@@ -227,7 +227,7 @@
     } else {
     h += '<div class="dgrp">' +
          '<button data-d="ppi" data-id="' + x.id + '" aria-pressed="' + (d.dest === 'ppi') + '">PPI</button>' +
-         '<button class="d2" data-d="entretien" data-id="' + x.id + '" aria-pressed="' + (d.dest === 'entretien') + '">Entretien</button>' +
+         '<button class="d2" data-d="entretien" data-id="' + x.id + '" aria-pressed="' + (d.dest === 'entretien') + '">Maintenance</button>' +
          '<button class="d3" data-d="ecarte" data-id="' + x.id + '" aria-pressed="' + (d.dest === 'ecarte') + '">Écarter</button>' +
          '</div>';
     }
@@ -405,7 +405,7 @@
   function nomDuFichier() {
     var m = ['Arbitrage'];
     if (filtres.rang) m.push(filtres.rang === '\u2014' ? 'non classees' : filtres.rang);
-    if (filtres.dec) m.push({'0':'a arbitrer','ppi':'retenues PPI','entretien':'petit entretien',
+    if (filtres.dec) m.push({'0':'a arbitrer','ppi':'retenues PPI','entretien':'maintenance DTT',
                              'ecarte':'ecartees','verse':'versees'}[filtres.dec] || filtres.dec);
     if (filtres.sect) m.push(filtres.sect);
     if (filtres.poste) m.push(filtres.poste);
@@ -419,7 +419,7 @@
               'Situation au plan', 'Demande du conseil d ecole', 'Anciennete',
               'Ligne existante', 'Destination arbitree', 'Annee retenue', 'Thematique',
               'Montant retenu', 'Versee au plan']];
-    var DEST = {ppi: 'PPI', entretien: 'Petit entretien', ecarte: 'Écartée'};
+    var DEST = {ppi: 'PPI', entretien: 'Maintenance DTT', ecarte: 'Écartée'};
     L.forEach(function (x) {
       var d = A[x.id] || {};
       var dem = (x.dem && x.dem.length)
@@ -442,8 +442,8 @@
       var txt = (x.dem && x.dem.length) ? x.dem.map(function (q) { return q.d; }).join(' / ') : (x.obs || '');
       l.push([x.ecolePPI, x.secteur, x.poste, x.note || '', txt, x.rang]); n++;
     });
-    if (!n) { etat('Aucune intervention orientée vers le petit entretien.'); return; }
-    telecharger('Petit entretien - Direction des travaux du territoire.csv', csv(l));
+    if (!n) { etat('Aucune intervention orientée vers la maintenance DTT.'); return; }
+    telecharger('Maintenance DTT - Direction des travaux du territoire.csv', csv(l));
     $('#notepan').textContent = n + ' ligne' + (n > 1 ? 's' : '') + ' exportée' + (n > 1 ? 's' : '') + ' pour la DTT.';
   });
   $('#expCSV').addEventListener('click', function () {
