@@ -141,6 +141,22 @@
   .gantt-ligne { border-bottom: 1px solid var(--border); transition: background-color .15s; }
   .gantt-ligne:hover { background: var(--surface2); }
 
+  /* Colonne de gauche figée : croisée avec les types de travaux, la matrice
+     dépasse largement l'écran, et un nom d'école qui sort du champ pendant
+     qu'on lit une cellule rend la ligne illisible. Le fond est opaque, sinon
+     les cellules défileraient par transparence sous les libellés. */
+  /* align-self:stretch est indispensable : la grille centre ses éléments,
+     le libellé ne faisait donc que la hauteur de son texte et les cellules
+     défilaient en clair au-dessus et au-dessous de lui. */
+  .gantt-fige { position: sticky; left: 0; z-index: 2; background: var(--bg);
+                align-self: stretch; }
+  .gantt-ligne:hover .gantt-fige { background: var(--surface2); }
+  /* Les libellés de colonne sont des phrases quand ce ne sont plus des
+     millésimes : deux lignes au plus, le reste en infobulle. */
+  .gantt-col-t { font-size: 11px; line-height: 1.2; display: -webkit-box;
+                 -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+                 overflow: hidden; }
+
   @media (prefers-reduced-motion: reduce) {
     .card, .matrix-quadrant, .alert-kpi-badge, .alert-card, .kpi-card,
     .gantt-bloc { transition: none; }
@@ -601,6 +617,7 @@
     .print-btn, .export-btn, .btn-secondary, .btn-primary,
     .nav, .header-right, .filters,
     #gantt-group, label[for="gantt-group"],
+    #gantt-cols, label[for="gantt-cols"],
     .alert-filter, #alert-filter-annee, #alert-filter-niveau,
     select#select-annee-dash,
     .page:not(.active) { display: none !important; }
@@ -1229,15 +1246,23 @@
   <div class="prog-header">
     <div>
       <div class="prog-title">Planning PPI <span style="font-size:13px;font-weight:400;color:var(--text-muted)">2025 – 2032</span></div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Chaque cellule porte le budget de l’exercice — cliquez-la pour ouvrir le détail de ses opérations.</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="prog-sous-titre">Chaque cellule porte le budget de l’exercice — cliquez-la pour ouvrir le détail de ses opérations.</div>
     </div>
     <div style="display:flex;align-items:center;gap:12px">
-      <label style="font-size:12px;color:var(--text-muted)">Grouper par</label>
-      <select id="gantt-group" onchange="renderGantt()" style="font-size:12px;padding:5px 10px">
+      <label for="gantt-group" style="font-size:12px;color:var(--text-muted)">En lignes</label>
+      <select id="gantt-group" onchange="majOptionsAxes();renderGantt()" style="font-size:12px;padding:5px 10px">
         <option value="type">Type de travaux</option>
         <option value="programme">Programme</option>
         <option value="secteur">Secteur</option>
         <option value="ecole">École</option>
+      </select>
+      <label for="gantt-cols" style="font-size:12px;color:var(--text-muted)">En colonnes</label>
+      <select id="gantt-cols" onchange="majOptionsAxes();renderGantt()" style="font-size:12px;padding:5px 10px">
+        <option value="annee">Années</option>
+        <option value="type">Type de travaux</option>
+        <option value="programme">Programme</option>
+        <option value="secteur">Secteur</option>
+        <option value="etat">État</option>
       </select>
       <button class="print-btn" onclick="printPage('programmation')" title="Imprimer cette page">🖨 Imprimer</button>
     </div>
@@ -1847,40 +1872,115 @@ function renderTypeChart() { refreshDashboard(); refreshAnnualDashboard(); }
 function renderSecteursChart() {}
 
 
+/* ====================================================================
+   Les deux axes du planning
+   --------------------------------------------------------------------
+   L'axe vertical était déjà au choix ; l'horizontal était figé sur les
+   exercices. Il l'est devenu aussi, ce qui permet de croiser les écoles
+   avec les types de travaux — qui fait quoi, et pour combien.
+   ==================================================================== */
+const AXES = {
+  annee:     { lib:'Année',           court:'exercice',  cle: d => d.annee },
+  type:      { lib:'Type de travaux', court:'nature',    cle: d => d.type },
+  programme: { lib:'Programme',       court:'programme', cle: d => d.programme || 'Non défini' },
+  secteur:   { lib:'Secteur',         court:'secteur',   cle: d => String(d.secteur).trim() },
+  ecole:     { lib:'École',           court:'école',     cle: d => String(d.ecole || 'Non défini').trim() },
+  etat:      { lib:'État',            court:'état',      cle: d => d.etat }
+};
+const ANNEES_PPI = [2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
+
+function axeLignes()   { return document.getElementById('gantt-group')?.value || 'type'; }
+function axeColonnes() { return document.getElementById('gantt-cols')?.value  || 'annee'; }
+
+/* Un même champ sur les deux axes ne dirait rien : la diagonale seule serait
+   remplie. L'option est donc désactivée dans l'autre liste. */
+function majOptionsAxes() {
+  const l = document.getElementById('gantt-group'), c = document.getElementById('gantt-cols');
+  if (!l || !c) return;
+  [[l, c], [c, l]].forEach(([a, b]) => {
+    Array.from(b.options).forEach(o => { o.disabled = (o.value === a.value); });
+  });
+  if (c.selectedOptions[0]?.disabled) c.value = 'annee';
+  if (l.selectedOptions[0]?.disabled) l.value = (c.value === 'type' ? 'ecole' : 'type');
+}
+
+/* Les valeurs d'un axe ne doivent pas s'évanouir quand on clique l'une
+   d'elles : on les prend donc avant que le filtre portant sur ce champ
+   ne s'applique, exactement comme les huit exercices restaient affichés. */
+function donneesHorsChamp(champ) {
+  const f = filtresCroises;
+  const ok = (c, test) => champ === c || f[c] === undefined || test();
+  return (rawData || []).filter(d =>
+    ok('annee',     () => d.annee === f.annee) &&
+    ok('type',      () => d.type === f.type) &&
+    ok('programme', () => (d.programme || 'Non défini') === f.programme) &&
+    ok('secteur',   () => String(d.secteur).trim() === f.secteur) &&
+    ok('etat',      () => d.etat === f.etat) &&
+    ok('ecole',     () => String(d.ecole).trim() === f.ecole));
+}
+
+function couleurAxe(champ, v) {
+  if (champ === 'annee') return couleurAnnee(parseInt(v));
+  if (champ === 'type')  return couleurType(v);
+  if (champ === 'etat')  return couleurEtat(v);
+  return 'var(--text-muted)';
+}
+function libelleAxe(champ, v) { return champ === 'etat' ? (LIB_ETAT[v] || v) : String(v); }
+
 function renderGantt() {
-  const donnees = donneesFiltrees();
-  const groupBy = document.getElementById('gantt-group')?.value || 'type';
-  const annees = [2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
+  const donnees  = donneesFiltrees();
+  const groupBy  = axeLignes();
+  const colBy    = axeColonnes();
+  const parLigne = AXES[groupBy].cle;
+  const parCol   = AXES[colBy].cle;
   const etatColor = SERIES[themeActuel()];
   const etatOrder = {realise:0, cours:1, consult:2, planifie:3, urgent:4, reporte:5};
 
-  // Grouper les opérations
+  // Les colonnes : les exercices sont une liste arrêtée, le reste se lit
+  // dans les données et se range par budget décroissant.
+  let colonnes;
+  if (colBy === 'annee') {
+    colonnes = ANNEES_PPI.map(String);
+  } else {
+    const poids = {};
+    donneesHorsChamp(colBy).forEach(d => {
+      const k = parCol(d); poids[k] = (poids[k] || 0) + d.montant;
+    });
+    colonnes = Object.entries(poids).sort((a,b) => b[1] - a[1]).map(e => e[0]);
+  }
+
+  const sousTitre = document.getElementById('prog-sous-titre');
+  if (sousTitre) sousTitre.textContent =
+    `Chaque cellule croise ${AXES[groupBy].court} et ${AXES[colBy].court}, et porte son budget` +
+    ` — cliquez-la pour ouvrir le détail de ses opérations.`;
+
+  if (!colonnes.length) {
+    document.getElementById('gantt-body').innerHTML =
+      `<div style="padding:32px 8px;color:var(--text-muted);font-size:13px">Aucune opération ne répond aux filtres en cours.</div>`;
+    return;
+  }
+
+  // Grouper : ligne → colonne → opérations
   const groups = {};
   donnees.forEach(d => {
-    const key = groupBy === 'type' ? d.type :
-                groupBy === 'programme' ? (d.programme || 'Non défini') :
-                groupBy === 'ecole' ? (d.ecole || 'Non défini').trim() :
-                d.secteur.trim();
-    if (!groups[key]) groups[key] = {};
-    const yr = d.annee;
-    if (!groups[key][yr]) groups[key][yr] = [];
-    groups[key][yr].push(d);
+    const kl = parLigne(d), kc = String(parCol(d));
+    if (!groups[kl]) groups[kl] = {};
+    if (!groups[kl][kc]) groups[kl][kc] = [];
+    groups[kl][kc].push(d);
   });
 
-  // Trier les groupes par budget total décroissant
   const sortedGroups = Object.entries(groups).sort((a,b) => {
     const sumA = Object.values(a[1]).flat().reduce((s,d)=>s+d.montant,0);
     const sumB = Object.values(b[1]).flat().reduce((s,d)=>s+d.montant,0);
     return sumB - sumA;
   });
 
-  const colW = 130;
-  // Les noms d'école sont longs : la colonne de gauche s'élargit pour eux.
+  // Les millésimes tiennent en peu de place ; un nom de type de travaux non.
+  const colW  = colBy === 'annee' ? 130 : 124;
   const labelW = groupBy === 'ecole' ? 210 : groupBy === 'secteur' ? 140 : 170;
-  const totalCol = 110;                     // colonne des totaux de ligne
-  const totalW = labelW + annees.length * colW + totalCol;
+  const totalCol = 110;
+  const totalW = labelW + colonnes.length * colW + totalCol;
 
-  // Couleur dominante d'un groupe = état le plus fréquent
   function dominantColor(ops) {
     if (!ops || ops.length === 0) return 'var(--border)';
     const counts = {};
@@ -1889,73 +1989,61 @@ function renderGantt() {
     return etatColor[dom] || etatColor.planifie;
   }
 
-  // Barre de progression état (mini-segments colorés)
   function etatBar(ops) {
-    const total = ops.reduce((s,d)=>s+d.montant,0)||1;
     const byEtat = {};
     ops.forEach(d => byEtat[d.etat] = (byEtat[d.etat]||0) + d.montant);
     const segs = Object.entries(byEtat).sort((a,b)=>(etatOrder[a[0]]||9)-(etatOrder[b[0]]||9));
     return `<div style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:5px;gap:1px">` +
-      // Sans infobulle : ces segments sont minuscules et nombreux, et leur
-      // survol faisait défiler des bulles au moindre déplacement. Le détail
-      // qu'ils portaient s'obtient désormais en cliquant la cellule.
       segs.map(([e,v])=>`<div style="flex:${v};background:${etatColor[e]||etatColor.planifie};min-width:4px"></div>`).join('') +
     `</div>`;
   }
 
   let html = `<div style="min-width:${totalW}px">`;
 
-  // En-tête
-  const LIB_GROUPE = { type:'Type de travaux', programme:'Programme',
-                       ecole:'École', secteur:'Secteur' };
-  const grille = `${labelW}px repeat(${annees.length},${colW}px) ${totalCol}px`;
+  const grille = `${labelW}px repeat(${colonnes.length},${colW}px) ${totalCol}px`;
   html += `<div style="display:grid;grid-template-columns:${grille};border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px">`;
-  html += `<div style="font-size:11px;font-weight:600;color:var(--text-muted);padding:0 8px">${LIB_GROUPE[groupBy] || 'Secteur'}</div>`;
-  const anneeAccents = ANNEE_TEINTES[themeActuel()];
-  annees.forEach(y => {
-    const total = donnees.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
-    html += `<div class="gantt-annee${filtresCroises.annee===y?' gantt-annee-active':''}"
+  html += `<div class="gantt-fige" style="font-size:11px;font-weight:600;color:var(--text-muted);padding:0 8px;display:flex;align-items:flex-end">${AXES[groupBy].lib}</div>`;
+
+  colonnes.forEach(v => {
+    const ops = donnees.filter(d => String(parCol(d)) === v);
+    const total = ops.reduce((s,d)=>s+d.montant,0);
+    const actif = String(filtresCroises[colBy]) === v;
+    const lib = libelleAxe(colBy, v);
+    html += `<div class="gantt-annee${actif?' gantt-annee-active':''}"
       style="text-align:center;padding:2px 8px;cursor:pointer;border-radius:6px"
-      onclick="basculerFiltre('annee',${y})">
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:${anneeAccents[y]}">${y}</div>
+      title="${esc(lib)}"
+      onclick="basculerFiltreAxe('${colBy}', '${esc(String(v)).replace(/'/g,"&#39;")}')">
+      <div class="gantt-col-t" style="font-family:'Syne',sans-serif;font-weight:800;${colBy==='annee'?'font-size:14px;':''}color:${couleurAxe(colBy, v)}">${esc(lib)}</div>
       <div style="font-size:10px;color:var(--text-muted);margin-top:1px">${fmt(total)}</div>
     </div>`;
   });
-  // Colonne des totaux : ce que pèse chaque ligne, tous exercices confondus.
+
   html += `<div style="text-align:right;padding:0 10px">
     <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--text-muted)">Total</div>
-    <div style="font-size:10px;color:var(--text-dim);margin-top:1px">tous exercices</div>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:1px">toutes colonnes</div>
   </div>`;
   html += `</div>`;
 
-  // Lignes
-  sortedGroups.forEach(([key, byYear]) => {
-    const rowTotal = Object.values(byYear).flat().reduce((s,d)=>s+d.montant,0);
-    const baseColor = groupBy === 'type' ? couleurType(key) : dominantColor(Object.values(byYear).flat());
-
+  sortedGroups.forEach(([key, byCol]) => {
+    const rowTotal = Object.values(byCol).flat().reduce((s,d)=>s+d.montant,0);
+    const baseColor = groupBy === 'type' ? couleurType(key) : dominantColor(Object.values(byCol).flat());
     html += `<div class="gantt-ligne" style="display:grid;grid-template-columns:${grille};align-items:center;padding:6px 0">`;
 
-    // Label
-    html += `<div style="padding:0 8px;display:flex;align-items:center;gap:8px">
+    html += `<div class="gantt-fige" style="padding:6px 8px;display:flex;align-items:center;gap:8px">
       <div style="width:10px;height:10px;border-radius:2px;background:${baseColor};flex-shrink:0"></div>
-      <div style="font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${key}">${key}</div>
+      <div style="font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(key)}">${esc(libelleAxe(groupBy, key))}</div>
     </div>`;
 
-    // Cellules par année
-    annees.forEach(y => {
-      const ops = byYear[y];
+    colonnes.forEach(v => {
+      const ops = byCol[v];
       if (!ops || ops.length === 0) {
         html += `<div style="padding:4px 8px;text-align:center"><span style="color:var(--border);font-size:18px">·</span></div>`;
       } else {
         const total = ops.reduce((s,d)=>s+d.montant,0);
         const nb = ops.length;
-        const domColor = dominantColor(ops);
-        // La teinte passe par une propriété personnalisée plutôt que par des
-        // styles en ligne : le survol peut alors la reprendre en CSS, ce qu'un
-        // style en ligne interdirait.
         html += `<div style="padding:4px 8px">
-          <div class="gantt-bloc" style="--c:${domColor}" tabindex="0" role="button"
-               data-g="${esc(key)}" data-a="${y}"
+          <div class="gantt-bloc" style="--c:${dominantColor(ops)}" tabindex="0" role="button"
+               data-g="${esc(key)}" data-c="${esc(String(v))}"
                onclick="ouvrirDetailCellule(this)"
                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
             <div class="gantt-bloc-m">${fmt(total)}</div>
@@ -1966,26 +2054,22 @@ function renderGantt() {
       }
     });
 
-    // Total de la ligne, tous exercices confondus
     html += `<div style="text-align:right;padding:0 10px">
       <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:12.5px;color:var(--text)">${fmt(rowTotal)}</div>
     </div>`;
-
     html += `</div>`;
   });
 
-  // Ligne total
   html += `<div style="display:grid;grid-template-columns:${grille};border-top:2px solid var(--border);margin-top:4px;padding-top:8px;align-items:center">`;
-  html += `<div style="padding:0 8px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text-muted)">TOTAL EXERCICE</div>`;
-  annees.forEach(y => {
-    const total = donnees.filter(d=>d.annee===y).reduce((s,d)=>s+d.montant,0);
-    const nb = donnees.filter(d=>d.annee===y).length;
+  html += `<div class="gantt-fige" style="padding:6px 8px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text-muted)">TOTAL ${AXES[colBy].court.toUpperCase()}</div>`;
+  colonnes.forEach(v => {
+    const ops = donnees.filter(d => String(parCol(d)) === v);
+    const total = ops.reduce((s,d)=>s+d.montant,0);
     html += `<div style="padding:4px 8px;text-align:center">
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:${anneeAccents[y]}">${fmt(total)}</div>
-      <div style="font-size:10px;color:var(--text-dim)">${nb} op.</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:${couleurAxe(colBy, v)}">${fmt(total)}</div>
+      <div style="font-size:10px;color:var(--text-dim)">${ops.length} op.</div>
     </div>`;
   });
-  // Total général, à l'intersection des deux totaux
   const totalGeneral = donnees.reduce((s,d)=>s+d.montant,0);
   html += `<div style="text-align:right;padding:0 10px">
     <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13.5px;color:var(--accent)">${fmt(totalGeneral)}</div>
@@ -1997,6 +2081,12 @@ function renderGantt() {
   document.getElementById('gantt-body').innerHTML = html;
 }
 
+/* Les années voyageaient en nombre, les autres valeurs sont du texte :
+   le filtre les reçoit dans le type qu'attend donneesFiltrees(). */
+function basculerFiltreAxe(champ, valeur) {
+  basculerFiltre(champ, champ === 'annee' ? parseInt(valeur) : valeur);
+}
+
 /* ====================================================================
    Détail d'une cellule du planning
    --------------------------------------------------------------------
@@ -2004,24 +2094,23 @@ function renderGantt() {
    Le panneau répond à la question sans quitter la vue.
    ==================================================================== */
 function ouvrirDetailCellule(el) {
-  // Le groupe et l'année voyagent en attributs de données : les glisser dans
-  // un onclick sous forme de JSON cassait l'attribut dès qu'une valeur
-  // contenait un guillemet.
-  const c = { g: el.dataset.g, a: parseInt(el.dataset.a) };
-  const groupBy = document.getElementById('gantt-group')?.value || 'type';
-  const cle = d => groupBy === 'type' ? d.type
-              : groupBy === 'programme' ? (d.programme || 'Non défini')
-              : groupBy === 'ecole' ? (d.ecole || 'Non défini').trim()
-              : d.secteur.trim();
-  const ops = donneesFiltrees().filter(d => d.annee === c.a && cle(d) === c.g)
-                     .sort((a, b) => b.montant - a.montant);
+  // Le groupe et la colonne voyagent en attributs de données : les glisser
+  // dans un onclick sous forme de JSON cassait l'attribut dès qu'une valeur
+  // contenait un guillemet. La colonne reste du texte, puisqu'elle n'est
+  // plus forcément un millésime.
+  const c = { g: el.dataset.g, c: el.dataset.c };
+  const groupBy = axeLignes(), colBy = axeColonnes();
+  const parLigne = AXES[groupBy].cle, parCol = AXES[colBy].cle;
+  const ops = donneesFiltrees()
+                .filter(d => String(parCol(d)) === c.c && String(parLigne(d)) === c.g)
+                .sort((a, b) => b.montant - a.montant);
   if (!ops.length) return;
 
   const LIB = { type:'Nature des travaux', programme:'Programme',
                 ecole:'École', secteur:'Secteur' };
   document.getElementById('detail-surtitre').textContent =
-    (LIB[groupBy] || 'Secteur') + ' · exercice ' + c.a;
-  document.getElementById('detail-titre').textContent = c.g;
+    (LIB[groupBy] || 'Secteur') + ' · ' + AXES[colBy].court + ' ' + libelleAxe(colBy, c.c);
+  document.getElementById('detail-titre').textContent = libelleAxe(groupBy, c.g);
   document.getElementById('detail-montant').textContent =
     fmt(ops.reduce((s, d) => s + d.montant, 0));
   document.getElementById('detail-nb').textContent = ops.length;
@@ -2715,6 +2804,7 @@ function initApp() {
   anneeSelect.value = validYears.includes(currentYear) ? currentYear : 2026;
   rendreBarreFiltres();
   refreshDashboard(); refreshAnnualDashboard();
+  majOptionsAxes();
   renderGantt(); renderTable(); renderAlertes();
   renderProgressBar(donneesFiltrees());
   startAutoRefresh();
