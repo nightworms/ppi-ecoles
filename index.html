@@ -1930,17 +1930,16 @@ function donneesHorsChamp(champ) {
 /* Dès que les colonnes ne sont plus les exercices, plus rien ne dit quand les
    travaux se font. La cellule porte donc son millésime, dans la teinte qui lui
    est déjà attachée ailleurs dans l'application. Une cellule qui en couvre
-   plusieurs affiche l'étendue, et l'infobulle donne le détail exact. */
+   plusieurs affiche l'étendue ; le détail, ouvert d'un clic, donne l'année de
+   chaque opération. Pas d'attribut « title » ici : le navigateur en ferait une
+   infobulle native — un rectangle noir au survol de chaque cellule — pour la
+   même raison qui les a fait retirer des segments d'état plus haut. */
 function anneesDeCellule(ops) {
   const ans = [...new Set(ops.map(o => parseInt(o.annee)).filter(a => !isNaN(a)))].sort((a,b) => a-b);
   if (!ans.length) return null;
-  if (ans.length === 1) {
-    return { texte: String(ans[0]), couleur: couleurAnnee(ans[0]),
-             infobulle: 'Réalisation : ' + ans[0] };
-  }
+  if (ans.length === 1) return { texte: String(ans[0]), couleur: couleurAnnee(ans[0]) };
   const fin = String(ans[ans.length-1]).slice(-2);
-  return { texte: ans[0] + '–' + fin, couleur: 'var(--text-muted)',
-           infobulle: 'Réalisation : ' + ans.join(', ') };
+  return { texte: ans[0] + '–' + fin, couleur: 'var(--text-muted)' };
 }
 
 function couleurAxe(champ, v) {
@@ -2069,7 +2068,6 @@ function renderGantt() {
         html += `<div style="padding:4px 8px">
           <div class="gantt-bloc" style="--c:${dominantColor(ops)}" tabindex="0" role="button"
                data-g="${esc(key)}" data-c="${esc(String(v))}"
-               ${an ? `title="${esc(an.infobulle)}"` : ''}
                onclick="ouvrirDetailCellule(this)"
                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
             <div class="gantt-bloc-m">${fmt(total)}</div>
@@ -2151,6 +2149,8 @@ function ouvrirDetailCellule(el) {
       <div class="detail-op-b">
         <span>${esc(o.type)}</span>
         ${etatBadge(o.etat)}
+        ${colBy === 'annee' ? '' :
+          `<span style="font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:${couleurAnnee(parseInt(o.annee))}">${esc(o.annee)}</span>`}
         <span class="detail-op-s">${esc(o.secteur)}</span>
       </div>
       ${o.notes ? `<div class="detail-op-n">${esc(o.notes)}</div>` : ''}
