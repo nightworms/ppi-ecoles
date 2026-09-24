@@ -906,6 +906,16 @@
     .nav-btn { padding: 8px 8px; font-size: 12px; }
     .header-right { gap: 7px; }
   }
+
+  /* Neuf onglets : « Maintenance DTT », le plus long, se coupe en deux lignes
+     dès que la barre se comprime. Sur un écran large il y a la place, et on la
+     prend. En dessous, on laisse faire : c'est la coupure du libellé qui
+     absorbe le manque de place, et l'empêcher ferait sortir le bouton Sync de
+     l'écran — mesuré à 1 594 px comme à 1 514 px. */
+  @media (min-width: 1800px) {
+    .nav-btn { white-space: nowrap; }
+  }
+
 </style>
   <link rel="stylesheet" href="carte.css?v=68">
 </head>
@@ -949,11 +959,13 @@
     <button class="nav-btn" onclick="showPage('dashboard-annee')">📅 Vue annuelle</button>
     <button class="nav-btn" onclick="showPage('programmation')">📋 Programmation</button>
     <button class="nav-btn" onclick="location.href='arbitrage.html'">⚖️ Arbitrage</button>
-    <button class="nav-btn" onclick="location.href='entretien.html'">🧰 Maintenance DTT</button>
     <button class="nav-btn" onclick="showPage('travaux')">🔨 Travaux</button>
     <button class="nav-btn" onclick="showPage('alertes')">🚨 Alertes</button>
     <button class="nav-btn" onclick="showPage('carte')">🗺 Carte</button>
     <button class="nav-btn" onclick="showPage('controle')">🔎 Contrôle</button>
+    <!-- La maintenance DTT ferme la navigation : elle ne relève pas du plan
+         pluriannuel, et ses montants n'entrent pas dans sa comptabilité. -->
+    <button class="nav-btn" onclick="location.href='entretien.html'">🧰 Maintenance DTT</button>
   </nav>
   <div class="header-right">
     <button id="btn-theme" class="btn-theme" onclick="basculerTheme()"
