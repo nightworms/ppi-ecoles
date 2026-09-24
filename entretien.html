@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Arbitrage de la programmation — PPI Écoles</title>
+<title>Petit entretien — suivi d'exécution — PPI Écoles</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
@@ -25,7 +25,6 @@ body{margin:0;background:var(--bg);color:var(--text);
   font-family:'DM Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;
   -webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:'Syne',sans-serif;font-weight:700;margin:0;line-height:1.15}
-.mono{font-variant-numeric:tabular-nums}
 .wrap{max-width:1560px;margin:0 auto;padding-inline:22px}
 a{color:var(--accent2)}
 
@@ -35,23 +34,25 @@ header{background:var(--surface);border-bottom:1px solid var(--border);position:
 .fil{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)}
 .qui{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--text-muted)}
 .qui b{color:var(--text);font-weight:500}
-.avance{font-size:.8rem;color:var(--text-muted);text-align:right}
-.avance b{display:block;font-size:1.2rem;color:var(--accent);font-weight:700;line-height:1.1}
+.btn-theme{background:transparent;border:1px solid var(--border);color:var(--text-muted);
+  border-radius:7px;width:34px;height:34px;cursor:pointer;font-size:1rem;line-height:1}
 
-.env{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:1px;
+.env{display:grid;grid-template-columns:repeat(auto-fit,minmax(124px,1fr));gap:1px;
   background:var(--surface2);border:1px solid var(--border);border-radius:8px;
   margin-block:14px;overflow:hidden}
-.env>div{background:var(--surface2);padding:9px 12px;outline:1px solid var(--border);outline-offset:0}
+.env>div{background:var(--surface2);padding:9px 12px;outline:1px solid var(--border)}
 .env .an{font-size:.68rem;letter-spacing:.11em;color:var(--text-dim);text-transform:uppercase}
 .env .mt{font-size:1.02rem;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
 .env .nb{font-size:.7rem;color:var(--text-dim);margin-top:1px}
-.env .tot{background:#1a2230} .env .tot .mt{color:var(--accent)}
-.env .dtt .mt{color:var(--accent2)}
+.env .fait .mt{color:var(--accent4)}
+.env .prog .mt{color:var(--accent2)}
+.env .tot .mt{color:var(--accent)}
 
 .filtres{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-bottom:14px}
 .filtres span.lb{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim)}
-select,input[type=search],input[type=email],input[type=number]{font-family:inherit;font-size:.82rem;
-  padding:6px 9px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+select,input[type=search],input[type=email],input[type=number],input[type=date],input[type=text]{
+  font-family:inherit;font-size:.82rem;padding:6px 9px;border-radius:6px;
+  border:1px solid var(--border);background:var(--bg);color:var(--text)}
 input[type=search]{min-width:180px}
 .pill{font-size:.72rem;font-weight:700;padding:5px 11px;border-radius:6px;border:1px solid var(--border);
   background:transparent;color:var(--text-muted);cursor:pointer;font-family:inherit}
@@ -60,15 +61,16 @@ input[type=search]{min-width:180px}
 
 main{padding-block:18px 70px}
 .ligne{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:7px;
-  display:grid;grid-template-columns:46px minmax(160px,1.4fr) minmax(130px,1fr) 34px minmax(170px,2fr) auto;
+  display:grid;grid-template-columns:46px minmax(150px,1.3fr) minmax(120px,.9fr) 34px minmax(160px,1.8fr) auto;
   gap:13px;align-items:center;padding:10px 13px}
-.ligne.ppi{border-left:3px solid var(--accent)}
-.ligne.entretien{border-left:3px solid var(--accent2)}
-.ligne.ecarte{opacity:.5}
-.ligne.verse{box-shadow:inset 0 0 0 1px var(--accent4)}
+.ligne.st-programme{border-left:3px solid var(--accent2)}
+.ligne.st-termine{border-left:3px solid var(--accent4)}
+.ligne.st-sans_suite{opacity:.5;border-left:3px solid var(--text-dim)}
 .rg{font-size:.7rem;font-weight:700;text-align:center;border-radius:5px;padding:4px 0}
 .rg.P1{background:var(--accent3);color:#fff} .rg.P2{background:#c9772f;color:#fff}
 .rg.P3{background:#3a4657;color:var(--text-muted)} .rg.P4,.rg.x{background:#232c3a;color:var(--text-dim)}
+body.jour .rg.P3{background:#e3dccc;color:var(--text-muted)}
+body.jour .rg.P4,body.jour .rg.x{background:#ece5d5;color:var(--text-dim)}
 .ec{font-weight:500;line-height:1.25}
 .ec small{display:block;color:var(--text-dim);font-weight:400;font-size:.7rem;letter-spacing:.04em}
 .po{font-size:.82rem;color:var(--text-muted)}
@@ -76,37 +78,44 @@ main{padding-block:18px 70px}
 .nt.v4{background:var(--accent3);color:#fff} .nt.v3{background:#c9772f;color:#fff}
 .nt.v2{background:#3d3520;color:var(--accent)} .nt.v1{background:#223424;color:var(--accent4)}
 .nt.v0{background:#232c3a;color:var(--text-dim)}
+body.jour .nt.v2{background:#f3e7c9;color:var(--accent)}
+body.jour .nt.v1{background:#dfeacf;color:var(--accent4)}
+body.jour .nt.v0{background:#ece5d5;color:var(--text-dim)}
 .ctx{font-size:.78rem;color:var(--text-muted);line-height:1.35}
 .ctx .src{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);margin-right:6px}
-.ctx button{background:none;border:0;color:var(--accent2);cursor:pointer;font:inherit;font-size:.74rem;padding:0}
+
 .dec{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .dgrp{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden;
   box-shadow:0 1px 0 var(--ombre)}
-.dgrp button{font-size:.72rem;font-weight:700;padding:7px 13px;border:0;background:var(--surface2);
+.dgrp button{font-size:.72rem;font-weight:700;padding:7px 12px;border:0;background:var(--surface2);
   color:var(--text);cursor:pointer;border-right:1px solid var(--border);font-family:inherit;
-  transition:background .12s,color .12s}
-.dgrp button:hover{background:var(--accent);color:#141414}
-.dgrp button.d2:hover{background:var(--accent2);color:#08201f}
-.dgrp button.d3:hover{background:var(--text-dim);color:var(--surface)}
-.dgrp button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  transition:background .12s,color .12s;white-space:nowrap}
 .dgrp button:last-child{border-right:0}
-.dgrp button[aria-pressed="true"]{background:var(--accent);color:#141414}
-.dgrp button.d2[aria-pressed="true"]{background:var(--accent2);color:#08201f}
-.dgrp button.d3[aria-pressed="true"]{background:#3a4657;color:var(--text)}
-.dec input[type=number]{width:100px;text-align:right;font-variant-numeric:tabular-nums}
-.versee{font-size:.7rem;font-weight:700;letter-spacing:.04em;padding:6px 11px;border-radius:7px;
-  background:var(--accent4);color:#fff;white-space:nowrap}
-.bt-reprendre{font-family:inherit;font-size:.72rem;font-weight:700;padding:6px 12px;border-radius:7px;
-  border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer}
-.bt-reprendre:hover{border-color:var(--accent3);color:var(--accent3)}
-.dec .manque{border-color:var(--accent);background:#2a2415}
-.detail{grid-column:1/-1;border-top:1px solid var(--border);margin-top:9px;padding-top:10px;
-  font-size:.8rem;color:var(--text-muted);line-height:1.45;display:flex;flex-direction:column;gap:8px}
-.detail b{color:var(--text);font-weight:500}
-.detail .tag{font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);display:block}
+.dgrp button:hover{background:var(--accent2);color:#08201f}
+.dgrp button.s3:hover{background:var(--accent4);color:#fff}
+.dgrp button.s4:hover{background:var(--text-dim);color:var(--surface)}
+.dgrp button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.dgrp button[aria-pressed="true"]{background:var(--accent2);color:#08201f}
+.dgrp button.s3[aria-pressed="true"]{background:var(--accent4);color:#fff}
+.dgrp button.s4[aria-pressed="true"]{background:#3a4657;color:var(--text)}
+body.jour .dgrp button.s4[aria-pressed="true"]{background:#ddd4c2;color:var(--text)}
+.dec input[type=number]{width:96px;text-align:right;font-variant-numeric:tabular-nums}
+.dec input[type=date]{width:136px}
+.dec label{font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);
+  display:flex;flex-direction:column;gap:3px}
+.suite{grid-column:1/-1;border-top:1px solid var(--border);margin-top:9px;padding-top:10px;
+  display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.suite label{flex:0 0 auto}
+.suite .libre{flex:1 1 260px}
+.suite .libre input{width:100%}
+.faitle{font-size:.7rem;color:var(--text-dim);align-self:center}
+
 .consigne{margin:0 0 14px;padding:11px 15px;background:var(--surface);border:1px solid var(--border);
-  border-left:3px solid var(--accent);border-radius:7px;font-size:.83rem;color:var(--text-muted);max-width:none}
+  border-left:3px solid var(--accent2);border-radius:7px;font-size:.83rem;color:var(--text-muted)}
 .consigne b{color:var(--text)}
+.horsppi{margin:0 0 16px;padding:11px 15px;background:var(--surface);border:1px solid var(--border);
+  border-left:3px solid var(--accent);border-radius:7px;font-size:.83rem;color:var(--text-muted)}
+.horsppi b{color:var(--text)}
 .hidden{display:none!important}
 .vide{text-align:center;padding:48px 20px;color:var(--text-dim)}
 
@@ -124,25 +133,20 @@ main{padding-block:18px 70px}
   border-radius:10px;padding:26px}
 .connexion h2{font-size:1.15rem;margin-bottom:8px}
 .connexion p{color:var(--text-muted);font-size:.86rem;margin:0 0 16px}
-.connexion form{display:flex;gap:8px}
-.connexion input{flex:1}
+.connexion form{display:flex;gap:8px;flex-wrap:wrap}
+.connexion input{flex:1 1 200px}
+.connexion .ou{margin:18px 0 10px;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-dim);border-top:1px solid var(--border);padding-top:14px}
 #etat{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:var(--surface2);
   border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:8px;font-size:.82rem;
-  z-index:70;opacity:0;pointer-events:none;transition:opacity .2s;box-shadow:0 6px 24px var(--ombre);max-width:80vw}
+  box-shadow:0 6px 24px var(--ombre);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60;
+  max-width:min(620px,90vw)}
 #etat.on{opacity:1}
-body.jour .rg.P3{background:#e4ddcc;color:var(--text-muted)}
-body.jour .rg.P4,body.jour .rg.x{background:#eae4d6;color:var(--text-dim)}
-body.jour .nt.v2{background:#f4e6c4;color:#8a6a10}
-body.jour .nt.v1{background:#dfeccf;color:#3f6b24}
-body.jour .nt.v0{background:#eae4d6;color:var(--text-dim)}
-body.jour .dec .manque{background:#f9edd2}
-body.jour .env .tot{background:#f3ead7}
-.btn-theme{background:none;border:1px solid var(--border);color:var(--text-muted);
-  border-radius:7px;width:32px;height:32px;cursor:pointer;font-size:.95rem;line-height:1}
-.btn-theme:hover{color:var(--accent);border-color:var(--accent)}
-@media (max-width:1150px){
-  .ligne{grid-template-columns:42px 1fr 34px;row-gap:9px}
-  .ligne .po{grid-column:2/4} .ligne .ctx{grid-column:1/-1} .dec{grid-column:1/-1;justify-content:flex-start}
+
+@media (max-width:980px){
+  .ligne{grid-template-columns:44px 1fr auto;gap:9px}
+  .po,.nt,.ctx{grid-column:1/-1}
+  .dec{justify-content:flex-start}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -152,29 +156,25 @@ body.jour .env .tot{background:#f3ead7}
 <header><div class="wrap">
   <div class="htop">
     <div><div class="fil"><a href="./" style="color:var(--text-dim);text-decoration:none">← Tableau de bord PPI</a>
-           · Direction de l'Éducation · Saint-Denis de La Réunion</div>
-         <h1>Arbitrage de la programmation</h1></div>
+           · Direction des travaux du territoire</div>
+         <h1>Petit entretien — suivi d'exécution</h1></div>
     <button id="btn-theme" class="btn-theme" onclick="basculerTheme()" title="Changer de thème">☾</button>
     <div class="qui" id="qui"></div>
-    <div class="avance"><b id="pfait">0</b><span>arbitrées sur <span id="ptot">—</span></span></div>
   </div>
   <div class="env" id="env"></div>
   <div class="filtres" id="barre">
-    <span class="lb">Priorité</span>
-    <button class="pill" data-f="rang" data-v="" aria-pressed="false">Toutes</button>
-    <button class="pill" data-f="rang" data-v="P1" aria-pressed="true">P1</button>
-    <button class="pill" data-f="rang" data-v="P2" aria-pressed="false">P2</button>
-    <button class="pill" data-f="rang" data-v="P3" aria-pressed="false">P3</button>
-    <button class="pill" data-f="rang" data-v="P4" aria-pressed="false">P4</button>
-    <button class="pill" data-f="rang" data-v="—" aria-pressed="false">Non classées</button>
-    <span class="lb" style="margin-left:8px">État</span>
-    <select id="fdec">
-      <option value="">Tous</option><option value="0">À arbitrer</option>
-      <option value="ppi">Retenues au PPI</option><option value="entretien">Petit entretien</option>
-      <option value="ecarte">Écartées</option><option value="verse">Déjà versées au plan</option>
+    <span class="lb">Avancement</span>
+    <button class="pill" data-f="statut" data-v="" aria-pressed="true">Toutes</button>
+    <button class="pill" data-f="statut" data-v="a_faire" aria-pressed="false">À faire</button>
+    <button class="pill" data-f="statut" data-v="programme" aria-pressed="false">Programmées</button>
+    <button class="pill" data-f="statut" data-v="termine" aria-pressed="false">Terminées</button>
+    <button class="pill" data-f="statut" data-v="sans_suite" aria-pressed="false">Sans suite</button>
+    <span class="lb" style="margin-left:8px">Priorité</span>
+    <select id="frang">
+      <option value="">Toutes</option><option value="P1">P1</option><option value="P2">P2</option>
+      <option value="P3">P3</option><option value="P4">P4</option>
     </select>
     <select id="fsect"><option value="">Tous les secteurs</option></select>
-    <select id="fposte"><option value="">Tous les postes</option></select>
     <input type="search" id="fq" placeholder="Rechercher une école…" aria-label="Rechercher une école">
     <span class="cnt" id="cnt"></span>
   </div>
@@ -183,47 +183,48 @@ body.jour .env .tot{background:#f3ead7}
 <main><div class="wrap">
   <div id="connexion" class="connexion hidden">
     <h2>Connexion</h2>
-    <p>L'arbitrage est réservé aux membres de la Direction. Saisissez votre adresse :
-       un lien de connexion vous sera envoyé.</p>
-    <form id="fconn"><input type="email" id="mail" placeholder="prenom.nom@saintdenis.re" required>
-      <button class="bt" type="submit">Recevoir le lien</button></form>
+    <p>Cette page est réservée aux agents de la Direction des travaux du territoire
+       et de la Direction de l'Éducation.</p>
+    <form id="fmdp">
+      <input type="email" id="mail2" placeholder="adresse professionnelle" required autocomplete="username">
+      <input type="password" id="mdp" placeholder="mot de passe" required autocomplete="current-password"
+             style="flex:1 1 200px;font-family:inherit;font-size:.82rem;padding:6px 9px;border-radius:6px;
+                    border:1px solid var(--border);background:var(--bg);color:var(--text)">
+      <button class="bt" type="submit">Entrer</button>
+    </form>
+    <div class="ou">Ou, si vous n'avez pas de mot de passe</div>
+    <form id="fconn"><input type="email" id="mail" placeholder="adresse professionnelle" required>
+      <button class="bt sec" type="submit">Recevoir un lien</button></form>
     <div class="note" id="noteconn"></div>
   </div>
 
   <div id="appli">
-    <p class="consigne">Pour chaque intervention, choisissez sa destination à droite de la ligne :
-       <b>PPI</b> pour l'inscrire au plan — l'année, le type et le montant s'ouvrent alors —,
-       <b>Entretien</b> pour la confier à la Direction des travaux du territoire,
-       <b>Écarter</b> pour la laisser sans suite. Tout est enregistré aussitôt.
-       Une intervention déjà versée au plan se reprend par le bouton <b>Reprendre</b> :
-       son opération est alors retirée du plan et la décision se rouvre.</p>
+    <p class="consigne">Ces interventions vous sont confiées par la Direction de l'Éducation, au terme
+       de son arbitrage. Pour chacune : <b>Programmée</b> avec la date à laquelle vous prévoyez
+       d'intervenir, <b>Terminée</b> une fois le travail fait — la date du jour se met alors seule si
+       vous n'en saisissez pas d'autre —, <b>Sans suite</b> si l'intervention ne relève pas de vos
+       services. Le montant et la note sont facultatifs. Tout est enregistré aussitôt.</p>
+    <p class="horsppi"><b>Ces montants sont hors PPI.</b> Ils sont totalisés ici pour votre suivi,
+       mais n'entrent pas dans la comptabilité du plan pluriannuel d'investissement : ils ne
+       rejoignent jamais le plan lui-même.</p>
     <div id="liste"></div>
     <div class="vide hidden" id="vide">Aucune intervention ne correspond à ces filtres.</div>
 
     <section class="panneau">
-      <h2>Verser les arbitrages au plan</h2>
-      <p>Les interventions retenues au PPI, pourvues d'une année et d'un montant, deviennent des
-         opérations du plan : elles apparaîtront dans le tableau de bord, la carte et les exports,
-         au même titre que les lignes existantes. Une intervention déjà versée est marquée et ne
-         peut pas l'être deux fois. Le deuxième bouton reprend <b>exactement la liste que vos
-         filtres désignent</b>, arbitrée ou non — de quoi sortir le tableau d'un secteur, d'un
-         poste ou d'une priorité pour le porter en réunion.</p>
+      <h2>Exporter</h2>
+      <p>Le tableau reprend l'état d'avancement tel qu'il est à cet instant, filtres compris.</p>
       <div class="bts">
-        <button class="bt" id="verser">Verser au plan les interventions prêtes</button>
-        <button class="bt sec" id="expDTT">Petit entretien → DTT (.csv)</button>
-        <button class="bt gh" onclick="location.href='entretien.html'">Suivi d'exécution DTT</button>
         <button class="bt sec" id="expVue">Exporter la liste affichée</button>
-        <button class="bt gh" id="expCSV">Export CSV de l'arbitrage</button>
+        <button class="bt gh" id="expTout">Exporter tout le petit entretien</button>
       </div>
       <div class="note" id="notepan"></div>
     </section>
   </div>
 </div></main>
+
 <div id="etat" role="status" aria-live="polite"></div>
 
 <script>
-/* Même mécanisme que le tableau de bord : classe « jour » sur le corps,
-   préférence conservée sous la clé ppi:theme. Le choix suit d'une page à l'autre. */
 function themeActuel(){ return document.body.classList.contains('jour') ? 'jour' : 'nuit'; }
 function appliquerTheme(t, memoriser){
   document.body.classList.toggle('jour', t === 'jour');
@@ -236,13 +237,11 @@ function basculerTheme(){ appliquerTheme(themeActuel() === 'jour' ? 'nuit' : 'jo
 (function(){
   var t;
   try { t = localStorage.getItem('ppi:theme'); } catch (e) {}
-  // Même règle que le tableau de bord : l'ivoire est le mode par défaut,
-  // seul un choix explicite de « nuit » passe la page en sombre.
   appliquerTheme(t !== 'nuit' ? 'jour' : 'nuit', false);
 })();
 </script>
 <script src="donnees/config.js"></script>
 <script src="donnees/source.js"></script>
-<script src="arbitrage.js?v=4"></script>
+<script src="entretien.js?v=1"></script>
 </body>
 </html>
